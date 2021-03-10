@@ -112,9 +112,9 @@ kotlin {
     }
 }
 
+/*
 task generateKotlinCommonGrammarSource(type: AntlrKotlinTask) {
-    def fc = project.buildscript.configurations.classpath.filter { true }
-    antlrClasspath fc
+    antlrClasspath project.buildscript.configurations.classpath.fileCollection { true }
     maxHeapSize "64m"
     packageName "com.strumenta.antlrkotlin.examples"
     arguments += ["-no-visitor", "-no-listener"]
@@ -124,7 +124,7 @@ task generateKotlinCommonGrammarSource(type: AntlrKotlinTask) {
     // outputDirectory is required, put it into the build directory
     // if you do not want to add the generated sources to version control
     outputDirectory new File("build/generated-src/commonAntlr/kotlin")
-}
+}*/
 
-compileKotlinJvm.dependsOn("generateKotlinCommonGrammarSource")
+//compileKotlinJvm.dependsOn("generateKotlinCommonGrammarSource")
 

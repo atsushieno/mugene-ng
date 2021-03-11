@@ -261,23 +261,24 @@ class MmlComparisonExprResolver(expr: MmlComparisonExpr) : MmlValueExprResolver(
         expr.left.resolver.resolve(ctx, type)
         expr.right.resolver.resolve(ctx, type)
         // FIXME: make sure that this actually works...
-        when (expr.comparisonType) {
-            ComparisonType.Lesser -> {
-                resolvedValue =
-                    if ((expr.left.resolver.resolvedValue as Comparable<*>).compareTo(expr.right.resolver.resolvedValue as Comparable<*>) < 0) 1 else 0
-            }
-            ComparisonType.LesserEqual -> {
-                resolvedValue =
-                    if ((expr.left.resolver.resolvedValue as Comparable<*>).compareTo(expr.right.resolver.resolvedValue as Comparable<*>) <= 0) 1 else 0
-            }
-            ComparisonType.Greater -> {
-                resolvedValue =
-                    if ((expr.left.resolver.resolvedValue as Comparable<*>).compareTo(expr.right.resolver.resolvedValue as Comparable<*>) > 0) 1 else 0
-            }
-            ComparisonType.GreaterEqual -> {
-                resolvedValue =
-                    if ((expr.left.resolver.resolvedValue as Comparable<*>).compareTo(expr.right.resolver.resolvedValue as Comparable<*>) >= 0) 1 else 0
-            }
+        if (type == MmlDataType.String) {
+            val l = expr.left.resolver.resolvedValue.toString()
+            val r = expr.left.resolver.resolvedValue.toString()
+            resolvedValue = if (when (expr.comparisonType) {
+                ComparisonType.Lesser -> l < r
+                ComparisonType.LesserEqual -> l <= r
+                ComparisonType.Greater -> l > r
+                ComparisonType.GreaterEqual -> l >= r
+            }) 1 else 0
+        } else {
+            val l = expr.left.resolver.getDoubleValue(ctx)
+            val r = expr.left.resolver.getDoubleValue(ctx)
+            resolvedValue = if (when (expr.comparisonType) {
+                ComparisonType.Lesser -> l < r
+                ComparisonType.LesserEqual -> l <= r
+                ComparisonType.Greater -> l > r
+                ComparisonType.GreaterEqual -> l >= r
+            }) 1 else 0
         }
     }
 }

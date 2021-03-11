@@ -1,14 +1,7 @@
 package dev.atsushieno.mugene
 
 import dev.atsushieno.mugene.parser.MugeneParser
-import dev.atsushieno.mugene.parser.MugeneParserVisitor
 import org.antlr.v4.kotlinruntime.*
-import org.antlr.v4.kotlinruntime.tree.ErrorNode
-import org.antlr.v4.kotlinruntime.tree.ParseTree
-import org.antlr.v4.kotlinruntime.tree.RuleNode
-import org.antlr.v4.kotlinruntime.tree.TerminalNode
-import org.antlr.v4.kotlinruntime.tree.pattern.DEFAULT_CHANNEL
-import java.lang.UnsupportedOperationException
 
 class MmlSemanticTreeSet {
     constructor() {
@@ -213,6 +206,7 @@ class MmlDivideExpr : MmlArithmeticExpr {
 class MmlModuloExpr : MmlArithmeticExpr {
     constructor (left: MmlValueExpr, right: MmlValueExpr)
             : super(left, right) {
+        resolver = MmlModuloExprResolver(this)
     }
 
     override fun toString(): String = "$left % $right"
@@ -224,6 +218,7 @@ class MmlConditionalExpr : MmlValueExpr {
         this.condition = condition
         this.trueExpr = trueExpr
         this.falseExpr = falseExpr
+        resolver = MmlConditionalExprResolver(this)
     }
 
     lateinit var condition: MmlValueExpr
@@ -239,6 +234,7 @@ class MmlComparisonExpr : MmlValueExpr {
         this.left = left
         this.right = right
         comparisonType = type
+        resolver = MmlComparisonExprResolver(this)
     }
 
     lateinit var left: MmlValueExpr

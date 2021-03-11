@@ -321,7 +321,7 @@ enum class MmlDataType {
     }
 
     val number: Int
-    val dots: Int
+    var dots: Int
     var isValueByStep: Boolean
 
     fun getSteps(numerator: Int): Int {

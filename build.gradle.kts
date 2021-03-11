@@ -80,7 +80,11 @@ kotlin {
                 implementation(kotlin("test-annotations-common"))
             }
         }
-        val jvmMain by getting
+        val jvmMain by getting {
+            dependencies {
+                implementation("dev.atsushieno:ktmidi-jvm:0.1.2")
+            }
+        }
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
@@ -114,8 +118,8 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
         project.dependencies.create("com.strumenta.antlr-kotlin:antlr-kotlin-target:-SNAPSHOT")
     )
     maxHeapSize = "64m"
-    packageName = "dev.atsushieno.mugene"
-    arguments = listOf("-no-visitor", "-no-listener")
+    packageName = "dev.atsushieno.mugene.parser"
+    arguments = listOf("-listener", "-visitor")
     source = project.objects
         .sourceDirectorySet("antlr", "antlr")
         .srcDir("src/commonAntlr/antlr").apply {

@@ -1,5 +1,13 @@
 package dev.atsushieno.mugene
 
+import dev.atsushieno.mugene.parser.MugeneParser
+import dev.atsushieno.mugene.parser.MugeneParserVisitor
+import org.antlr.v4.kotlinruntime.*
+import org.antlr.v4.kotlinruntime.tree.ErrorNode
+import org.antlr.v4.kotlinruntime.tree.ParseTree
+import org.antlr.v4.kotlinruntime.tree.RuleNode
+import org.antlr.v4.kotlinruntime.tree.TerminalNode
+import org.antlr.v4.kotlinruntime.tree.pattern.DEFAULT_CHANNEL
 import java.lang.UnsupportedOperationException
 
 class MmlSemanticTreeSet {
@@ -262,17 +270,17 @@ class MmlOperationUse {
     constructor (name: String, location: MmlLineInfo?) {
         this.name = name
         this.location = location
-        this.arguments = mutableListOf<MmlValueExpr>()
+        this.arguments = mutableListOf()
     }
 
     val name: String
 
     var location: MmlLineInfo?
 
-    val arguments: MutableList<MmlValueExpr>
+    val arguments: MutableList<MmlValueExpr?>
 
     override fun toString(): String {
-        var args = mutableListOf<String>()
+        val args = mutableListOf<String>()
         for (i in 0 until args.size)
             args.add(arguments[i].toString())
         return "$name { ${arguments.joinToString { a -> a.toString() }} }"
@@ -291,9 +299,9 @@ class MmlOperationUse {
             }
         }
         for (i in 0 until arguments.size) {
-            var arg = arguments[i]
-            var type = if (i < types.size) types[i] else MmlDataType.Any
-            arg.resolver.resolve(ctx, type)
+            val arg = arguments[i]
+            val type = if (i < types.size) types[i] else MmlDataType.Any
+            arg!!.resolver.resolve(ctx, type)
         }
     }
 }
@@ -304,7 +312,7 @@ class MmlOperationUse {
 class MmlSemanticTreeBuilder {
     companion object {
         fun compile(tokenSet: MmlTokenSet, contextCompiler: MmlCompiler): MmlSemanticTreeSet {
-            var b = MmlSemanticTreeBuilder(tokenSet, contextCompiler)
+            val b = MmlSemanticTreeBuilder(tokenSet, contextCompiler)
             b.compile()
             return b.result
         }
@@ -323,9 +331,9 @@ class MmlSemanticTreeBuilder {
     lateinit var result: MmlSemanticTreeSet
 
     private fun compile() {
-        var metaTrack = MmlSemanticTrack(0.0)
+        val metaTrack = MmlSemanticTrack(0.0)
         for (p in tokenSet.metaTexts) {
-            var use = MmlOperationUse(MmlPrimitiveOperation.MidiMeta.name, null)
+            val use = MmlOperationUse(MmlPrimitiveOperation.MidiMeta.name, null)
             use.arguments.add(MmlConstantExpr(p.typeLocation, MmlDataType.Number, p.metaType))
             use.arguments.add(MmlConstantExpr(p.textLocation, MmlDataType.String, p.text))
             metaTrack.data.add(use)
@@ -344,20 +352,32 @@ class MmlSemanticTreeBuilder {
             result.tracks.add(buildTrackOperationList(track))
     }
 
+    private fun antlrCompile(compiler: MmlCompiler, stream: TokenStream) : Any {
+        val tokenStream = CommonTokenStream(WrappedTokenSource(stream))
+        val parser = MugeneParser(tokenStream)
+        val tree = parser.expressionOrOptOperationUses()
+        val visitor = MugeneParserVisitorImpl(compiler)
+        return visitor.visit(tree)!!
+    }
+
     private fun buildVariableDeclaration(src: MmlVariableDefinition): MmlSemanticVariable {
-        var ret = MmlSemanticVariable(src.location, src.name, src.type)
+        val ret = MmlSemanticVariable(src.location, src.name, src.type)
 
         if (src.defaultValueTokens.size == 0)
             return ret
 
-        var stream = TokenStream(src.defaultValueTokens, src.location)
-        ret.defaultValue = Parser.MmlParser(compiler, stream.source).ParseExpression()
+        // This is the rewritten code for Kotlin...
+        val stream = TokenStream(src.defaultValueTokens, src.location)
+        ret.defaultValue = antlrCompile(compiler, stream) as MmlValueExpr
+        // ...end of that.
+
+        //ret.defaultValue = Parser.MmlParser(compiler, stream.source).ParseExpression()
 
         return ret
     }
 
     private fun buildMacroOperationList(src: MmlMacroDefinition): MmlSemanticMacro {
-        var ret = MmlSemanticMacro(src.location, src.name, src.targetTracks)
+        val ret = MmlSemanticMacro(src.location, src.name, src.targetTracks)
 
         for (arg in src.arguments)
             ret.arguments.add(buildVariableDeclaration(arg))
@@ -368,14 +388,14 @@ class MmlSemanticTreeBuilder {
     }
 
     private fun buildTrackOperationList(src: MmlTrack): MmlSemanticTrack {
-        var ret = MmlSemanticTrack(src.number)
+        val ret = MmlSemanticTrack(src.number)
         if (ret.data.any())
             compileOperationTokens(ret.data, TokenStream(src.tokens, ret.data.first().location!!))
         return ret
     }
 
     private fun compileOperationTokens(data: MutableList<MmlOperationUse>, stream: TokenStream) {
-        data.addAll(Parser.MmlParser(compiler, stream.source).ParseOperations())
+        data.addAll(antlrCompile(compiler, stream) as List<MmlOperationUse>)
     }
 }
 
@@ -413,13 +433,13 @@ class MmlMacroExpander {
     private val expansionStack = mutableListOf<MmlSemanticMacro>()
 
     private fun expand() {
-        var ctx = MmlResolveContext(source, null, compiler)
+        val ctx = MmlResolveContext(source, null, compiler)
 
         // resolve variables without any context.
         for (variable in source.variables.values) {
             if (variable.defaultValue == null)
                 variable.fillDefaultValue()
-            var defValue = variable.defaultValue
+            val defValue = variable.defaultValue
             if (defValue == null)
                 throw Exception("INTERNAL ERROR: no default value for " + variable.name)
             defValue.resolver.resolve(ctx, variable.type)

@@ -423,7 +423,7 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
         list: List<MmlOperationUse>,
         start: Int,
         count: Int,
-        extraTailArgs: List<MmlValueExpr>
+        extraTailArgs: List<MmlValueExpr?>
     ) {
         var storeIndex = -1
         var storeCurrentOutput: MutableList<MmlResolvedEvent>? = null
@@ -436,20 +436,22 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
             var extraTailArgsIfApplied =
                 if (listIndex == start + count - 1) extraTailArgs else null
 
+            var arguments = oper.arguments.requireNoNulls()
+
             when (oper.name) {
                 "__PRINT" -> {
-                    oper.arguments[0].resolver.resolve(rctx, MmlDataType.String)
+                    arguments[0].resolver.resolve(rctx, MmlDataType.String)
                     compiler.report(
                         MmlDiagnosticVerbosity.Information,
                         oper.location,
-                        oper.arguments[0].resolver.stringValue,
-                        extraTailArgs
+                        arguments[0].resolver.stringValue,
+                        extraTailArgs.requireNoNulls()
                     )
                     break
                 }
                 "__LET" -> {
-                    oper.arguments[0].resolver.resolve(rctx, MmlDataType.String)
-                    val name = oper.arguments[0].resolver.stringValue
+                    arguments[0].resolver.resolve(rctx, MmlDataType.String)
+                    val name = arguments[0].resolver.stringValue
                     var variable = source.variables.get(name) as MmlSemanticVariable
                     if (variable == null) {
                         compiler.report(
@@ -459,16 +461,16 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                             listOf()
                         )
                     } else {
-                        oper.arguments[1].resolver.resolve(rctx, variable.type)
-                        rctx.values[variable] = oper.arguments[1].resolver.resolvedValue!!
+                        arguments[1].resolver.resolve(rctx, variable.type)
+                        rctx.values[variable] = arguments[1].resolver.resolvedValue!!
                         if (name == "__timeline_position")
-                            rctx.timelinePosition = oper.arguments[1].resolver.intValue
+                            rctx.timelinePosition = arguments[1].resolver.intValue
                     }
                 }
                 "__STORE" -> {
-                    oper.arguments[0].resolver.resolve(rctx, MmlDataType.String)
-                    oper.validateArguments(rctx, oper.arguments.size)
-                    val name = oper.arguments[0].resolver.stringValue
+                    arguments[0].resolver.resolve(rctx, MmlDataType.String)
+                    oper.validateArguments(rctx, arguments.size)
+                    val name = arguments[0].resolver.stringValue
                     var variable = source.variables.get(name) as MmlSemanticVariable
                     if (variable == null) {
                         compiler.report(
@@ -489,16 +491,16 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                         break
                     }
                     var sb = rctx.ensureDefaultResolvedVariable(variable) as StringBuilder
-                    for (i in 1 until oper.arguments.size)
-                        sb.append(oper.arguments[i].resolver.stringValue)
+                    for (i in 1 until arguments.size)
+                        sb.append(arguments[i].resolver.stringValue)
                 }
                 "__FORMAT", "__STORE_FORMAT" -> {
                     isStringFormat = oper.name == "__FORMAT"
-                    oper.arguments[0].resolver.resolve(rctx, MmlDataType.String)
-                    oper.arguments[1].resolver.resolve(rctx, MmlDataType.String)
+                    arguments[0].resolver.resolve(rctx, MmlDataType.String)
+                    arguments[1].resolver.resolve(rctx, MmlDataType.String)
                     oper.validateArguments(rctx, oper.arguments.size)
-                    val name = oper.arguments[0].resolver.stringValue
-                    val format = oper.arguments[1].resolver.stringValue
+                    val name = arguments[0].resolver.stringValue
+                    val format = arguments[1].resolver.stringValue
                     var variable = source.variables.get(name) as MmlSemanticVariable
                     if (variable == null) {
                         compiler.report(
@@ -533,7 +535,7 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                     //try {
                     val v = String.format(
                         format,
-                        oper.arguments.drop(2).map { x -> x.resolver.stringValue }.toTypedArray()
+                        arguments.drop(2).map { x -> x.resolver.stringValue }.toTypedArray()
                     )
                     if (isStringFormat)
                         rctx.values[variable] = v
@@ -550,21 +552,21 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                     }*/
                 }
                 "__APPLY" -> {
-                    var oa = oper.arguments[0]
+                    var oa = arguments[0]
                     oa.resolver.resolve(rctx, MmlDataType.String)
                     val apparg = oa.resolver.stringValue
 
                     // add macro argument definitions
                     var tmpop = MmlOperationUse(apparg, oper.location)
-                    for (x in 1 until oper.arguments.size)
-                        tmpop.arguments.add(oper.arguments[x])
+                    for (x in 1 until arguments.size)
+                        tmpop.arguments.add(arguments[x])
                     ProcessMacroCall(track, rctx, tmpop, extraTailArgsIfApplied ?: listOf())
 
                 }
                 "__MIDI" -> {
-                    oper.validateArguments(rctx, oper.arguments.size)
+                    oper.validateArguments(rctx, arguments.size)
                     var mop = MmlResolvedEvent("MIDI", rctx.timelinePosition)
-                    for (arg in oper.arguments)
+                    for (arg in arguments)
                         mop.arguments.add(arg.resolver.byteValue)
                     currentOutput.add(mop)
                     if (recordNextAsChord)
@@ -583,12 +585,12 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                         MmlDataType.Number,
                         MmlDataType.Number
                     )
-                    if (oper.arguments[0].resolver.intValue == 0)
+                    if (arguments[0].resolver.intValue == 0)
                     // record next note as part of chord
                         recordNextAsChord = true
                     else {
                         for (cop in chord)
-                            cop.tick += oper.arguments[0].resolver.intValue
+                            cop.tick += arguments[0].resolver.intValue
                         chord.clear()
                     }
                 }
@@ -596,7 +598,7 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                     oper.validateArguments(rctx, oper.arguments.size)
                     var mmop = MmlResolvedEvent("META", rctx.timelinePosition)
                     mmop.arguments.add(0xFF.toByte())
-                    for (arg in oper.arguments)
+                    for (arg in arguments)
                         mmop.arguments.addAll(arg.resolver.byteArrayValue.toList())
                     currentOutput.add(mmop)
                 }
@@ -621,7 +623,7 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                 }
                 "__SAVE_OPER_END" -> {
                     oper.validateArguments(rctx, 1, MmlDataType.Number)
-                    val bufIdx = oper.arguments[0].resolver.intValue
+                    val bufIdx = arguments[0].resolver.intValue
                     storedOperations[bufIdx] = currentStoredOperations!!
                     currentStoredOperations.operations =
                         list.drop(storeIndex).take(listIndex - storeIndex - 1).toMutableList()
@@ -633,7 +635,7 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                 }
                 "__RESTORE_OPER" -> {
                     oper.validateArguments(rctx, 1, MmlDataType.Number)
-                    val bufIdx = oper.arguments[0].resolver.intValue
+                    val bufIdx = arguments[0].resolver.intValue
                     var ss = storedOperations[bufIdx]!!
                     var valuesBak = rctx.values
                     var macroArgsBak = rctx.macroArguments
@@ -708,8 +710,8 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                         )
                         loop.currentBreaks.add(-1)
                     } else {
-                        for (x in 0 until oper.arguments.size) {
-                            var numexpr = oper.arguments[x]
+                        for (x in 0 until arguments.size) {
+                            var numexpr = arguments[x]
                             var num =
                                 numexpr.resolver.intValue - 1 // "1st. loop" for musicians == 0th iteration in code.
                             if (x > 0 && num < 0)
@@ -753,9 +755,9 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                         loop.endLocations[cl] =
                             LoopLocation(listIndex, currentOutput.size, rctx.timelinePosition)
                     var loopCount = 0
-                    when (oper.arguments.size) {
+                    when (arguments.size) {
                         0 -> loopCount = 2
-                        1 -> loopCount = oper.arguments[0].resolver.intValue
+                        1 -> loopCount = arguments[0].resolver.intValue
                         else -> compiler.report(
                             MmlDiagnosticVerbosity.Error,
                             oper.location,
@@ -869,7 +871,7 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
         track: MmlResolvedTrack,
         ctx: MmlResolveContext,
         oper: MmlOperationUse,
-        extraTailArgs: List<MmlValueExpr>
+        extraTailArgs: List<MmlValueExpr?>
     ) {
         var macro = track.macros[oper.name] as MmlSemanticMacro?
         if (macro == null) {

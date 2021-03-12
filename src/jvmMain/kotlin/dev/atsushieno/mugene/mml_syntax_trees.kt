@@ -105,16 +105,10 @@ abstract class MmlValueExpr {
     lateinit var resolver: MmlValueExprResolver
 }
 
-class MmlConstantExpr : MmlValueExpr {
-    constructor (location: MmlLineInfo?, type: MmlDataType, value: Any?)
-            : super(location) {
-        this.type = type
-        this.value = value
+class MmlConstantExpr(location: MmlLineInfo?, val type: MmlDataType, val value: Any?) : MmlValueExpr(location) {
+    init {
         resolver = MmlConstantExprResolver(this)
     }
-
-    val type: MmlDataType
-    val value: Any?
 
     override fun toString(): String {
         return when (type) {
@@ -127,8 +121,7 @@ class MmlConstantExpr : MmlValueExpr {
 
 class MmlVariableReferenceExpr : MmlValueExpr {
     constructor (location: MmlLineInfo, name: String)
-            : this(location, name, 1) {
-    }
+            : this(location, name, 1)
 
     constructor (location: MmlLineInfo, name: String, scope: Int)
             : super(location) {
@@ -139,7 +132,7 @@ class MmlVariableReferenceExpr : MmlValueExpr {
 
     var scope: Int
 
-    lateinit var name: String
+    var name: String
 
     override fun toString() = "\$${if (scope > 1) "\$" else ""}$name"
 }
@@ -151,95 +144,68 @@ class MmlParenthesizedExpr : MmlValueExpr {
         resolver = MmlParenthesizedExprResolver(this)
     }
 
-    lateinit var content: MmlValueExpr
+    var content: MmlValueExpr
 
     override fun toString() = "($content)"
 }
 
-abstract class MmlArithmeticExpr : MmlValueExpr {
-    protected constructor (left: MmlValueExpr, right: MmlValueExpr)
-            : super(left.location) {
-        this.left = left
-        this.right = right
-    }
+abstract class MmlArithmeticExpr protected constructor(val left: MmlValueExpr, val right: MmlValueExpr)
+    : MmlValueExpr(left.location)
 
-    lateinit var left: MmlValueExpr
-    lateinit var right: MmlValueExpr
-}
-
-class MmlAddExpr : MmlArithmeticExpr {
-    constructor (left: MmlValueExpr, right: MmlValueExpr)
-            : super(left, right) {
+class MmlAddExpr(left: MmlValueExpr, right: MmlValueExpr) : MmlArithmeticExpr(left, right) {
+    init {
         resolver = MmlAddExprResolver(this)
     }
 
     override fun toString(): String = "$left + $right"
 }
 
-class MmlSubtractExpr : MmlArithmeticExpr {
-    constructor (left: MmlValueExpr, right: MmlValueExpr)
-            : super(left, right) {
+class MmlSubtractExpr(left: MmlValueExpr, right: MmlValueExpr) : MmlArithmeticExpr(left, right) {
+    init {
         resolver = MmlSubtractExprResolver(this)
     }
 
     override fun toString(): String = "$left - $right"
 }
 
-class MmlMultiplyExpr : MmlArithmeticExpr {
-    constructor (left: MmlValueExpr, right: MmlValueExpr)
-            : super(left, right) {
+class MmlMultiplyExpr(left: MmlValueExpr, right: MmlValueExpr) : MmlArithmeticExpr(left, right) {
+    init {
         resolver = MmlMultiplyExprResolver(this)
     }
 
     override fun toString(): String = "$left * $right"
 }
 
-class MmlDivideExpr : MmlArithmeticExpr {
-    constructor (left: MmlValueExpr, right: MmlValueExpr)
-            : super(left, right) {
+class MmlDivideExpr(left: MmlValueExpr, right: MmlValueExpr) : MmlArithmeticExpr(left, right) {
+    init {
         resolver = MmlDivideExprResolver(this)
     }
 
     override fun toString(): String = "$left / $right"
 }
 
-class MmlModuloExpr : MmlArithmeticExpr {
-    constructor (left: MmlValueExpr, right: MmlValueExpr)
-            : super(left, right) {
+class MmlModuloExpr(left: MmlValueExpr, right: MmlValueExpr) : MmlArithmeticExpr(left, right) {
+    init {
         resolver = MmlModuloExprResolver(this)
     }
 
     override fun toString(): String = "$left % $right"
 }
 
-class MmlConditionalExpr : MmlValueExpr {
-    constructor (condition: MmlValueExpr, trueExpr: MmlValueExpr, falseExpr: MmlValueExpr)
-            : super(condition.location) {
-        this.condition = condition
-        this.trueExpr = trueExpr
-        this.falseExpr = falseExpr
-        resolver = MmlConditionalExprResolver(this)
-    }
-
-    lateinit var condition: MmlValueExpr
-    lateinit var trueExpr: MmlValueExpr
-    lateinit var falseExpr: MmlValueExpr
+class MmlConditionalExpr(val condition: MmlValueExpr, val trueExpr: MmlValueExpr, val falseExpr: MmlValueExpr) :
+    MmlValueExpr(condition.location) {
 
     override fun toString(): String = "$condition ? $trueExpr % $falseExpr"
+
+    init {
+        resolver = MmlConditionalExprResolver(this)
+    }
 }
 
-class MmlComparisonExpr : MmlValueExpr {
-    constructor (left: MmlValueExpr, right: MmlValueExpr, type: ComparisonType)
-            : super(left.location) {
-        this.left = left
-        this.right = right
-        comparisonType = type
-        resolver = MmlComparisonExprResolver(this)
-    }
+class MmlComparisonExpr( val left: MmlValueExpr,  val right: MmlValueExpr, type: ComparisonType) :
+    MmlValueExpr(left.location) {
 
-    lateinit var left: MmlValueExpr
-    lateinit var right: MmlValueExpr
-    lateinit var comparisonType: ComparisonType
+    val comparisonType: ComparisonType = type
 
     override fun toString(): String = "$left $comparisonType $right"
 
@@ -251,6 +217,10 @@ class MmlComparisonExpr : MmlValueExpr {
             ComparisonType.GreaterEqual -> ">"
             else -> throw UnsupportedOperationException()
         }
+    }
+
+    init {
+        resolver = MmlComparisonExprResolver(this)
     }
 }
 
@@ -305,7 +275,7 @@ class MmlOperationUse {
 
 // semantic tree builder
 
-class MmlSemanticTreeBuilder {
+class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextCompiler: MmlCompiler) {
     companion object {
         fun compile(tokenSet: MmlTokenSet, contextCompiler: MmlCompiler): MmlSemanticTreeSet {
             val b = MmlSemanticTreeBuilder(tokenSet, contextCompiler)
@@ -314,17 +284,8 @@ class MmlSemanticTreeBuilder {
         }
     }
 
-    constructor (tokenSet: MmlTokenSet, contextCompiler: MmlCompiler) {
-        if (tokenSet == null)
-            throw IllegalArgumentException("tokenSet")
-        this.compiler = contextCompiler
-        this.tokenSet = tokenSet
-        result = MmlSemanticTreeSet().apply { baseCount = tokenSet.baseCount }
-    }
-
-    lateinit var compiler: MmlCompiler
-    lateinit var tokenSet: MmlTokenSet
-    lateinit var result: MmlSemanticTreeSet
+    private val compiler: MmlCompiler = contextCompiler
+    val result: MmlSemanticTreeSet
 
     private fun compile() {
         val metaTrack = MmlSemanticTrack(0.0)
@@ -393,17 +354,15 @@ class MmlSemanticTreeBuilder {
     private fun compileOperationTokens(data: MutableList<MmlOperationUse>, stream: TokenStream) {
         data.addAll(antlrCompile(compiler, stream) as List<MmlOperationUse>)
     }
+
+    init {
+        if (tokenSet == null)
+            throw IllegalArgumentException("tokenSet")
+        result = MmlSemanticTreeSet().apply { baseCount = tokenSet.baseCount }
+    }
 }
 
-class TokenStream {
-    constructor (source: List<MmlToken>, definitionLocation: MmlLineInfo) {
-        this.source = source
-        this.definitionLocation = definitionLocation
-    }
-
-    lateinit var definitionLocation: MmlLineInfo
-
-    lateinit var source: List<MmlToken>
+class TokenStream(val source: List<MmlToken>, val definitionLocation: MmlLineInfo) {
 
     var position: Int = 0
 }
@@ -424,8 +383,8 @@ class MmlMacroExpander {
         this.source = source
     }
 
-    private lateinit var compiler: MmlCompiler
-    private lateinit var source: MmlSemanticTreeSet
+    private val compiler: MmlCompiler
+    private val source: MmlSemanticTreeSet
     private val expansionStack = mutableListOf<MmlSemanticMacro>()
 
     private fun expand() {
@@ -435,9 +394,7 @@ class MmlMacroExpander {
         for (variable in source.variables.values) {
             if (variable.defaultValue == null)
                 variable.fillDefaultValue()
-            val defValue = variable.defaultValue
-            if (defValue == null)
-                throw Exception("INTERNAL ERROR: no default value for " + variable.name)
+            val defValue = variable.defaultValue ?: throw Exception("INTERNAL ERROR: no default value for " + variable.name)
             defValue.resolver.resolve(ctx, variable.type)
         }
 

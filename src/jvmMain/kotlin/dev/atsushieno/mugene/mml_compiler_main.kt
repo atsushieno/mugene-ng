@@ -112,12 +112,12 @@ This option is for core MML operation hackers."""
         }
 
         // file names -> input sources
-        var inputFilenames = mutableListOf<String>()
-        var outfilename: String? = null
-        var explicitfilename: String? = null
+        val inputFilenames = mutableListOf<String>()
+        var outFilename: String? = null
+        var explicitFilename: String? = null
         var disableRunningStatus = false
-        var extension = ".mid"
-        var metaWriter = SmfWriterExtension.DEFAULT_META_EVENT_WRITER
+        val extension = ".mid"
+        val metaWriter = SmfWriterExtension.DEFAULT_META_EVENT_WRITER
         var noDefault = false
 
         for (arg in args) {
@@ -136,13 +136,13 @@ This option is for core MML operation hackers."""
                 }
                 else -> {
                     if (arg.startsWith("--encoding:")) {
-                        var enc = arg.substring(11)
+                        val enc = arg.substring(11)
                         MmlValueExprResolver.stringToBytes =
                             { s -> s.toByteArray(Charset.forName(enc)) }
                         continue
                     }
                     if (arg.startsWith("--output:")) {
-                        explicitfilename = arg.substring(9);
+                        explicitFilename = arg.substring(9);
                         continue;
                     }
                     if (arg == "--help") {
@@ -151,26 +151,26 @@ This option is for core MML operation hackers."""
                     }
                 }
             }
-            var argAsFile = File(arg)
-            outfilename = argAsFile.nameWithoutExtension + extension
+            val argAsFile = File(arg)
+            outFilename = argAsFile.nameWithoutExtension + extension
             inputFilenames.add(arg);
         }
-        if (explicitfilename != null)
-            outfilename = explicitfilename;
+        if (explicitFilename != null)
+            outFilename = explicitFilename;
 
         // FIXME: stream resolver should be processed within the actual parsing phase.
         // This makes it redundant to support #include
-        var inputs = mutableListOf<MmlInputSource>()
+        val inputs = mutableListOf<MmlInputSource>()
         for (fname in inputFilenames)
             inputs.add(MmlInputSource(fname, resolver.getEntity(fname)));
 
-        FileOutputStream(outfilename).use {
+        FileOutputStream(outFilename).use {
             compile(noDefault, inputs, metaWriter, it, disableRunningStatus);
         }
         report(
             MmlDiagnosticVerbosity.Information,
             null,
-            "Written SMF file ... $outfilename",
+            "Written SMF file ... $outFilename",
             listOf()
         )
     }
@@ -178,7 +178,6 @@ This option is for core MML operation hackers."""
     class MmlCompilerOptions {
         var skipDefaultMmlFiles = false
         var disableRunningStatus = false
-        var useVsqMetadata = false
         var metaWriter: ((Boolean, MidiMessage, OutputStream?) -> Int)? = null
     }
 
@@ -189,7 +188,7 @@ This option is for core MML operation hackers."""
         output: OutputStream,
         disableRunningStatus: Boolean
     ) {
-        var music = compile(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
+        val music = compile(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
         music.save(output, disableRunningStatus, metaWriter)
     }
 
@@ -222,27 +221,27 @@ This option is for core MML operation hackers."""
             else inputs
 
         // input sources -> tokenizer sources
-        var tokenizerSources = MmlInputSourceReader.parse(this, inputs);
+        val tokenizerSources = MmlInputSourceReader.parse(this, inputs);
 
         // tokenizer sources -> token streams
         return MmlTokenizer.tokenize(tokenizerSources);
     }
 
     // used by language server and compiler.
-    fun buildSemanticTree(tokens: MmlTokenSet): MmlSemanticTreeSet {
+    private fun buildSemanticTree(tokens: MmlTokenSet): MmlSemanticTreeSet {
         // token streams -> semantic trees
         return MmlSemanticTreeBuilder.compile(tokens, this);
     }
 
-    fun generateMusic(tree: MmlSemanticTreeSet): MidiMusic {
+    private fun generateMusic(tree: MmlSemanticTreeSet): MidiMusic {
         // semantic trees -> simplified streams
         MmlMacroExpander.expand(tree, this);
 
         // simplified streams -> raw events
-        var resolved = MmlEventStreamGenerator.generate(tree, this);
+        val resolved = MmlEventStreamGenerator.generate(tree, this);
 
         // raw events -> SMF
-        var smf = MmlSmfGenerator.generate(resolved);
+        val smf = MmlSmfGenerator.generate(resolved);
 
         return smf;
     }
@@ -341,24 +340,22 @@ enum class MmlDataType {
     override fun toString() = "[${if (isValueByStep) "%" else ""}$number${".".repeat(dots)}]"
 }
 
-class MmlException(message: String = "ML error", innerException: Exception? = null) :
+class MmlException(message: String = "MML error", innerException: Exception? = null) :
     Exception(message, innerException) {
 
     companion object {
         fun formatMessage(message: String, location: MmlLineInfo): String {
-            if (location == null)
+            if (location == MmlLineInfo.empty)
                 return message;
             return "$message (${location.file} line ${location.lineNumber} column ${location.linePosition})"
         }
     }
 
     constructor (message: String, location: MmlLineInfo)
-            : this(message, location, null) {
-    }
+            : this(message, location, null)
 
     constructor (message: String, location: MmlLineInfo, innerException: Exception?)
-            : this(formatMessage(message, location), innerException) {
-    }
+            : this(formatMessage(message, location), innerException)
 }
 
 fun MidiMusic.save(
@@ -366,7 +363,7 @@ fun MidiMusic.save(
     disableRunningStatus: Boolean = false,
     metaWriter: ((Boolean, MidiMessage, OutputStream?) -> Int)? = null
 ) {
-    var writer = SmfWriter(output).apply { this.disableRunningStatus = disableRunningStatus };
+    val writer = SmfWriter(output).apply { this.disableRunningStatus = disableRunningStatus };
     if (metaWriter != null)
         writer.metaEventWriter = metaWriter!!
     writer.writeMusic(this);
@@ -376,7 +373,7 @@ fun MidiMusic.toBytes(
     disableRunningStatus: Boolean = false,
     metaWriter: ((Boolean, MidiMessage, OutputStream?) -> Int)? = null
 ): Array<Byte> {
-    var ms = ByteArrayOutputStream();
+    val ms = ByteArrayOutputStream();
     this.save(ms, disableRunningStatus, metaWriter);
     return ms.toByteArray().toTypedArray()
 }

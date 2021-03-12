@@ -2,12 +2,11 @@ package dev.atsushieno.mugene
 
 import dev.atsushieno.mugene.parser.MugeneParser
 import dev.atsushieno.mugene.parser.MugeneParserBaseVisitor
-import dev.atsushieno.mugene.parser.MugeneParserVisitor
-import org.antlr.v4.kotlinruntime.*
-import org.antlr.v4.kotlinruntime.tree.ErrorNode
-import org.antlr.v4.kotlinruntime.tree.ParseTree
-import org.antlr.v4.kotlinruntime.tree.RuleNode
-import org.antlr.v4.kotlinruntime.tree.TerminalNode
+import org.antlr.v4.kotlinruntime.CharStream
+import org.antlr.v4.kotlinruntime.ParserRuleContext
+import org.antlr.v4.kotlinruntime.Token
+import org.antlr.v4.kotlinruntime.TokenFactory
+import org.antlr.v4.kotlinruntime.TokenSource
 import org.antlr.v4.kotlinruntime.tree.pattern.DEFAULT_CHANNEL
 
 

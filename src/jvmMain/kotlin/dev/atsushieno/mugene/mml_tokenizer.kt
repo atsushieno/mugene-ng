@@ -40,19 +40,19 @@ class MmlTokenSet {
     constructor () {
         baseCount = 192
         conditional = MmlCompilationCondition()
-        macros = mutableListOf<MmlMacroDefinition>()
-        variables = mutableListOf<MmlVariableDefinition>()
-        tracks = mutableListOf<MmlTrack>()
-        metaTexts = mutableListOf<MmlMetaTextToken>()
+        macros = mutableListOf()
+        variables = mutableListOf()
+        tracks = mutableListOf()
+        metaTexts = mutableListOf()
     }
 
     var baseCount = 0
 
-    lateinit var conditional: MmlCompilationCondition
-    lateinit var macros: MutableList<MmlMacroDefinition>
-    lateinit var variables: MutableList<MmlVariableDefinition>
-    lateinit var tracks: MutableList<MmlTrack>
-    lateinit var metaTexts: MutableList<MmlMetaTextToken>
+    var conditional: MmlCompilationCondition
+    var macros: MutableList<MmlMacroDefinition>
+    var variables: MutableList<MmlVariableDefinition>
+    var tracks: MutableList<MmlTrack>
+    var metaTexts: MutableList<MmlMetaTextToken>
 
     fun getTrack(number: Double): MmlTrack {
         var t = tracks.firstOrNull { tr -> tr.number == number }
@@ -89,43 +89,27 @@ data class MmlToken(
 
 abstract class MmlOperationDefinition {
     val arguments = mutableListOf<MmlVariableDefinition>()
-    lateinit var name: String
 }
 
-public class MmlMacroDefinition : MmlOperationDefinition {
-    constructor (name: String, targetTracks: List<Double>, location: MmlLineInfo) {
-        this.name = name
-        this.targetTracks = targetTracks.toMutableList()
-        this.location = location
-        this.tokens = mutableListOf<MmlToken>()
-    }
+class MmlMacroDefinition(val name: String, targetTracks: List<Double>, var location: MmlLineInfo) :
+    MmlOperationDefinition() {
 
-    lateinit var targetTracks: MutableList<Double>
-    lateinit var location: MmlLineInfo
-    lateinit var tokens: MutableList<MmlToken>
+    var targetTracks: MutableList<Double> = targetTracks.toMutableList()
+    var tokens: MutableList<MmlToken> = mutableListOf()
+
 }
 
-class MmlVariableDefinition {
-    constructor (name: String, location: MmlLineInfo) {
-        this.name = name
-        this.location = location
-        this.defaultValueTokens = mutableListOf<MmlToken>()
-    }
+class MmlVariableDefinition(val name: String, var location: MmlLineInfo) {
 
-    val name: String
-    var location: MmlLineInfo
     lateinit var type: MmlDataType
-    lateinit var defaultValueTokens: MutableList<MmlToken>
+    var defaultValueTokens: MutableList<MmlToken> = mutableListOf()
+
 }
 
-class MmlTrack {
-    constructor (number: Double) {
-        this.number = number
-        this.tokens = mutableListOf<MmlToken>()
-    }
+class MmlTrack(val number: Double) {
 
-    val number: Double
-    lateinit var tokens: MutableList<MmlToken>
+    var tokens: MutableList<MmlToken> = mutableListOf()
+
 }
 
 
@@ -134,25 +118,18 @@ class MmlTrack {
 abstract class StreamResolver {
 
     fun getEntity(file: String): Reader {
-        if (file == null)
-            throw IllegalArgumentException("file is null")
-        if (file.length == 0)
+        if (file.isEmpty())
             throw IllegalArgumentException("Empty filename is passed")
-        var ret = onGetEntity(file)
-        if (ret == null)
-            throw InvalidObjectException("MML stream \"$file\" could not be resolved.")
-        return ret
+        return onGetEntity(file) ?: throw InvalidObjectException("MML stream \"$file\" could not be resolved.")
     }
 
     internal open fun onGetEntity(file: String): Reader? {
         throw UnsupportedOperationException("You have to implement it. It is virtual only because of backward compatibility.")
     }
 
-    val includes = mutableListOf<String>()
+    private val includes = mutableListOf<String>()
 
     fun resolveFilePath(file: String): String? {
-        if (file == null)
-            return null
         if (!includes.any())
             return File(file).absolutePath
         if (File(file).isAbsolute)
@@ -172,14 +149,10 @@ abstract class StreamResolver {
     }
 }
 
-class MergeStreamResolver : StreamResolver {
-    private val resolvers: MutableList<StreamResolver>
+class MergeStreamResolver(vararg resolvers: StreamResolver) : StreamResolver() {
+    private val resolvers: MutableList<StreamResolver> = resolvers.toMutableList()
 
-    constructor (vararg resolvers: StreamResolver) {
-        this.resolvers = resolvers.toMutableList()
-    }
-
-    internal override fun onGetEntity(file: String): Reader? {
+    override fun onGetEntity(file: String): Reader? {
         for (r in resolvers) {
             val ret = r.onGetEntity(file)
             if (ret != null)
@@ -199,9 +172,9 @@ class MergeStreamResolver : StreamResolver {
     }
 }
 
-public class LocalFileStreamResolver : StreamResolver() {
+class LocalFileStreamResolver : StreamResolver() {
     override fun onGetEntity(file: String): Reader? {
-        var abs = resolveFilePath(file)
+        val abs = resolveFilePath(file)
         if (File(abs).exists())
             return FileReader(abs)
         return null
@@ -212,39 +185,24 @@ public class LocalFileStreamResolver : StreamResolver() {
 // and macro.
 data class MmlInputSource(val file: String, val reader: Reader)
 
-class MmlLineInfo {
+class MmlLineInfo(var file: String, line: Int, column: Int) {
     companion object {
         val empty = MmlLineInfo("__internal__", 0, 0)
     }
 
-    constructor (file: String, line: Int, column: Int) {
-        this.file = file
-        this.lineNumber = line
-        this.linePosition = column
-    }
-
-    var file: String
-    var lineNumber: Int
-    var linePosition: Int
+    var lineNumber: Int = line
+    var linePosition: Int = column
 
     fun clone() = MmlLineInfo(file, lineNumber, linePosition)
 
     override fun toString() = "Location: $file ($lineNumber, $linePosition)"
 }
 
-class MmlLine {
+class MmlLine(val location: MmlLineInfo, var text: String) {
     companion object {
         fun create(file: String, lineNumber: Int, linePosition: Int, text: String) =
             MmlLine(MmlLineInfo(file, lineNumber, linePosition), text)
     }
-
-    constructor (location: MmlLineInfo, text: String) {
-        this.location = location
-        this.text = text
-    }
-
-    val location: MmlLineInfo
-    var text: String
 
     fun tryMatch(target: String): Boolean {
         if (location.linePosition + target.length > text.length)
@@ -268,9 +226,9 @@ class MmlLine {
     }
 }
 
-class MmlTokenizerSource {
+class MmlTokenizerSource(compiler: MmlCompiler) {
     // can be switched
-    var lexer: MmlLexer
+    var lexer: MmlLexer = MmlMatchLongestLexer(compiler, this)
 
     // It holds ongoing definition of a macro. Used for argument name lookup.
     var currentMacroDefinition: MmlMacroDefinition? = null
@@ -289,18 +247,16 @@ class MmlTokenizerSource {
 
     val primitiveOperations = mutableListOf<String>()
 
-    constructor (compiler: MmlCompiler) {
-        lexer = MmlMatchLongestLexer(compiler, this)
-
+    init {
         for (primitive in MmlPrimitiveOperation.all)
             primitiveOperations.add(primitive.name)
     }
 }
 
-public class MmlInputSourceReader {
+class MmlInputSourceReader(private val compiler: MmlCompiler) {
     companion object {
         fun parse(compiler: MmlCompiler, inputs: List<MmlInputSource>): MmlTokenizerSource {
-            var r = MmlInputSourceReader(compiler)
+            val r = MmlInputSourceReader(compiler)
             r.process(inputs)
             return r.result
         }
@@ -325,29 +281,22 @@ public class MmlInputSourceReader {
         }
     }
 
-    private val compiler: MmlCompiler
     private lateinit var result: MmlTokenizerSource
 
-    constructor (compiler: MmlCompiler) {
-        this.compiler = compiler
-    }
-
-    var in_comment_mode = false
+    private var inCommentMode = false
 
     fun process(inputs: List<MmlInputSource>) {
         result = MmlTokenizerSource(compiler)
-        doProcess(inputs)
+        doProcess(inputs.toMutableList())
     }
 
-    fun doProcess(inputs: List<MmlInputSource>) {
-        var inputList = inputs
+    private fun doProcess(inputs: MutableList<MmlInputSource>) {
 
-        for (i in 0 until inputList.size) {
+        for (i in 0 until inputs.size) {  // inputs could grow up, so avoid converting to range
             var line = 0
-            var s = ""
+            val s = ""
             var ls: MmlSourceLineSet? = null
-            // inputs could grow up.
-            var input = inputList[i]
+            val input = inputs[i]
             compiler.resolver.pushInclude(input.file)
             var continued = false
             var wasContinued = continued
@@ -355,21 +304,21 @@ public class MmlInputSourceReader {
                 line++
                 wasContinued = continued
                 var s = trimComments(ss, 0)
-                if (s.length == 0) // comment line is allowed inside multi-line MML.
+                if (s.isEmpty()) // comment line is allowed inside multi-line MML.
                     continue
 
                 continued = (s[s.length - 1] == '\\')
                 if (continued)
                     s = s.substring(0, s.length - 1)
                 if (wasContinued) {
-                    if (!in_comment_mode)
+                    if (!inCommentMode)
                         ls?.addConsecutiveLine(s)
                     continue
                 }
-                if (s[0] == '#')
-                    ls = processPragmaLine(MmlLine.create(input.file, line, 0, s))
+                ls = if (s[0] == '#')
+                    processPragmaLine(MmlLine.create(input.file, line, 0, s))
                 else
-                    ls = processTrackLine(MmlLine.create(input.file, line, 0, s))
+                    processTrackLine(MmlLine.create(input.file, line, 0, s))
             }
             if (wasContinued)
                 throw mmlError(
@@ -386,7 +335,7 @@ public class MmlInputSourceReader {
         result.lexer.setCurrentInput(line)
         line.location.linePosition++
         // get identifier
-        var identifier = result.lexer.readNewIdentifier()
+        val identifier = result.lexer.readNewIdentifier()
         when (identifier) {
             "include" -> {
                 result.lexer.skipWhitespaces(true)
@@ -401,11 +350,11 @@ public class MmlInputSourceReader {
                 return processMacroLine(line)
             }
             "comment" -> {
-                in_comment_mode = true
+                inCommentMode = true
                 return null
             }
             "endcomment" -> {
-                in_comment_mode = false
+                inCommentMode = false
                 return null
             }
             "define", "conditional", "meta", "basecount" -> {
@@ -414,7 +363,7 @@ public class MmlInputSourceReader {
         }
 
         result.lexer.skipWhitespaces(true)
-        var ps = MmlPragmaSource(identifier)
+        val ps = MmlPragmaSource(identifier)
         ps.lines.add(line)
         result.pragmas.add(ps)
         return ps
@@ -423,7 +372,7 @@ public class MmlInputSourceReader {
     private fun processIncludeLine(line: MmlLine): MmlSourceLineSet? {
         val file = line.text.substring(line.location.linePosition).trim()
         this.doProcess(
-            listOf<MmlInputSource>(
+            mutableListOf(
                 MmlInputSource(file, compiler.resolver.getEntity(file))
             )
         )
@@ -431,18 +380,18 @@ public class MmlInputSourceReader {
     }
 
     private fun processMacroLine(line: MmlLine): MmlSourceLineSet? {
-        if (in_comment_mode)
+        if (inCommentMode)
             return null
-        var mms = MmlMacroSource()
+        val mms = MmlMacroSource()
         mms.lines.add(line)
         result.macros.add(mms)
         return mms
     }
 
     private fun processVariableLine(line: MmlLine): MmlSourceLineSet? {
-        if (in_comment_mode)
+        if (inCommentMode)
             return null
-        var vs = MmlVariableSource()
+        val vs = MmlVariableSource()
         vs.lines.add(line)
         result.variables.add(vs)
         return vs
@@ -452,7 +401,7 @@ public class MmlInputSourceReader {
     private var previous_range: List<Double>? = null
 
     private fun processTrackLine(line: MmlLine): MmlSourceLineSet? {
-        if (in_comment_mode)
+        if (inCommentMode)
             return null
         result.lexer.setCurrentInput(line)
 
@@ -483,17 +432,17 @@ public class MmlInputSourceReader {
         previous_section = section
         previous_range = range
         result.lexer.skipWhitespaces(false)
-        var ts = MmlTrackSource(section, range)
+        val ts = MmlTrackSource(section, range)
         ts.lines.add(line)
         result.tracks.add(ts)
         return ts
     }
 
-    fun mmlError(location: MmlLineInfo, msg: String): MmlException {
+    private fun mmlError(location: MmlLineInfo, msg: String): MmlException {
         return MmlException(msg, location)
     }
 
-    fun mmlError(input: MmlInputSource, line: Int, column: Int, msg: String): MmlException {
+    private fun mmlError(input: MmlInputSource, line: Int, column: Int, msg: String): MmlException {
         return MmlException(msg, MmlLineInfo(input.file, line, column))
     }
 }
@@ -509,7 +458,7 @@ abstract class MmlSourceLineSet {
     open fun addConsecutiveLine(text: String) {
         if (lines.size == 0)
             throw InvalidObjectException("Unexpected addition to previous line while there was no registered line.")
-        var prev = lines.last()
+        val prev = lines.last()
         val line = MmlLine.create(
             prev.location.file,
             prev.location.lineNumber + 1,
@@ -520,22 +469,16 @@ abstract class MmlSourceLineSet {
     }
 }
 
-class MmlUntypedSource : MmlSourceLineSet {
-    constructor (singleLine: MmlLine)
-            : super() {
+class MmlUntypedSource(singleLine: MmlLine) : MmlSourceLineSet() {
+    init {
         lines.add(singleLine)
     }
 }
 
-class MmlTrackSource : MmlSourceLineSet {
-    constructor (blockName: String, tracks: List<Double>)
-            : super() {
-        this.blockName = blockName
-        this.tracks = tracks.toMutableList()
-    }
+class MmlTrackSource(val blockName: String, tracks: List<Double>) : MmlSourceLineSet() {
 
-    val blockName: String
-    val tracks: MutableList<Double>
+    val tracks: MutableList<Double> = tracks.toMutableList()
+
 }
 
 class MmlMacroSource(var parsedName: String? = null) : MmlSourceLineSet() {}
@@ -543,30 +486,19 @@ class MmlMacroSource(var parsedName: String? = null) : MmlSourceLineSet() {}
 class MmlVariableSource(val parsedNames: MutableList<String> = mutableListOf()) :
     MmlSourceLineSet() {}
 
-class MmlPragmaSource(val name: String) : MmlSourceLineSet() {}
+class MmlPragmaSource(val name: String) : MmlSourceLineSet()
 
-enum class MmlSourceLineSetKind {
-    Track,
-    Macro,
-    Pragma,
-}
+abstract class MmlLexer(internal val compiler: MmlCompiler, source: MmlTokenizerSource) {
 
-abstract class MmlLexer {
-    protected constructor (compiler: MmlCompiler, source: MmlTokenizerSource) {
-        this.compiler = compiler
-        tokenizerSource = source
-    }
-
-    internal val compiler: MmlCompiler
     private var input: MmlSourceLineSet? = null
     private var currentLine: Int = 0
 
     // It contains all macro definitions.
-    val tokenizerSource: MmlTokenizerSource
+    val tokenizerSource: MmlTokenizerSource = source
 
     val line: MmlLine
         get() {
-            var l = input!!.lines[currentLine]
+            val l = input!!.lines[currentLine]
             if (l.location.linePosition == l.text.length && currentLine + 1 < input!!.lines.size) {
                 currentLine++
                 return line
@@ -588,8 +520,6 @@ abstract class MmlLexer {
     }
 
     internal fun lexerError(msg: String): MmlException {
-        if (line == null)
-            return MmlException(msg)
         return MmlException(msg, line.location)
     }
 
@@ -610,8 +540,8 @@ abstract class MmlLexer {
     open fun isNumber(c: Int) = '0'.toInt() <= c && c <= '9'.toInt()
 
     open fun readNumber(acceptFloatingPoint: Boolean): Double {
-        var line = line
-        var ch_ = line.peekChar()
+        val line = line
+        val ch_ = line.peekChar()
         if (ch_ < 0)
             throw lexerError("Expected a number, but reached the end of input")
         var ch = ch_.toChar()
@@ -623,18 +553,18 @@ abstract class MmlLexer {
             var passed = false
             while (true) {
                 ch = line.peekChar().toChar()
-                var isnum = isNumber(ch.toInt())
-                var isupper = 'A' <= ch && ch <= 'F'
-                var islower = 'a' <= ch && ch <= 'f'
-                if (!isnum && !isupper && !islower) {
+                val isNum = isNumber(ch.toInt())
+                val isUpper = ch in 'A'..'F'
+                val isLower = ch in 'a'..'f'
+                if (!isNum && !isUpper && !isLower) {
                     if (!passed)
                         throw lexerError("Invalid hexadecimal digits")
                     break
                 }
                 passed = true
-                var h =
-                    if (isnum) line.readChar() - '0'.toInt()
-                    else if (isupper) line.readChar() - 'A'.toInt() + 10
+                val h =
+                    if (isNum) line.readChar() - '0'.toInt()
+                    else if (isUpper) line.readChar() - 'A'.toInt() + 10
                     else line.readChar() - 'a'.toInt() + 10
                 value = value * 16 + h
             }
@@ -665,10 +595,10 @@ abstract class MmlLexer {
     private val stringLiteralBuffer = StringBuilder()
 
     open fun readStringLiteral(): String {
-        var sb = stringLiteralBuffer
+        val sb = stringLiteralBuffer
         sb.clear()
         line.readChar() // ' or "
-        var startLoc = line.location
+        val startLoc = line.location
         while (true) {
             var ch = line.readChar()
             if (ch < 0)
@@ -686,9 +616,9 @@ abstract class MmlLexer {
                         'n' -> sb.append('\n')
                         else -> {
                             line.location.linePosition--
-                            if (cc == '#' || '0' <= cc && cc <= '9') {
+                            if (cc == '#' || cc in '0'..'9') {
                                 sb.append(readNumber(false).toChar())
-                                ch = line.readChar()
+                                line.readChar()
                                 if (cc != ';')
                                     throw lexerError("Unexpected string escape sequence: ';' is expected after number escape sequence")
                             } else
@@ -704,7 +634,7 @@ abstract class MmlLexer {
     open fun readRange(whitespacesAcceptable: Boolean): List<Double> {
         return sequence {
             var n = readNumber(true)
-            var ch = line.peekChar().toChar()
+            val ch = line.peekChar().toChar()
             val processAtComma = {
                 sequence {
                     yield(n)
@@ -781,7 +711,6 @@ abstract class MmlLexer {
             throw lexerError("Identifier character is expected")
         while (isIdentifier(line.peekChar(), false))
             line.readChar()
-//Util.DebugWriter.WriteLine ("NEW Identifier: " + Line.Text.Substring (start, Line.Location.LinePosition - start));
         return line.text.substring(start, line.location.linePosition - start)
     }
 
@@ -797,14 +726,12 @@ abstract class MmlLexer {
     }
 
     open fun advance(): Boolean {
-        var ret = _advance()
-//Util.DebugWriter.WriteLine ("TOKEN: {0} : Value: {1}", CurrentToken, Value);
-        return ret
+        return doAdvance()
     }
 
-    var currentLocation: MmlLineInfo = MmlLineInfo.empty
+    private var currentLocation: MmlLineInfo = MmlLineInfo.empty
 
-    private fun _advance(): Boolean {
+    private fun doAdvance(): Boolean {
         skipWhitespaces()
         currentLocation = line.location.clone()
         var ch_ = line.peekChar()
@@ -927,7 +854,7 @@ abstract class MmlLexer {
             currentToken = MmlTokenType.Identifier
             return true
         }
-        var ident = tryReadIdentifier()
+        val ident = tryReadIdentifier()
         if (ident != null) {
             value = ident
             currentToken = MmlTokenType.Identifier
@@ -970,7 +897,7 @@ abstract class MmlLexer {
 
     open fun getValidIdentifiers(): List<String> {
         return sequence {
-            var macros = tokenizerSource.currentMacroDefinition
+            val macros = tokenizerSource.currentMacroDefinition
             if (macros != null)
                 for (a in macros.arguments)
                     yield(a.name)
@@ -990,23 +917,22 @@ class MmlMatchLongestLexer : MmlLexer {
             : super(compiler, source) {
     }
 
-    var matchpos: List<Int>? = null
-    var buffer = Array<Char>(256, { _ -> 0.toChar() })
-    var buffer_pos = 0
+    private var matchpos: List<Int>? = null
+    private var buffer = Array(256) { 0.toChar() }
+    private var bufferPos = 0
 
     override fun tryReadIdentifier(): String? {
         if (matchpos == null)
-            matchpos = List<Int>(tokenizerSource.macros.size, { _ -> 0 })
+            matchpos = List(tokenizerSource.macros.size) { 0 }
         if (matchpos!!.size < tokenizerSource.macros.size)
             throw InvalidObjectException("Macro definition is added somewhere after the first macro search is invoked.")
         var matched: String? = null
 
-        buffer_pos = 0 // reset
+        bufferPos = 0 // reset
 
         for (name in getValidIdentifiers()) {
             if (matched != null && matched.length >= name.length)
                 continue // no hope it could match.
-//Util.DebugWriter.WriteLine ("!!! {0} / {1} / {2}", name, matched, buffer_pos);
             if (matches(name))
                 matched = name
         }
@@ -1016,69 +942,68 @@ class MmlMatchLongestLexer : MmlLexer {
         // then it could be a new identifier.
         // In such case, read up until the input comes to non-identifier.
         // If it is not a valid identifier input, then return null.
-        if (buffer_pos == 0) {
+        if (bufferPos == 0) {
             if (!isIdentifier(line.peekChar(), true))
                 return null // not an identifier
-            buffer[buffer_pos++] = line.readChar().toChar()
+            buffer[bufferPos++] = line.readChar().toChar()
         }
 
         while (true) {
             val ch = line.peekChar()
             if (!isIdentifier(ch, false))
                 break
-            if (buffer.size == buffer_pos) {
-                var newbuf = Array<Char>(buffer.size * 2) { _ -> 0.toChar() }
+            if (buffer.size == bufferPos) {
+                val newbuf = Array(buffer.size * 2) { _ -> 0.toChar() }
                 buffer.copyInto(newbuf, 0, buffer.size)
                 buffer = newbuf
             }
-            buffer[buffer_pos++] = ch.toChar()
+            buffer[bufferPos++] = ch.toChar()
             line.readChar()
         }
-        return String(buffer.toCharArray(), 0, buffer_pos)
+        return String(buffer.toCharArray(), 0, bufferPos)
     }
 
     // examines if current token matches the argument identifier,
     // proceeding the MmlLine.
     private fun matches(name: String): Boolean {
         var ret = false
-        var savedPos = line.location.linePosition
-        var savedBufferPos = buffer_pos
+        val savedPos = line.location.linePosition
+        val savedBufferPos = bufferPos
         ret = matchesProceed(name)
         if (!ret) {
-            buffer_pos = savedBufferPos
+            bufferPos = savedBufferPos
             line.location.linePosition = savedPos
         }
         return ret
     }
 
     private fun matchesProceed(name: String): Boolean {
-        for (i in 0 until buffer_pos) {
+        for (i in 0 until bufferPos) {
             if (i == name.length)
                 return true // matched within the buffer
             if (buffer[i] != name[i])
                 return false
         }
-        while (buffer_pos < name.length) {
-            if (buffer.size == buffer_pos) {
-                var newbuf = Array<Char>(buffer.size * 2) { _ -> 0.toChar() }
+        while (bufferPos < name.length) {
+            if (buffer.size == bufferPos) {
+                val newbuf = Array(buffer.size * 2) { _ -> 0.toChar() }
                 buffer.copyInto(newbuf, 0, buffer.size)
                 buffer = newbuf
             }
             val ch_ = line.peekChar()
             if (ch_ < 0)
                 return false
-            buffer[buffer_pos] = ch_.toChar()
-//Util.DebugWriter.WriteLine ("$$$ {0} {1} ({2})", buffer [buffer_pos], name [buffer_pos], buffer_pos);
-            if (buffer[buffer_pos] != name[buffer_pos])
+            buffer[bufferPos] = ch_.toChar()
+            if (buffer[bufferPos] != name[bufferPos])
                 return false
-            buffer_pos++
+            bufferPos++
             line.readChar()
         }
         return true
     }
 }
 
-class MmlTokenizer {
+class MmlTokenizer(private val source: MmlTokenizerSource) {
     companion object {
         val metaMap = mutableMapOf<String, Byte>()
 
@@ -1089,20 +1014,14 @@ class MmlTokenizer {
         }
 
         fun tokenize(source: MmlTokenizerSource): MmlTokenSet {
-            var tokenizer = MmlTokenizer(source)
+            val tokenizer = MmlTokenizer(source)
             tokenizer.process()
             return tokenizer.result
         }
     }
 
-    constructor (source: MmlTokenizerSource) {
-        this.source = source
-        this.result = MmlTokenSet()
-    }
-
-    private val source: MmlTokenizerSource
     private val aliases = mutableMapOf<String, String>()
-    private val result: MmlTokenSet
+    private val result: MmlTokenSet = MmlTokenSet()
 
     private val compiler
         get() = source.lexer.compiler
@@ -1116,7 +1035,7 @@ class MmlTokenizer {
         result.variables.add(MmlVariableDefinition("__timeline_position", MmlLineInfo.empty).apply {
             type = MmlDataType.Number
         })
-        var bc = MmlVariableDefinition("__base_count", MmlLineInfo.empty).apply {
+        val bc = MmlVariableDefinition("__base_count", MmlLineInfo.empty).apply {
             type = MmlDataType.Number
         }
         bc.defaultValueTokens.add(
@@ -1150,8 +1069,7 @@ class MmlTokenizer {
                 MmlValueExprResolver.baseCount = result.baseCount
             }
             "conditional" -> {
-                var category = source.lexer.readNewIdentifier()
-                when (category) {
+                when (val category = source.lexer.readNewIdentifier()) {
                     "block" -> {
                         source.lexer.skipWhitespaces(true)
                         while (true) {
@@ -1175,7 +1093,7 @@ class MmlTokenizer {
                     }
                     "track" -> {
                         source.lexer.skipWhitespaces(true)
-                        var tracks = source.lexer.readRange(true)
+                        val tracks = source.lexer.readRange(true)
                         result.conditional.tracks.addAll(tracks)
                         source.lexer.skipWhitespaces()
                         if (source.lexer.advance())
@@ -1196,11 +1114,11 @@ class MmlTokenizer {
                 }
             }
             "meta" -> {
-                var typeLoc = source.lexer.line.location
+                val typeLoc = source.lexer.line.location
                 source.lexer.newIdentifierMode = true
-                var identifier = source.lexer.readNewIdentifier()
+                val identifier = source.lexer.readNewIdentifier()
                 source.lexer.skipWhitespaces(true)
-                var textLoc = source.lexer.line.location
+                val textLoc = source.lexer.line.location
                 var text = source.lexer.readStringLiteral()
                 when (identifier) {
                     "title",
@@ -1266,20 +1184,20 @@ class MmlTokenizer {
         source.lexer.setCurrentInput(src)
 
         var range = mutableListOf<Double>()
-        var location = source.lexer.line.location.clone()
-        var ch = source.lexer.line.peekChar()
+        val location = source.lexer.line.location.clone()
+        val ch = source.lexer.line.peekChar()
         if (ch.toChar() == '#' || source.lexer.isNumber(ch)) {
             range = source.lexer.readRange(false).toMutableList()
             source.lexer.skipWhitespaces(true)
         }
 
         // get identifier
-        var identifier = source.lexer.readNewIdentifier()
+        val identifier = source.lexer.readNewIdentifier()
         source.lexer.skipWhitespaces(true)
 
         src.parsedName = identifier
 
-        var m = MmlMacroDefinition(identifier, range, location)
+        val m = MmlMacroDefinition(identifier, range, location)
         source.currentMacroDefinition = m
         if (m.tokens.size == 0) {
             // get args
@@ -1308,7 +1226,7 @@ class MmlTokenizer {
                 source.lexer.advance()
             }
             source.lexer.expectCurrent(MmlTokenType.Identifier)
-            var arg =
+            val arg =
                 MmlVariableDefinition(source.lexer.value as String, source.lexer.line.location)
             vars.add(arg)
             count++
@@ -1385,7 +1303,7 @@ class MmlTokenizer {
     }
 
     private fun parseTrackLines(src: MmlTrackSource) {
-        var tokens = mutableListOf<MmlToken>()
+        val tokens = mutableListOf<MmlToken>()
         for (line in src.lines)
             for (entry in aliases)
                 line.text = line.text.replace(entry.key, entry.value)
@@ -1400,4 +1318,5 @@ class MmlTokenizer {
                 result.getTrack(t).tokens.addAll(tokens)
         }
     }
+
 }

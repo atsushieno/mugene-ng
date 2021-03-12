@@ -23,14 +23,13 @@ abstract class MmlValueExprResolver(val expr: MmlValueExpr) {
             type: MmlDataType,
             location: MmlLineInfo?,
             throwException: Boolean = false
-        ): Any? = getTypedValue(ctx.compiler, value, type, location, throwException)
+        ): Any? = getTypedValue(ctx.compiler, value, type, location)
 
         fun getTypedValue(
             compiler: MmlCompiler,
             value: Any?,
             type: MmlDataType,
-            location: MmlLineInfo?,
-            throwException: Boolean = false
+            location: MmlLineInfo?
         ): Any? {
             when (type) {
                 MmlDataType.Any -> return value
@@ -43,29 +42,30 @@ abstract class MmlValueExprResolver(val expr: MmlValueExpr) {
                     if (value is Byte)
                         return value.toDouble()
                     if (value is MmlLength)
-                        return value.getSteps(MmlValueExprResolver.baseCount).toDouble()
+                        return value.getSteps(baseCount).toDouble()
                 }
                 MmlDataType.Length -> {
                     if (value is MmlLength)
                         return value
                     var denom = 0
-                    if (value is Double)
-                        denom = value.toInt()
+                    denom = if (value is Double)
+                        value.toInt()
                     else if (value is Int)
-                        denom = value
+                        value
                     else if (value is Byte)
-                        denom = value.toInt()
+                        value.toInt()
                     else
                         throw InvalidObjectException("Cannot convert to length") // error
                     return MmlLength(denom)
                 }
+                else ->
+                    compiler.report(
+                        MmlDiagnosticVerbosity.Error,
+                        location,
+                        "Invalid value $value for the expected data type $type)",
+                        listOf()
+                    )
             }
-            compiler.report(
-                MmlDiagnosticVerbosity.Error,
-                location,
-                "Invalid value $value for the expected data type $type)",
-                listOf()
-            )
             return null
         }
     }
@@ -132,7 +132,7 @@ class MmlVariableReferenceExprResolver(expr: MmlVariableReferenceExpr) :
         if (!excludeMacroArgs) { // reference to macro argument takes precedence
             val _arg = ctx.macroArguments[expr.name]
             if (_arg != null) {
-                var arg = _arg as Pair<MmlSemanticVariable, Any?>
+                val arg = _arg as Pair<MmlSemanticVariable, Any?>
                 resolvedValue = getTypedValue(ctx, arg.second, type, expr.location)
                 return
             }
@@ -323,18 +323,16 @@ class MmlResolvedEvent {
 
 // primitive resolver
 
-class Loop {
-    constructor (ctx: MmlResolveContext) {
-        savedValues = ctx.values
-    }
+class Loop(ctx: MmlResolveContext) {
 
     var beginAt: LoopLocation? = null
     var firstBreakAt: LoopLocation? = null
     val breaks = mutableMapOf<Int, LoopLocation>()
     var events = mutableListOf<MmlResolvedEvent>()
-    val savedValues: MutableMap<MmlSemanticVariable, Any>
+    val savedValues: MutableMap<MmlSemanticVariable, Any> = ctx.values
     var endLocations = mutableMapOf<Int, LoopLocation>() // count -> indexes for end
     var currentBreaks = mutableListOf<Int>()
+
 }
 
 data class LoopLocation(val source: Int, val output: Int, val tick: Int)
@@ -344,16 +342,12 @@ class MmlResolveContext(
     val globalContext: MmlResolveContext?,
     contextCompiler: MmlCompiler?
 ) {
-    val compiler: MmlCompiler
+    val compiler: MmlCompiler = contextCompiler ?: globalContext!!.compiler
 
     var timelinePosition: Int = 0
     var macroArguments = mutableMapOf<Any?, Any>()
     var values = mutableMapOf<MmlSemanticVariable, Any>()
     val loops = mutableListOf<Loop>()
-
-    init {
-        this.compiler = contextCompiler ?: globalContext!!.compiler
-    }
 
     val currentLoop: Loop?
         get() = loops.lastOrNull()
@@ -369,40 +363,36 @@ class MmlResolveContext(
     }
 }
 
-class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlCompiler) {
+class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private val compiler: MmlCompiler) {
     companion object {
         fun generate(source: MmlSemanticTreeSet, contextCompiler: MmlCompiler): MmlResolvedMusic {
-            var gen = MmlEventStreamGenerator(source, contextCompiler)
+            val gen = MmlEventStreamGenerator(source, contextCompiler)
             gen.generate()
             return gen.result
         }
     }
 
-    lateinit var globalContext: MmlResolveContext
-    val result: MmlResolvedMusic
-    var currentOutput = mutableListOf<MmlResolvedEvent>()
-
-    init {
-        result = MmlResolvedMusic().apply { baseCount = source.baseCount }
-    }
+    private lateinit var globalContext: MmlResolveContext
+    val result: MmlResolvedMusic = MmlResolvedMusic().apply { baseCount = source.baseCount }
+    private var currentOutput = mutableListOf<MmlResolvedEvent>()
 
     private fun generate() {
         globalContext = MmlResolveContext(source, null, compiler)
 
         for (track in source.tracks) {
-            var rtrk = MmlResolvedTrack(track.number, source)
+            val rtrk = MmlResolvedTrack(track.number, source)
             result.tracks.add(rtrk)
-            var tctx = MmlResolveContext(source, globalContext, compiler)
-            var list = track.data
+            val tctx = MmlResolveContext(source, globalContext, compiler)
+            val list = track.data
             currentOutput = rtrk.events
             processOperations(rtrk, tctx, list, 0, list.size, listOf())
             sort(currentOutput)
         }
     }
 
-    val chord = mutableListOf<MmlResolvedEvent>()
-    var recordNextAsChord = false
-    val storedOperations = mutableMapOf<Int, StoredOperations>()
+    private val chord = mutableListOf<MmlResolvedEvent>()
+    private var recordNextAsChord = false
+    private val storedOperations = mutableMapOf<Int, StoredOperations>()
 
     class StoredOperations {
         var operations = mutableListOf<MmlOperationUse>()
@@ -433,11 +423,11 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
         var isStringFormat = false
 
         for (listIndex in start until start + count) {
-            var oper = list[listIndex]
-            var extraTailArgsIfApplied =
+            val oper = list[listIndex]
+            val extraTailArgsIfApplied =
                 if (listIndex == start + count - 1) extraTailArgs else null
 
-            var arguments = oper.arguments.requireNoNulls()
+            val arguments = oper.arguments.requireNoNulls()
 
             when (oper.name) {
                 "__PRINT" -> {
@@ -453,7 +443,7 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                 "__LET" -> {
                     arguments[0].resolver.resolve(rctx, MmlDataType.String)
                     val name = arguments[0].resolver.stringValue
-                    var variable = source.variables.get(name) as MmlSemanticVariable
+                    val variable = source.variables.get(name) as MmlSemanticVariable?
                     if (variable == null) {
                         compiler.report(
                             MmlDiagnosticVerbosity.Error,
@@ -472,7 +462,7 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                     arguments[0].resolver.resolve(rctx, MmlDataType.String)
                     oper.validateArguments(rctx, arguments.size)
                     val name = arguments[0].resolver.stringValue
-                    var variable = source.variables.get(name) as MmlSemanticVariable
+                    val variable = source.variables[name]
                     if (variable == null) {
                         compiler.report(
                             MmlDiagnosticVerbosity.Error,
@@ -491,7 +481,7 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                         )
                         break
                     }
-                    var sb = rctx.ensureDefaultResolvedVariable(variable) as StringBuilder
+                    val sb = rctx.ensureDefaultResolvedVariable(variable) as StringBuilder
                     for (i in 1 until arguments.size)
                         sb.append(arguments[i].resolver.stringValue)
                 }
@@ -502,7 +492,7 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                     oper.validateArguments(rctx, oper.arguments.size)
                     val name = arguments[0].resolver.stringValue
                     val format = arguments[1].resolver.stringValue
-                    var variable = source.variables.get(name) as MmlSemanticVariable
+                    val variable = source.variables[name]
                     if (variable == null) {
                         compiler.report(
                             MmlDiagnosticVerbosity.Error,
@@ -553,20 +543,20 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                     }*/
                 }
                 "__APPLY" -> {
-                    var oa = arguments[0]
+                    val oa = arguments[0]
                     oa.resolver.resolve(rctx, MmlDataType.String)
                     val apparg = oa.resolver.stringValue
 
                     // add macro argument definitions
-                    var tmpop = MmlOperationUse(apparg, oper.location)
+                    val tmpop = MmlOperationUse(apparg, oper.location)
                     for (x in 1 until arguments.size)
                         tmpop.arguments.add(arguments[x])
-                    ProcessMacroCall(track, rctx, tmpop, extraTailArgsIfApplied ?: listOf())
+                    processMacroCall(track, rctx, tmpop, extraTailArgsIfApplied ?: listOf())
 
                 }
                 "__MIDI" -> {
                     oper.validateArguments(rctx, arguments.size)
-                    var mop = MmlResolvedEvent("MIDI", rctx.timelinePosition)
+                    val mop = MmlResolvedEvent("MIDI", rctx.timelinePosition)
                     for (arg in arguments)
                         mop.arguments.add(arg.resolver.byteValue)
                     currentOutput.add(mop)
@@ -597,7 +587,7 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                 }
                 "__MIDI_META" -> {
                     oper.validateArguments(rctx, oper.arguments.size)
-                    var mmop = MmlResolvedEvent("META", rctx.timelinePosition)
+                    val mmop = MmlResolvedEvent("META", rctx.timelinePosition)
                     mmop.arguments.add(0xFF.toByte())
                     for (arg in arguments)
                         mmop.arguments.addAll(arg.resolver.byteArrayValue.toList())
@@ -637,9 +627,9 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                 "__RESTORE_OPER" -> {
                     oper.validateArguments(rctx, 1, MmlDataType.Number)
                     val bufIdx = arguments[0].resolver.intValue
-                    var ss = storedOperations[bufIdx]!!
-                    var valuesBak = rctx.values
-                    var macroArgsBak = rctx.macroArguments
+                    val ss = storedOperations[bufIdx]!!
+                    val valuesBak = rctx.values
+                    val macroArgsBak = rctx.macroArguments
                     rctx.values = ss.values
                     rctx.macroArguments = ss.macroArguments
                     // adjust timeline_position (no need to update rctx.TimelinePosition here).
@@ -662,7 +652,7 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                 "__LOOP_BEGIN", "[" -> {
                     // #endif
                     oper.validateArguments(rctx, 0)
-                    var loop = Loop(rctx).apply {
+                    val loop = Loop(rctx).apply {
                         beginAt = LoopLocation(listIndex, currentOutput.size, rctx.timelinePosition)
                     }
                     rctx.values = mutableMapOf<MmlSemanticVariable, Any>()
@@ -677,7 +667,7 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                 "__LOOP_BREAK", "/", ":" -> {
                     // #endif
                     oper.validateArguments(rctx, oper.arguments.size)
-                    var loop = rctx.currentLoop
+                    val loop = rctx.currentLoop
                     if (loop == null) {
                         compiler.report(
                             MmlDiagnosticVerbosity.Error,
@@ -711,9 +701,9 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                         )
                         loop.currentBreaks.add(-1)
                     } else {
-                        for (x in 0 until arguments.size) {
-                            var numexpr = arguments[x]
-                            var num =
+                        for (x in arguments.indices) {
+                            val numexpr = arguments[x]
+                            val num =
                                 numexpr.resolver.intValue - 1 // "1st. loop" for musicians == 0th iteration in code.
                             if (x > 0 && num < 0)
                                 break // after the last argument.
@@ -768,7 +758,7 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                     }
 
                     rctx.loops.removeLast()
-                    var outside = rctx.currentLoop
+                    val outside = rctx.currentLoop
                     currentOutput = if (outside != null) outside.events else track.events
 
                     // now expand loop.
@@ -858,23 +848,23 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                     }
                 }
                 else ->
-                    ProcessMacroCall(track, rctx, oper, extraTailArgsIfApplied ?: listOf())
+                    processMacroCall(track, rctx, oper, extraTailArgsIfApplied ?: listOf())
             }
         }
     }
 
-    val expansionStack = mutableListOf<MmlSemanticMacro>()
+    private val expansionStack = mutableListOf<MmlSemanticMacro>()
 
-    val argCaches = mutableListOf<MutableMap<Any?, Any>>()
-    var cacheStackNum = 0
+    private val argCaches = mutableListOf<MutableMap<Any?, Any>>()
+    private var cacheStackNum = 0
 
-    private fun ProcessMacroCall(
+    private fun processMacroCall(
         track: MmlResolvedTrack,
         ctx: MmlResolveContext,
         oper: MmlOperationUse,
         extraTailArgs: List<MmlValueExpr?>
     ) {
-        var macro = track.macros[oper.name] as MmlSemanticMacro?
+        val macro = track.macros[oper.name]
         if (macro == null) {
             compiler.report(
                 MmlDiagnosticVerbosity.Error,
@@ -896,10 +886,10 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
         expansionStack.add(macro)
 
         if (cacheStackNum == argCaches.size)
-            argCaches.add(mutableMapOf<Any?, Any>())
-        var args = argCaches[cacheStackNum++]
-        var operUseArgs =
-            if (extraTailArgs != null) oper.arguments + extraTailArgs else oper.arguments
+            argCaches.add(mutableMapOf())
+        val args = argCaches[cacheStackNum++]
+        val operUseArgs =
+            if (extraTailArgs.any()) oper.arguments + extraTailArgs else oper.arguments
         for (i in 0 until macro.arguments.size) {
             val argdef = macro.arguments[i]
             var arg = if (i < operUseArgs.size) operUseArgs[i] else null
@@ -913,11 +903,11 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
                     "Argument name must be identical to all other argument names. Argument '${argdef.name}' in '${oper.name}' macro",
                     listOf()
                 )
-            args[argdef.name] = Pair<MmlSemanticVariable, Any>(argdef, arg.resolver.resolvedValue!!)
+            args[argdef.name] = Pair(argdef, arg.resolver.resolvedValue!!)
         }
-        var argsBak = ctx.macroArguments
+        val argsBak = ctx.macroArguments
         ctx.macroArguments = args
-        var extraTailArgsToCall =
+        val extraTailArgsToCall =
             if (macro.arguments.size < operUseArgs.size) operUseArgs.drop(macro.arguments.size) else null
         processOperations(
             track,
@@ -935,15 +925,15 @@ class MmlEventStreamGenerator(val source: MmlSemanticTreeSet, val compiler: MmlC
     }
 
     private fun sort(l: MutableList<MmlResolvedEvent>) {
-        var msgBlockByTime = mutableMapOf<Int, MutableList<MmlResolvedEvent>>()
+        val msgBlockByTime = mutableMapOf<Int, MutableList<MmlResolvedEvent>>()
         var m = 0
         var prev = 0
 
         while (m < l.size) {
-            var e = l[m]
+            val e = l[m]
             var pl = msgBlockByTime[l[m].tick]
             if (pl == null) {
-                pl = mutableListOf<MmlResolvedEvent>()
+                pl = mutableListOf()
                 msgBlockByTime[e.tick] = pl
             }
             prev = l[m].tick

@@ -26,13 +26,9 @@ enum class MmlDiagnosticVerbosity {
 
 typealias MmlDiagnosticReporter = (verbosity: MmlDiagnosticVerbosity, location: MmlLineInfo?, format: String, args: List<Any>?) -> Unit
 
-class MmlCompiler {
+class MmlCompiler() {
     companion object {
         val defaultIncludes = Util.defaultIncludes
-    }
-
-    constructor() {
-        report = { v, k, f, a -> reportOnConsole(v, k, f, (a ?: listOf()).toTypedArray()) }
     }
 
     var verbose = false
@@ -76,25 +72,15 @@ class MmlCompiler {
         }
     }
 
-    val help = """MML compiler mugene
+    private val help = """MML compiler mugene
 
 Usage: mugene [options] mml_files
 
 Options:
 --output
 specify explicit output file name.
---vsq
-Vocaloid VSQ mode on.
-Changes extension to .vsq and encoding to ShiftJIS,
-and uses VSQ metadata mode.
---uvsq
-Vocaloid VSQ mode on.
-and uses VSQ metadata mode.
-No changes on encoding, to support Bopomofo.
 --verbose
 prints debugging aid.
---use-vsq-metadata
-uses Vocaloid VSQ metadata mode.
 --disable-running-status
 disables running status in SMF.
 --encoding
@@ -162,7 +148,7 @@ This option is for core MML operation hackers."""
         // This makes it redundant to support #include
         val inputs = mutableListOf<MmlInputSource>()
         for (fname in inputFilenames)
-            inputs.add(MmlInputSource(fname, resolver.getEntity(fname)));
+            inputs.add(MmlInputSource(fname, resolver.getEntity(fname).readText()));
 
         FileOutputStream(outFilename).use {
             compile(noDefault, inputs, metaWriter, it, disableRunningStatus);
@@ -193,7 +179,7 @@ This option is for core MML operation hackers."""
     }
 
     fun compile(skipDefaultMmlFiles: Boolean, vararg mmlParts: String): MidiMusic {
-        val sources = mmlParts.map { mml -> MmlInputSource("<string>", StringReader(mml)) }
+        val sources = mmlParts.map { mml -> MmlInputSource("<string>", mml) }
         return compile(skipDefaultMmlFiles, inputs = sources.toTypedArray())
     }
 
@@ -215,7 +201,7 @@ This option is for core MML operation hackers."""
                 Util.defaultIncludes.map { f ->
                     MmlInputSource(
                         f,
-                        resolver.getEntity(f)
+                        resolver.getEntity(f).readText()
                     )
                 } + inputs
             else inputs
@@ -245,117 +231,10 @@ This option is for core MML operation hackers."""
 
         return smf;
     }
-}
 
-class MmlPrimitiveOperation {
-    companion object {
-
-        lateinit var all: List<MmlPrimitiveOperation>
-
-        val Print = MmlPrimitiveOperation().apply { name = "__PRINT" }
-        val Let = MmlPrimitiveOperation().apply { name = "__LET" };
-        val Store = MmlPrimitiveOperation().apply { name = "__STORE" };
-        val StoreFormat = MmlPrimitiveOperation().apply { name = "__STORE_FORMAT" };
-        val Format = MmlPrimitiveOperation().apply { name = "__FORMAT" };
-        val Apply = MmlPrimitiveOperation().apply { name = "__APPLY" };
-        val Midi = MmlPrimitiveOperation().apply { name = "__MIDI" };
-        val SyncNoteOffWithNext =
-            MmlPrimitiveOperation().apply { name = "__SYNC_NOFF_WITH_NEXT" };
-        val OnMidiNoteOff = MmlPrimitiveOperation().apply { name = "__ON_MIDI_NOTE_OFF" };
-        val MidiMeta = MmlPrimitiveOperation().apply { name = "__MIDI_META" };
-        val SaveOperationBegin = MmlPrimitiveOperation().apply { name = "__SAVE_OPER_BEGIN" };
-        val SaveOperationEnd = MmlPrimitiveOperation().apply { name = "__SAVE_OPER_END" };
-        val RestoreOperation = MmlPrimitiveOperation().apply { name = "__RESTORE_OPER" };
-        val LoopBegin = MmlPrimitiveOperation().apply { name = "__LOOP_BEGIN" };
-        val LoopBreak = MmlPrimitiveOperation().apply { name = "__LOOP_BREAK" };
-        val LoopEnd = MmlPrimitiveOperation().apply { name = "__LOOP_END" };
-        //#if !UNHACK_LOOP
-        //val LoopBegin2 =  MmlPrimitiveOperation().apply { name = "[" };
-        //val LoopBreak2 =  MmlPrimitiveOperation().apply { name = ":" };
-        //val LoopBreak3 =  MmlPrimitiveOperation().apply { name = "/" };
-        //val LoopEnd2 =  MmlPrimitiveOperation().apply { name = "]" };
-        //#endif
-
-        init {
-            all = listOf(
-                Print,
-                Let,
-                Store,
-                StoreFormat,
-                Format,
-                Apply,
-                Midi,
-                SyncNoteOffWithNext,
-                OnMidiNoteOff,
-                MidiMeta,
-                SaveOperationBegin,
-                SaveOperationEnd,
-                RestoreOperation,
-                LoopBegin,
-                LoopBreak,
-                LoopEnd,
-                //#if !UNHACK_LOOP
-                //LoopBegin2, LoopBreak2, LoopBreak3, LoopEnd2
-                //#endif
-            )
-        }
+    init {
+        report = { v, k, f, a -> reportOnConsole(v, k, f, (a ?: listOf()).toTypedArray()) }
     }
-
-    lateinit var name: String
-}
-
-enum class MmlDataType {
-    Any,
-    Number,
-    Length,
-    String,
-    Buffer,
-}
-
-/*struct*/ class MmlLength {
-    constructor(num: Int) {
-        dots = 0;
-        isValueByStep = false;
-        number = num;
-    }
-
-    val number: Int
-    var dots: Int
-    var isValueByStep: Boolean
-
-    fun getSteps(numerator: Int): Int {
-        if (isValueByStep)
-            return number
-        if (number == 0)
-            return 0;
-        var basis = numerator / number;
-        var ret = basis;
-        for (i in 0 until dots) {
-            basis /= 2
-            ret += basis;
-        }
-        return ret;
-    }
-
-    override fun toString() = "[${if (isValueByStep) "%" else ""}$number${".".repeat(dots)}]"
-}
-
-class MmlException(message: String = "MML error", innerException: Exception? = null) :
-    Exception(message, innerException) {
-
-    companion object {
-        fun formatMessage(message: String, location: MmlLineInfo): String {
-            if (location == MmlLineInfo.empty)
-                return message;
-            return "$message (${location.file} line ${location.lineNumber} column ${location.linePosition})"
-        }
-    }
-
-    constructor (message: String, location: MmlLineInfo)
-            : this(message, location, null)
-
-    constructor (message: String, location: MmlLineInfo, innerException: Exception?)
-            : this(formatMessage(message, location), innerException)
 }
 
 fun MidiMusic.save(

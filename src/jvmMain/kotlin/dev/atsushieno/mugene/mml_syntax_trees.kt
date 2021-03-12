@@ -408,3 +408,115 @@ class MmlMacroExpander {
                 variable.fillDefaultValue()
     }
 }
+
+
+class MmlPrimitiveOperation {
+    companion object {
+
+        lateinit var all: List<MmlPrimitiveOperation>
+
+        val Print = MmlPrimitiveOperation().apply { name = "__PRINT" }
+        val Let = MmlPrimitiveOperation().apply { name = "__LET" };
+        val Store = MmlPrimitiveOperation().apply { name = "__STORE" };
+        val StoreFormat = MmlPrimitiveOperation().apply { name = "__STORE_FORMAT" };
+        val Format = MmlPrimitiveOperation().apply { name = "__FORMAT" };
+        val Apply = MmlPrimitiveOperation().apply { name = "__APPLY" };
+        val Midi = MmlPrimitiveOperation().apply { name = "__MIDI" };
+        val SyncNoteOffWithNext =
+            MmlPrimitiveOperation().apply { name = "__SYNC_NOFF_WITH_NEXT" };
+        val OnMidiNoteOff = MmlPrimitiveOperation().apply { name = "__ON_MIDI_NOTE_OFF" };
+        val MidiMeta = MmlPrimitiveOperation().apply { name = "__MIDI_META" };
+        val SaveOperationBegin = MmlPrimitiveOperation().apply { name = "__SAVE_OPER_BEGIN" };
+        val SaveOperationEnd = MmlPrimitiveOperation().apply { name = "__SAVE_OPER_END" };
+        val RestoreOperation = MmlPrimitiveOperation().apply { name = "__RESTORE_OPER" };
+        val LoopBegin = MmlPrimitiveOperation().apply { name = "__LOOP_BEGIN" };
+        val LoopBreak = MmlPrimitiveOperation().apply { name = "__LOOP_BREAK" };
+        val LoopEnd = MmlPrimitiveOperation().apply { name = "__LOOP_END" };
+        //#if !UNHACK_LOOP
+        //val LoopBegin2 =  MmlPrimitiveOperation().apply { name = "[" };
+        //val LoopBreak2 =  MmlPrimitiveOperation().apply { name = ":" };
+        //val LoopBreak3 =  MmlPrimitiveOperation().apply { name = "/" };
+        //val LoopEnd2 =  MmlPrimitiveOperation().apply { name = "]" };
+        //#endif
+
+        init {
+            all = listOf(
+                Print,
+                Let,
+                Store,
+                StoreFormat,
+                Format,
+                Apply,
+                Midi,
+                SyncNoteOffWithNext,
+                OnMidiNoteOff,
+                MidiMeta,
+                SaveOperationBegin,
+                SaveOperationEnd,
+                RestoreOperation,
+                LoopBegin,
+                LoopBreak,
+                LoopEnd,
+                //#if !UNHACK_LOOP
+                //LoopBegin2, LoopBreak2, LoopBreak3, LoopEnd2
+                //#endif
+            )
+        }
+    }
+
+    lateinit var name: String
+}
+
+enum class MmlDataType {
+    Any,
+    Number,
+    Length,
+    String,
+    Buffer,
+}
+
+/*struct*/ class MmlLength {
+    constructor(num: Int) {
+        dots = 0;
+        isValueByStep = false;
+        number = num;
+    }
+
+    val number: Int
+    var dots: Int
+    var isValueByStep: Boolean
+
+    fun getSteps(numerator: Int): Int {
+        if (isValueByStep)
+            return number
+        if (number == 0)
+            return 0;
+        var basis = numerator / number;
+        var ret = basis;
+        for (i in 0 until dots) {
+            basis /= 2
+            ret += basis;
+        }
+        return ret;
+    }
+
+    override fun toString() = "[${if (isValueByStep) "%" else ""}$number${".".repeat(dots)}]"
+}
+
+class MmlException(message: String = "MML error", innerException: Exception? = null) :
+    Exception(message, innerException) {
+
+    companion object {
+        fun formatMessage(message: String, location: MmlLineInfo): String {
+            if (location == MmlLineInfo.empty)
+                return message;
+            return "$message (${location.file} line ${location.lineNumber} column ${location.linePosition})"
+        }
+    }
+
+    constructor (message: String, location: MmlLineInfo)
+            : this(message, location, null)
+
+    constructor (message: String, location: MmlLineInfo, innerException: Exception?)
+            : this(formatMessage(message, location), innerException)
+}

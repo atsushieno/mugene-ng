@@ -1,9 +1,5 @@
 package dev.atsushieno.mugene
 
-import java.io.*
-import java.lang.IllegalArgumentException
-import java.lang.UnsupportedOperationException
-
 //region mml token sequence structure
 
 enum class MmlTokenType {
@@ -113,77 +109,10 @@ class MmlTrack(val number: Double) {
 }
 
 
-//region input sources to tokenizer sources
-
-abstract class StreamResolver {
-
-    fun getEntity(file: String): Reader {
-        if (file.isEmpty())
-            throw IllegalArgumentException("Empty filename is passed")
-        return onGetEntity(file) ?: throw InvalidObjectException("MML stream \"$file\" could not be resolved.")
-    }
-
-    internal open fun onGetEntity(file: String): Reader? {
-        throw UnsupportedOperationException("You have to implement it. It is virtual only because of backward compatibility.")
-    }
-
-    private val includes = mutableListOf<String>()
-
-    fun resolveFilePath(file: String): String? {
-        if (!includes.any())
-            return File(file).absolutePath
-        if (File(file).isAbsolute)
-            return file
-        return File(includes.last(), file).absolutePath
-    }
-
-    open fun pushInclude(file: String) {
-        val abs = resolveFilePath(file)!!
-        if (includes.contains(abs))
-            throw IllegalArgumentException("File \"$abs\" is already being processed. Recursive inclusion is prohibited.")
-        includes.add(abs)
-    }
-
-    open fun popInclude() {
-        includes.removeLast()
-    }
-}
-
-class MergeStreamResolver(vararg resolvers: StreamResolver) : StreamResolver() {
-    private val resolvers: MutableList<StreamResolver> = resolvers.toMutableList()
-
-    override fun onGetEntity(file: String): Reader? {
-        for (r in resolvers) {
-            val ret = r.onGetEntity(file)
-            if (ret != null)
-                return ret
-        }
-        return null
-    }
-
-    override fun pushInclude(file: String) {
-        for (r in resolvers)
-            r.pushInclude(file)
-    }
-
-    override fun popInclude() {
-        for (r in resolvers)
-            r.popInclude()
-    }
-}
-
-class LocalFileStreamResolver : StreamResolver() {
-    override fun onGetEntity(file: String): Reader? {
-        val abs = resolveFilePath(file)
-        if (File(abs).exists())
-            return FileReader(abs)
-        return null
-    }
-}
 
 // file sources to be parsed into MmlSourceLineSet, for each track
 // and macro.
-data class MmlInputSource(val file: String, val reader: Reader)
+data class MmlInputSource(val file: String, val text: String)
 
 class MmlLineInfo(var file: String, line: Int, column: Int) {
     companion object {
@@ -294,16 +223,16 @@ class MmlInputSourceReader(private val compiler: MmlCompiler) {
 
         for (i in 0 until inputs.size) {  // inputs could grow up, so avoid converting to range
             var line = 0
-            val s = ""
+            var s = ""
             var ls: MmlSourceLineSet? = null
             val input = inputs[i]
             compiler.resolver.pushInclude(input.file)
             var continued = false
             var wasContinued = continued
-            for (ss in input.reader.readLines()) {
+            for (ss in input.text.split('\n')) {
                 line++
                 wasContinued = continued
-                var s = trimComments(ss, 0)
+                s = trimComments(ss, 0).trimEnd()
                 if (s.isEmpty()) // comment line is allowed inside multi-line MML.
                     continue
 
@@ -373,7 +302,7 @@ class MmlInputSourceReader(private val compiler: MmlCompiler) {
         val file = line.text.substring(line.location.linePosition).trim()
         this.doProcess(
             mutableListOf(
-                MmlInputSource(file, compiler.resolver.getEntity(file))
+                MmlInputSource(file, compiler.resolver.getEntity(file).readText())
             )
         )
         return MmlUntypedSource(line)
@@ -457,7 +386,7 @@ abstract class MmlSourceLineSet {
 
     open fun addConsecutiveLine(text: String) {
         if (lines.size == 0)
-            throw InvalidObjectException("Unexpected addition to previous line while there was no registered line.")
+            throw IllegalStateException("Unexpected addition to previous line while there was no registered line.")
         val prev = lines.last()
         val line = MmlLine.create(
             prev.location.file,
@@ -925,7 +854,7 @@ class MmlMatchLongestLexer : MmlLexer {
         if (matchpos == null)
             matchpos = List(tokenizerSource.macros.size) { 0 }
         if (matchpos!!.size < tokenizerSource.macros.size)
-            throw InvalidObjectException("Macro definition is added somewhere after the first macro search is invoked.")
+            throw IllegalStateException("Macro definition is added somewhere after the first macro search is invoked.")
         var matched: String? = null
 
         bufferPos = 0 // reset

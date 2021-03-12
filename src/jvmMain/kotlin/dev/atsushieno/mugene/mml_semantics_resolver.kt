@@ -1,16 +1,12 @@
 package dev.atsushieno.mugene
 
-import java.io.InvalidObjectException
-import java.nio.charset.Charset
-
 // variable resolver structures
 
 abstract class MmlValueExprResolver(val expr: MmlValueExpr) {
     companion object {
         internal var baseCount = 192
 
-        var stringToBytes: (String) -> ByteArray =
-            { s: String -> s.toByteArray(Charset.defaultCharset()) }
+        var stringToBytes: (String) -> ByteArray = { s: String -> s.encodeToByteArray() }
 
         fun lengthDotsToMultiplier(dots: Int): Double {
             return 2.0 - Math.pow(0.5, dots.toDouble())
@@ -21,8 +17,7 @@ abstract class MmlValueExprResolver(val expr: MmlValueExpr) {
             ctx: MmlResolveContext,
             value: Any?,
             type: MmlDataType,
-            location: MmlLineInfo?,
-            throwException: Boolean = false
+            location: MmlLineInfo?
         ): Any? = getTypedValue(ctx.compiler, value, type, location)
 
         fun getTypedValue(
@@ -43,30 +38,44 @@ abstract class MmlValueExprResolver(val expr: MmlValueExpr) {
                         return value.toDouble()
                     if (value is MmlLength)
                         return value.getSteps(baseCount).toDouble()
+                    else
+                        compiler.report(
+                            MmlDiagnosticVerbosity.Error,
+                            location,
+                            "Cannot convert from length to $type)",
+                            listOf()
+                        )
+                    return null
                 }
                 MmlDataType.Length -> {
                     if (value is MmlLength)
                         return value
                     var denom = 0
-                    denom = if (value is Double)
-                        value.toInt()
+                    if (value is Double)
+                        denom = value.toInt()
                     else if (value is Int)
-                        value
+                        denom = value
                     else if (value is Byte)
-                        value.toInt()
+                        denom = value.toInt()
                     else
-                        throw InvalidObjectException("Cannot convert to length") // error
+                        compiler.report(
+                            MmlDiagnosticVerbosity.Error,
+                            location,
+                            "Cannot convert from length to $type)",
+                            listOf()
+                        )
                     return MmlLength(denom)
                 }
-                else ->
+                else -> {
                     compiler.report(
                         MmlDiagnosticVerbosity.Error,
                         location,
                         "Invalid value $value for the expected data type $type)",
                         listOf()
                     )
+                    return null
+                }
             }
-            return null
         }
     }
 

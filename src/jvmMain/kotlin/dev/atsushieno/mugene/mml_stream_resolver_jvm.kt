@@ -54,3 +54,21 @@ class LocalFileStreamResolver : StreamResolver() {
         return null
     }
 }
+
+class JarResourceStreamResolver : StreamResolver() {
+
+    override fun resolveFilePath(file: String): String? {
+        val resName = if (file.startsWith("/")) file else "/$file"
+        val res = javaClass.getResource(resName)
+        if (res == null)
+            return null
+        return resName
+    }
+
+    override fun onGetEntity(file: String): String? {
+        val resName = resolveFilePath(file) ?: return null
+        javaClass.getResource(resName).openStream().use {
+            return java.io.InputStreamReader(it).readText()
+        }
+    }
+}

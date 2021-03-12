@@ -10,7 +10,7 @@ import java.nio.charset.Charset
 
 
 class MmlCompilerJvm : MmlCompiler() {
-    override var resolver : StreamResolver = MergeStreamResolver(LocalFileStreamResolver())
+    override var resolver : StreamResolver = MergeStreamResolver(LocalFileStreamResolver(), JarResourceStreamResolver())
 
     class MmlCompilerOptions {
         var skipDefaultMmlFiles = false

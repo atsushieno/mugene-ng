@@ -20,10 +20,10 @@ abstract class StreamResolver {
     abstract fun resolveFilePath(file: String): String?
 
     open fun pushInclude(file: String) {
-        val abs = resolveFilePath(file)!!
-        if (includes.contains(abs))
+        val abs = resolveFilePath(file)
+        if (abs != null && includes.contains(abs))
             throw IllegalArgumentException("File \"$abs\" is already being processed. Recursive inclusion is prohibited.")
-        includes.add(abs)
+        includes.add(abs ?: "")
     }
 
     open fun popInclude() {

@@ -77,9 +77,9 @@ class MmlSemanticVariable {
 
     override fun toString(): String {
         if (defaultValue != null)
-            return String.format("$0:$1(=$2)", name, type, defaultValue)
+            return "$name:$type(=$defaultValue)"
         else
-            return String.format("$0:$1", name, type)
+            return "$name:$type"
     }
 }
 
@@ -202,7 +202,7 @@ class MmlConditionalExpr(val condition: MmlValueExpr, val trueExpr: MmlValueExpr
     }
 }
 
-class MmlComparisonExpr( val left: MmlValueExpr,  val right: MmlValueExpr, type: ComparisonType) :
+class MmlComparisonExpr(val left: MmlValueExpr, val right: MmlValueExpr, type: ComparisonType) :
     MmlValueExpr(left.location) {
 
     val comparisonType: ComparisonType = type
@@ -255,7 +255,7 @@ class MmlOperationUse {
     fun validateArguments(ctx: MmlResolveContext, minParams: Int, vararg types: MmlDataType) {
         if (arguments.size != types.size) {
             if (arguments.size < minParams || minParams < 0) {
-                ctx.compiler.report(
+                ctx.reporter(
                     MmlDiagnosticVerbosity.Error,
                     location,
                     "Insufficient argument(s)",
@@ -275,16 +275,16 @@ class MmlOperationUse {
 
 // semantic tree builder
 
-class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextCompiler: MmlCompiler) {
+class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiagnosticReporter) {
     companion object {
-        fun compile(tokenSet: MmlTokenSet, contextCompiler: MmlCompiler): MmlSemanticTreeSet {
-            val b = MmlSemanticTreeBuilder(tokenSet, contextCompiler)
+        fun compile(tokenSet: MmlTokenSet, contextReporter: MmlDiagnosticReporter): MmlSemanticTreeSet {
+            val b = MmlSemanticTreeBuilder(tokenSet, contextReporter)
             b.compile()
             return b.result
         }
     }
 
-    private val compiler: MmlCompiler = contextCompiler
+    private val reporter: MmlDiagnosticReporter = contextReporter
     val result: MmlSemanticTreeSet
 
     private fun compile() {
@@ -309,11 +309,11 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextCompiler: MmlComp
             result.tracks.add(buildTrackOperationList(track))
     }
 
-    private fun antlrCompile(compiler: MmlCompiler, stream: TokenStream) : Any {
+    private fun antlrCompile(reporter: MmlDiagnosticReporter, stream: TokenStream) : Any {
         val tokenStream = CommonTokenStream(WrappedTokenSource(stream))
         val parser = MugeneParser(tokenStream)
         val tree = parser.expressionOrOptOperationUses()
-        val visitor = MugeneParserVisitorImpl(compiler)
+        val visitor = MugeneParserVisitorImpl(reporter)
         return visitor.visit(tree)!!
     }
 
@@ -325,7 +325,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextCompiler: MmlComp
 
         // This is the rewritten code for Kotlin...
         val stream = TokenStream(src.defaultValueTokens, src.location)
-        ret.defaultValue = antlrCompile(compiler, stream) as MmlValueExpr
+        ret.defaultValue = antlrCompile(reporter, stream) as MmlValueExpr
         // ...end of that.
 
         //ret.defaultValue = Parser.MmlParser(compiler, stream.source).ParseExpression()
@@ -352,7 +352,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextCompiler: MmlComp
     }
 
     private fun compileOperationTokens(data: MutableList<MmlOperationUse>, stream: TokenStream) {
-        data.addAll(antlrCompile(compiler, stream) as List<MmlOperationUse>)
+        data.addAll(antlrCompile(reporter, stream) as List<MmlOperationUse>)
     }
 
     init {
@@ -367,28 +367,22 @@ class TokenStream(val source: List<MmlToken>, val definitionLocation: MmlLineInf
     var position: Int = 0
 }
 
-fun <K, V> Map<K, V?>.get(key: K): V? = this.getOrDefault(key, null)
+//fun <K, V> Map<K, V?>.get(key: K): V? = this.getOrDefault(key, null)
 
 // semantic tree expander
 
-class MmlMacroExpander {
+class MmlMacroExpander(private val source: MmlSemanticTreeSet, contextReporter: MmlDiagnosticReporter) {
     companion object {
-        fun expand(source: MmlSemanticTreeSet, contextCompiler: MmlCompiler) {
-            MmlMacroExpander(source, contextCompiler).expand()
+        fun expand(source: MmlSemanticTreeSet, contextReporter: MmlDiagnosticReporter) {
+            MmlMacroExpander(source, contextReporter).expand()
         }
     }
 
-    constructor (source: MmlSemanticTreeSet, contextCompiler: MmlCompiler) {
-        this.compiler = contextCompiler
-        this.source = source
-    }
-
-    private val compiler: MmlCompiler
-    private val source: MmlSemanticTreeSet
+    private val reporter: MmlDiagnosticReporter = contextReporter
     private val expansionStack = mutableListOf<MmlSemanticMacro>()
 
     private fun expand() {
-        val ctx = MmlResolveContext(source, null, compiler)
+        val ctx = MmlResolveContext(source, null, reporter)
 
         // resolve variables without any context.
         for (variable in source.variables.values) {

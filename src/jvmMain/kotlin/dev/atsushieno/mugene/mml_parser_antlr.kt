@@ -61,7 +61,7 @@ class WrappedTokenSource(val ts: TokenStream) : TokenSource {
     }
 }
 
-class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserBaseVisitor<Any>() {
+class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : MugeneParserBaseVisitor<Any>() {
     private fun getSingleContent(ctx: ParserRuleContext) = visit(ctx.getChild(0)!!)!!
 
     private val skippedArgument = MmlConstantExpr (MmlLineInfo.empty, MmlDataType.String, "DEFAULT ARGUMENT")
@@ -234,7 +234,7 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
                 else -> error ("Unexpected parser error; unexpected token index")
             }
         val n = visit(ctx.getChild(1)!!) as MmlToken
-        val l = MmlLength (mul * (MmlValueExprResolver.getTypedValue (compiler, n.value, MmlDataType.Number, n.location) as Double).toInt()).apply {
+        val l = MmlLength (mul * (MmlValueExprResolver.getTypedValue (reporter, n.value, MmlDataType.Number, n.location) as Double).toInt()).apply {
             isValueByStep = true
         }
         return MmlConstantExpr (n.location, MmlDataType.Length, l)

@@ -90,13 +90,21 @@ kotlin {
                 implementation(kotlin("test-junit"))
             }
         }
-        val jsMain by getting
+        val jsMain by getting {
+            dependencies {
+                implementation("dev.atsushieno:ktmidi-js:0.1.2")
+            }
+        }
         val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))
             }
         }
-        val nativeMain by getting
+        val nativeMain by getting {
+            dependencies {
+                implementation("dev.atsushieno:ktmidi-native:0.1.2")
+            }
+        }
         val nativeTest by getting
     }
 }

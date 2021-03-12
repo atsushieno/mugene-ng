@@ -1,6 +1,45 @@
 package dev.atsushieno.mugene
 
+import kotlin.math.pow
+
+
+abstract class StreamResolver {
+
+    fun getEntity(file: String): String {
+        if (file.isEmpty())
+            throw IllegalArgumentException("Empty filename is passed")
+        return onGetEntity(file) ?: throw IllegalArgumentException("MML stream \"$file\" could not be resolved.")
+    }
+
+    internal open fun onGetEntity(file: String): String? {
+        throw UnsupportedOperationException("You have to implement it. It is virtual only because of backward compatibility.")
+    }
+
+    protected val includes = mutableListOf<String>()
+
+    abstract fun resolveFilePath(file: String): String?
+
+    open fun pushInclude(file: String) {
+        val abs = resolveFilePath(file)!!
+        if (includes.contains(abs))
+            throw IllegalArgumentException("File \"$abs\" is already being processed. Recursive inclusion is prohibited.")
+        includes.add(abs)
+    }
+
+    open fun popInclude() {
+        includes.removeLast()
+    }
+}
+
 //region mml token sequence structure
+
+enum class MmlDiagnosticVerbosity {
+    Error,
+    Warning,
+    Information,
+}
+
+typealias MmlDiagnosticReporter = (verbosity: MmlDiagnosticVerbosity, location: MmlLineInfo?, format: String, args: List<Any>?) -> Unit
 
 enum class MmlTokenType {
     None,
@@ -155,9 +194,9 @@ class MmlLine(val location: MmlLineInfo, var text: String) {
     }
 }
 
-class MmlTokenizerSource(compiler: MmlCompiler) {
+class MmlTokenizerSource(reporter: MmlDiagnosticReporter, resolver: StreamResolver) {
     // can be switched
-    var lexer: MmlLexer = MmlMatchLongestLexer(compiler, this)
+    var lexer: MmlLexer = MmlMatchLongestLexer(reporter, resolver, this)
 
     // It holds ongoing definition of a macro. Used for argument name lookup.
     var currentMacroDefinition: MmlMacroDefinition? = null
@@ -182,10 +221,10 @@ class MmlTokenizerSource(compiler: MmlCompiler) {
     }
 }
 
-class MmlInputSourceReader(private val compiler: MmlCompiler) {
+class MmlInputSourceReader(private val reporter: MmlDiagnosticReporter, private val resolver: StreamResolver) {
     companion object {
-        fun parse(compiler: MmlCompiler, inputs: List<MmlInputSource>): MmlTokenizerSource {
-            val r = MmlInputSourceReader(compiler)
+        fun parse(reporter: MmlDiagnosticReporter, resolver: StreamResolver, inputs: List<MmlInputSource>): MmlTokenizerSource {
+            val r = MmlInputSourceReader(reporter, resolver)
             r.process(inputs)
             return r.result
         }
@@ -215,7 +254,7 @@ class MmlInputSourceReader(private val compiler: MmlCompiler) {
     private var inCommentMode = false
 
     fun process(inputs: List<MmlInputSource>) {
-        result = MmlTokenizerSource(compiler)
+        result = MmlTokenizerSource(reporter, resolver)
         doProcess(inputs.toMutableList())
     }
 
@@ -226,7 +265,7 @@ class MmlInputSourceReader(private val compiler: MmlCompiler) {
             var s = ""
             var ls: MmlSourceLineSet? = null
             val input = inputs[i]
-            compiler.resolver.pushInclude(input.file)
+            resolver.pushInclude(input.file)
             var continued = false
             var wasContinued = continued
             for (ss in input.text.split('\n')) {
@@ -256,7 +295,7 @@ class MmlInputSourceReader(private val compiler: MmlCompiler) {
                     s.length - 1,
                     "Unexpected end of consecutive line by '\\' at the end of file"
                 )
-            compiler.resolver.popInclude()
+            resolver.popInclude()
         }
     }
 
@@ -302,7 +341,7 @@ class MmlInputSourceReader(private val compiler: MmlCompiler) {
         val file = line.text.substring(line.location.linePosition).trim()
         this.doProcess(
             mutableListOf(
-                MmlInputSource(file, compiler.resolver.getEntity(file).readText())
+                MmlInputSource(file, resolver.getEntity(file))
             )
         )
         return MmlUntypedSource(line)
@@ -349,7 +388,7 @@ class MmlInputSourceReader(private val compiler: MmlCompiler) {
             }
         }
         if (range == null) {
-            compiler.report(
+            reporter(
                 MmlDiagnosticVerbosity.Error,
                 line.location,
                 "Current line indicates no track number, and there was no indicated tracks previously.",
@@ -417,7 +456,7 @@ class MmlVariableSource(val parsedNames: MutableList<String> = mutableListOf()) 
 
 class MmlPragmaSource(val name: String) : MmlSourceLineSet()
 
-abstract class MmlLexer(internal val compiler: MmlCompiler, source: MmlTokenizerSource) {
+abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal val resolver: StreamResolver, source: MmlTokenizerSource) {
 
     private var input: MmlSourceLineSet? = null
     private var currentLine: Int = 0
@@ -514,10 +553,7 @@ abstract class MmlLexer(internal val compiler: MmlCompiler, source: MmlTokenizer
                 if (!(acceptFloatingPoint && ch2 == '.'.toInt()) && !isNumber(ch2))
                     break
             }
-            return if (floatingPointAt > 0) value * Math.pow(
-                0.1,
-                (digits - floatingPointAt).toDouble()
-            ) else value
+            return if (floatingPointAt > 0) value * 0.1.pow((digits - floatingPointAt).toDouble()) else value
         }
     }
 
@@ -720,7 +756,7 @@ abstract class MmlLexer(internal val compiler: MmlCompiler, source: MmlTokenizer
                 line.readChar()
                 ch_ = line.peekChar()
                 if (ch_ < 0) {
-                    compiler.report(
+                    reporter(
                         MmlDiagnosticVerbosity.Error,
                         line.location,
                         "Unexpected end of stream in the middle of escaped token.",
@@ -750,7 +786,7 @@ abstract class MmlLexer(internal val compiler: MmlCompiler, source: MmlTokenizer
                             return true
                         }
                         else -> {
-                            compiler.report(
+                            reporter(
                                 MmlDiagnosticVerbosity.Error,
                                 line.location,
                                 "Unexpected escaped token: '\\$ch'",
@@ -841,10 +877,7 @@ abstract class MmlLexer(internal val compiler: MmlCompiler, source: MmlTokenizer
     }
 }
 
-class MmlMatchLongestLexer : MmlLexer {
-    constructor (compiler: MmlCompiler, source: MmlTokenizerSource)
-            : super(compiler, source) {
-    }
+class MmlMatchLongestLexer(reporter: MmlDiagnosticReporter, resolver: StreamResolver, source: MmlTokenizerSource) : MmlLexer(reporter, resolver, source) {
 
     private var matchpos: List<Int>? = null
     private var buffer = Array(256) { 0.toChar() }
@@ -932,7 +965,7 @@ class MmlMatchLongestLexer : MmlLexer {
     }
 }
 
-class MmlTokenizer(private val source: MmlTokenizerSource) {
+class MmlTokenizer(private val reporter: MmlDiagnosticReporter, private val source: MmlTokenizerSource) {
     companion object {
         val metaMap = mutableMapOf<String, Byte>()
 
@@ -942,8 +975,8 @@ class MmlTokenizer(private val source: MmlTokenizerSource) {
             metaMap["title"] = 3
         }
 
-        fun tokenize(source: MmlTokenizerSource): MmlTokenSet {
-            val tokenizer = MmlTokenizer(source)
+        fun tokenize(reporter: MmlDiagnosticReporter, source: MmlTokenizerSource): MmlTokenSet {
+            val tokenizer = MmlTokenizer(reporter, source)
             tokenizer.process()
             return tokenizer.result
         }
@@ -951,9 +984,6 @@ class MmlTokenizer(private val source: MmlTokenizerSource) {
 
     private val aliases = mutableMapOf<String, String>()
     private val result: MmlTokenSet = MmlTokenSet()
-
-    private val compiler
-        get() = source.lexer.compiler
 
     fun process() {
         // process pragmas
@@ -1012,7 +1042,7 @@ class MmlTokenizer(private val source: MmlTokenizerSource) {
                             source.lexer.skipWhitespaces()
                         }
                         if (source.lexer.advance())
-                            compiler.report(
+                            reporter(
                                 MmlDiagnosticVerbosity.Error,
                                 source.lexer.line.location,
                                 "Extra conditional tokens",
@@ -1026,7 +1056,7 @@ class MmlTokenizer(private val source: MmlTokenizerSource) {
                         result.conditional.tracks.addAll(tracks)
                         source.lexer.skipWhitespaces()
                         if (source.lexer.advance())
-                            compiler.report(
+                            reporter(
                                 MmlDiagnosticVerbosity.Error,
                                 source.lexer.line.location,
                                 "Extra conditional tokens",
@@ -1034,7 +1064,7 @@ class MmlTokenizer(private val source: MmlTokenizerSource) {
                             )
                     }
                     else ->
-                        compiler.report(
+                        reporter(
                             MmlDiagnosticVerbosity.Error,
                             source.lexer.line.location,
                             "Unexpected compilation condition type '$category'",
@@ -1055,7 +1085,7 @@ class MmlTokenizer(private val source: MmlTokenizerSource) {
                     "text" -> {
                     }
                     else ->
-                        compiler.report(
+                        reporter(
                             MmlDiagnosticVerbosity.Error,
                             source.lexer.line.location,
                             "Invalid #meta directive argument: $identifier",
@@ -1075,7 +1105,7 @@ class MmlTokenizer(private val source: MmlTokenizerSource) {
                 val identifier = source.lexer.readNewIdentifier()
                 source.lexer.skipWhitespaces(true)
                 if (aliases.containsKey(identifier))
-                    compiler.report(
+                    reporter(
                         MmlDiagnosticVerbosity.Warning,
                         source.lexer.line.location,
                         "Warning: overwriting definition $identifier, redefined at ${source.lexer.line.location}",
@@ -1172,7 +1202,7 @@ class MmlTokenizer(private val source: MmlTokenizerSource) {
 
             source.lexer.newIdentifierMode = false
             if (!source.lexer.advance()) {
-                compiler.report(
+                reporter(
                     MmlDiagnosticVerbosity.Error,
                     source.lexer.line.location,
                     "type name is expected after ':' in macro argument definition",
@@ -1187,7 +1217,7 @@ class MmlTokenizer(private val source: MmlTokenizerSource) {
                 MmlTokenType.KeywordBuffer -> {
                 }
                 else -> {
-                    compiler.report(
+                    reporter(
                         MmlDiagnosticVerbosity.Error,
                         source.lexer.line.location,
                         "Data type name is expected, but got ${source.lexer.currentToken}",
@@ -1210,7 +1240,7 @@ class MmlTokenizer(private val source: MmlTokenizerSource) {
                 if (!source.lexer.advance()) {
                     if (isVariable)
                         return
-                    compiler.report(
+                    reporter(
                         MmlDiagnosticVerbosity.Error,
                         source.lexer.line.location,
                         "Incomplete argument default value definition",

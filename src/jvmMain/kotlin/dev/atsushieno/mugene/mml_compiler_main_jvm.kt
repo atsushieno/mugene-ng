@@ -18,14 +18,6 @@ internal class Util {
     }
 }
 
-enum class MmlDiagnosticVerbosity {
-    Error,
-    Warning,
-    Information,
-}
-
-typealias MmlDiagnosticReporter = (verbosity: MmlDiagnosticVerbosity, location: MmlLineInfo?, format: String, args: List<Any>?) -> Unit
-
 class MmlCompiler() {
     companion object {
         val defaultIncludes = Util.defaultIncludes
@@ -148,7 +140,7 @@ This option is for core MML operation hackers."""
         // This makes it redundant to support #include
         val inputs = mutableListOf<MmlInputSource>()
         for (fname in inputFilenames)
-            inputs.add(MmlInputSource(fname, resolver.getEntity(fname).readText()));
+            inputs.add(MmlInputSource(fname, resolver.getEntity(fname)));
 
         FileOutputStream(outFilename).use {
             compile(noDefault, inputs, metaWriter, it, disableRunningStatus);
@@ -201,30 +193,30 @@ This option is for core MML operation hackers."""
                 Util.defaultIncludes.map { f ->
                     MmlInputSource(
                         f,
-                        resolver.getEntity(f).readText()
+                        resolver.getEntity(f)
                     )
                 } + inputs
             else inputs
 
         // input sources -> tokenizer sources
-        val tokenizerSources = MmlInputSourceReader.parse(this, inputs);
+        val tokenizerSources = MmlInputSourceReader.parse(report, resolver, inputs);
 
         // tokenizer sources -> token streams
-        return MmlTokenizer.tokenize(tokenizerSources);
+        return MmlTokenizer.tokenize(report, tokenizerSources);
     }
 
     // used by language server and compiler.
     private fun buildSemanticTree(tokens: MmlTokenSet): MmlSemanticTreeSet {
         // token streams -> semantic trees
-        return MmlSemanticTreeBuilder.compile(tokens, this);
+        return MmlSemanticTreeBuilder.compile(tokens, report);
     }
 
     private fun generateMusic(tree: MmlSemanticTreeSet): MidiMusic {
         // semantic trees -> simplified streams
-        MmlMacroExpander.expand(tree, this);
+        MmlMacroExpander.expand(tree, report);
 
         // simplified streams -> raw events
-        val resolved = MmlEventStreamGenerator.generate(tree, this);
+        val resolved = MmlEventStreamGenerator.generate(tree, report);
 
         // raw events -> SMF
         val smf = MmlSmfGenerator.generate(resolved);

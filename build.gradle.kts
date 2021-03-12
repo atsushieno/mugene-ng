@@ -28,6 +28,7 @@ repositories {
 
 plugins {
     kotlin("multiplatform") version "1.5.0-M1"
+    `maven-publish`
 }
 
 group = "dev.atsushieno"
@@ -146,3 +147,21 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
 tasks.getByName("compileKotlinJvm").dependsOn("generateKotlinCommonGrammarSource")
 
 // end of copy(2)
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("all") {
+                groupId = "dev.atsushieno"
+                if (name.contains("metadata")) {
+                    artifactId = "mugene"
+                } else {
+                    artifactId = "mugene-$name"
+                }
+
+                version = version
+            }
+        }
+    }
+}
+

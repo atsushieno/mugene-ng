@@ -54,6 +54,7 @@ kotlin {
             }
         }
     }
+/*
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")
     val nativeTarget = when {
@@ -62,8 +63,8 @@ kotlin {
         isMingwX64 -> mingwX64("native")
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
+*/
 
-    
     sourceSets {
         val commonAntlr by creating {
             dependencies {
@@ -101,12 +102,14 @@ kotlin {
                 implementation(kotlin("test-js"))
             }
         }
+/*
         val nativeMain by getting {
             dependencies {
                 implementation("dev.atsushieno:ktmidi-native:0.1.2")
             }
         }
         val nativeTest by getting
+*/
     }
 }
 

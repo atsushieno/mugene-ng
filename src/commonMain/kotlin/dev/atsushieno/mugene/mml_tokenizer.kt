@@ -33,14 +33,6 @@ abstract class StreamResolver {
 
 //region mml token sequence structure
 
-enum class MmlDiagnosticVerbosity {
-    Error,
-    Warning,
-    Information,
-}
-
-typealias MmlDiagnosticReporter = (verbosity: MmlDiagnosticVerbosity, location: MmlLineInfo?, format: String, args: List<Any>?) -> Unit
-
 enum class MmlTokenType {
     None,
     Identifier,
@@ -391,9 +383,7 @@ class MmlInputSourceReader(private val reporter: MmlDiagnosticReporter, private 
             reporter(
                 MmlDiagnosticVerbosity.Error,
                 line.location,
-                "Current line indicates no track number, and there was no indicated tracks previously.",
-                listOf()
-            )
+                "Current line indicates no track number, and there was no indicated tracks previously.")
             return null
         }
 
@@ -759,9 +749,7 @@ abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal v
                     reporter(
                         MmlDiagnosticVerbosity.Error,
                         line.location,
-                        "Unexpected end of stream in the middle of escaped token.",
-                        listOf()
-                    )
+                        "Unexpected end of stream in the middle of escaped token.")
                 } else {
                     ch = ch_.toChar()
                     when (ch) {
@@ -789,9 +777,7 @@ abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal v
                             reporter(
                                 MmlDiagnosticVerbosity.Error,
                                 line.location,
-                                "Unexpected escaped token: '\\$ch'",
-                                listOf()
-                            )
+                                "Unexpected escaped token: '\\$ch'")
                             return false
                         }
                     }
@@ -1045,9 +1031,7 @@ class MmlTokenizer(private val reporter: MmlDiagnosticReporter, private val sour
                             reporter(
                                 MmlDiagnosticVerbosity.Error,
                                 source.lexer.line.location,
-                                "Extra conditional tokens",
-                                listOf()
-                            )
+                                "Extra conditional tokens")
                         source.lexer.newIdentifierMode = false
                     }
                     "track" -> {
@@ -1059,17 +1043,13 @@ class MmlTokenizer(private val reporter: MmlDiagnosticReporter, private val sour
                             reporter(
                                 MmlDiagnosticVerbosity.Error,
                                 source.lexer.line.location,
-                                "Extra conditional tokens",
-                                listOf()
-                            )
+                                "Extra conditional tokens")
                     }
                     else ->
                         reporter(
                             MmlDiagnosticVerbosity.Error,
                             source.lexer.line.location,
-                            "Unexpected compilation condition type '$category'",
-                            listOf()
-                        )
+                            "Unexpected compilation condition type '$category'")
                 }
             }
             "meta" -> {
@@ -1088,9 +1068,7 @@ class MmlTokenizer(private val reporter: MmlDiagnosticReporter, private val sour
                         reporter(
                             MmlDiagnosticVerbosity.Error,
                             source.lexer.line.location,
-                            "Invalid #meta directive argument: $identifier",
-                            listOf()
-                        )
+                            "Invalid #meta directive argument: $identifier")
                 }
                 result.metaTexts.add(MmlMetaTextToken().apply {
                     typeLocation = typeLoc
@@ -1108,9 +1086,7 @@ class MmlTokenizer(private val reporter: MmlDiagnosticReporter, private val sour
                     reporter(
                         MmlDiagnosticVerbosity.Warning,
                         source.lexer.line.location,
-                        "Warning: overwriting definition $identifier, redefined at ${source.lexer.line.location}",
-                        listOf()
-                    )
+                        "Warning: overwriting definition $identifier, redefined at ${source.lexer.line.location}")
                 aliases[identifier] =
                     source.lexer.line.text.substring(source.lexer.line.location.linePosition)
                 source.lexer.newIdentifierMode = false
@@ -1205,9 +1181,7 @@ class MmlTokenizer(private val reporter: MmlDiagnosticReporter, private val sour
                 reporter(
                     MmlDiagnosticVerbosity.Error,
                     source.lexer.line.location,
-                    "type name is expected after ':' in macro argument definition",
-                    listOf()
-                )
+                    "type name is expected after ':' in macro argument definition")
                 return
             }
             when (source.lexer.currentToken) {
@@ -1220,9 +1194,7 @@ class MmlTokenizer(private val reporter: MmlDiagnosticReporter, private val sour
                     reporter(
                         MmlDiagnosticVerbosity.Error,
                         source.lexer.line.location,
-                        "Data type name is expected, but got ${source.lexer.currentToken}",
-                        listOf()
-                    )
+                        "Data type name is expected, but got ${source.lexer.currentToken}")
                     return
                 }
             }
@@ -1243,9 +1215,7 @@ class MmlTokenizer(private val reporter: MmlDiagnosticReporter, private val sour
                     reporter(
                         MmlDiagnosticVerbosity.Error,
                         source.lexer.line.location,
-                        "Incomplete argument default value definition",
-                        listOf()
-                    )
+                        "Incomplete argument default value definition")
                     return
                 }
                 when (source.lexer.currentToken) {

@@ -43,9 +43,7 @@ abstract class MmlValueExprResolver(val expr: MmlValueExpr) {
                         reporter(
                             MmlDiagnosticVerbosity.Error,
                             location,
-                            "Cannot convert from length to $type)",
-                            listOf()
-                        )
+                            "Cannot convert from length to $type)")
                     return null
                 }
                 MmlDataType.Length -> {
@@ -62,18 +60,14 @@ abstract class MmlValueExprResolver(val expr: MmlValueExpr) {
                         reporter(
                             MmlDiagnosticVerbosity.Error,
                             location,
-                            "Cannot convert from length to $type)",
-                            listOf()
-                        )
+                            "Cannot convert from length to $type)")
                     return MmlLength(denom)
                 }
                 else -> {
                     reporter(
                         MmlDiagnosticVerbosity.Error,
                         location,
-                        "Invalid value $value for the expected data type $type)",
-                        listOf()
-                    )
+                        "Invalid value $value for the expected data type $type)")
                     return null
                 }
             }
@@ -128,9 +122,7 @@ class MmlVariableReferenceExprResolver(expr: MmlVariableReferenceExpr) :
                 ctx.reporter(
                     MmlDiagnosticVerbosity.Error,
                     null,
-                    "Global variable '${expr.name}' cannot be resolved at this compilation phase",
-                    listOf()
-                )
+                    "Global variable '${expr.name}' cannot be resolved at this compilation phase")
             else
                 resolveCore(ctx.globalContext, type, true)
         } else
@@ -153,9 +145,7 @@ class MmlVariableReferenceExprResolver(expr: MmlVariableReferenceExpr) :
             ctx.reporter(
                 MmlDiagnosticVerbosity.Error,
                 expr.location,
-                "Cannot resolve variable '${expr.name}'",
-                listOf()
-            )
+                "Cannot resolve variable '${expr.name}'")
         else {
             val value = ctx.ensureDefaultResolvedVariable(variable)
             resolvedValue = getTypedValue(ctx, value, type, expr.location)
@@ -445,9 +435,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                     reporter(
                         MmlDiagnosticVerbosity.Information,
                         oper.location,
-                        arguments[0].resolver.stringValue,
-                        extraTailArgs.requireNoNulls()
-                    )
+                        arguments[0].resolver.stringValue)
                     break
                 }
                 "__LET" -> {
@@ -458,9 +446,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                         reporter(
                             MmlDiagnosticVerbosity.Error,
                             oper.location,
-                            "Target variable not found: $name",
-                            listOf()
-                        )
+                            "Target variable not found: $name")
                     } else {
                         arguments[1].resolver.resolve(rctx, variable.type)
                         rctx.values[variable] = arguments[1].resolver.resolvedValue!!
@@ -477,18 +463,14 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                         reporter(
                             MmlDiagnosticVerbosity.Error,
                             oper.location,
-                            "Target variable not found: $name",
-                            listOf()
-                        )
+                            "Target variable not found: $name")
                         break
                     }
                     if (variable.type != MmlDataType.Buffer) {
                         reporter(
                             MmlDiagnosticVerbosity.Error,
                             oper.location,
-                            "Target variable is not a buffer: $name",
-                            listOf()
-                        )
+                            "Target variable is not a buffer: $name")
                         break
                     }
                     val sb = rctx.ensureDefaultResolvedVariable(variable) as StringBuilder
@@ -612,9 +594,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                         reporter(
                             MmlDiagnosticVerbosity.Error,
                             oper.location,
-                            "__SAVE_OPER_BEGIN works only within a simple list without nested uses",
-                            listOf()
-                        )
+                            "__SAVE_OPER_BEGIN works only within a simple list without nested uses")
                         break
                     }
                     storeIndex = listIndex + 1
@@ -685,9 +665,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                         reporter(
                             MmlDiagnosticVerbosity.Error,
                             oper.location,
-                            "Loop break operation must be inside a pair of loop start and end",
-                            listOf()
-                        )
+                            "Loop break operation must be inside a pair of loop start and end")
                         break
                     }
                     if (loop.firstBreakAt == null)
@@ -704,9 +682,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                             reporter(
                                 MmlDiagnosticVerbosity.Error,
                                 oper.location,
-                                "Default loop break is already defined in current loop",
-                                listOf()
-                            )
+                                "Default loop break is already defined in current loop")
                         loop.breaks[-1] = LoopLocation(
                             listIndex,
                             currentOutput.size,
@@ -725,9 +701,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                                 reporter(
                                     MmlDiagnosticVerbosity.Error,
                                     oper.location,
-                                    "Loop section $num was already defined in current loop",
-                                    listOf()
-                                )
+                                    "Loop section $num was already defined in current loop")
                                 break
                             }
                             // specified loop count is for human users. Here the number is for program, hence -1.
@@ -750,9 +724,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                         reporter(
                             MmlDiagnosticVerbosity.Error,
                             oper.location,
-                            "Loop has not started",
-                            listOf()
-                        )
+                            "Loop has not started")
                         break
                     }
                     for (cl in loop.currentBreaks)
@@ -765,9 +737,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                         else -> reporter(
                             MmlDiagnosticVerbosity.Error,
                             oper.location,
-                            "Arguments at loop end exceeded",
-                            listOf()
-                        )
+                            "Arguments at loop end exceeded")
                     }
 
                     rctx.loops.removeLast()
@@ -783,9 +753,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                             reporter(
                                 MmlDiagnosticVerbosity.Error,
                                 list[p.value.source].location,
-                                "Loop break specified beyond the loop count",
-                                listOf()
-                            )
+                                "Loop break specified beyond the loop count")
                             loop.breaks.clear()
                         }
                     }
@@ -837,9 +805,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                                     reporter(
                                         MmlDiagnosticVerbosity.Error,
                                         list[beginAt.source].location,
-                                        "No corresponding loop break specification for iteration at ${l + 1} from the innermost loop",
-                                        listOf()
-                                    )
+                                        "No corresponding loop break specification for iteration at ${l + 1} from the innermost loop")
                                     loop.breaks.clear()
                                 }
                             }
@@ -882,18 +848,14 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
             reporter(
                 MmlDiagnosticVerbosity.Error,
                 oper.location,
-                "Macro ${oper.name} was not found",
-                listOf()
-            )
+                "Macro ${oper.name} was not found")
             return
         }
         if (expansionStack.contains(macro)) {
             reporter(
                 MmlDiagnosticVerbosity.Error,
                 oper.location,
-                "Illegally recursive macro reference to ${macro.name} is found",
-                listOf()
-            )
+                "Illegally recursive macro reference to ${macro.name} is found")
             return
         }
         expansionStack.add(macro)
@@ -913,9 +875,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                 reporter(
                     MmlDiagnosticVerbosity.Error,
                     oper.location,
-                    "Argument name must be identical to all other argument names. Argument '${argdef.name}' in '${oper.name}' macro",
-                    listOf()
-                )
+                    "Argument name must be identical to all other argument names. Argument '${argdef.name}' in '${oper.name}' macro")
             args[argdef.name] = Pair(argdef, arg.resolver.resolvedValue!!)
         }
         val argsBak = ctx.macroArguments

@@ -258,9 +258,7 @@ class MmlOperationUse {
                 ctx.reporter(
                     MmlDiagnosticVerbosity.Error,
                     location,
-                    "Insufficient argument(s)",
-                    listOf()
-                )
+                    "Insufficient argument(s)")
                 return
             }
         }

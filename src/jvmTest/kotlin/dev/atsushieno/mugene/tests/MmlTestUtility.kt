@@ -1,6 +1,7 @@
 package dev.atsushieno.mugene.tests
 
 import dev.atsushieno.mugene.MmlCompiler
+import dev.atsushieno.mugene.MmlCompilerJvm
 import dev.atsushieno.mugene.MmlInputSource
 import java.io.ByteArrayOutputStream
 
@@ -11,7 +12,7 @@ class MmlTestUtility {
             sources.add ( MmlInputSource ("fakefilename.mml", mml))
             val outs = ByteArrayOutputStream ()
             outs.use {
-                MmlCompiler().compile(false, sources, null, outs, false)
+                MmlCompilerJvm().compile(false, sources, null, outs, false)
                 return outs.toByteArray()
             }
         }

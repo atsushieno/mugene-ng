@@ -7,49 +7,26 @@ import dev.atsushieno.ktmidi.SmfWriterExtension
 import java.io.*
 import java.nio.charset.Charset
 
-internal class Util {
-    companion object {
-        val defaultIncludes = listOf(
-            "default-macro.mml",
-            "drum-part.mml",
-            "gs-sysex.mml",
-            "nrpn-gs-xg.mml",
-        )
-    }
-}
 
-class MmlCompiler() {
-    companion object {
-        val defaultIncludes = Util.defaultIncludes
+
+class MmlCompilerJvm : MmlCompiler() {
+    override var resolver : StreamResolver = MergeStreamResolver(LocalFileStreamResolver())
+
+    class MmlCompilerOptions {
+        var skipDefaultMmlFiles = false
+        var disableRunningStatus = false
+        var metaWriter: ((Boolean, MidiMessage, OutputStream?) -> Int)? = null
     }
 
-    var verbose = false
-
-    var resolver: StreamResolver =
-        MergeStreamResolver(LocalFileStreamResolver())
-
-    var report: MmlDiagnosticReporter
-
-    var continueOnError = false
-
-    fun reportOnConsole(
-        verbosity: MmlDiagnosticVerbosity,
-        location: MmlLineInfo?,
-        format: String,
-        vararg args: Any
+    fun compile(
+        skipDefaultMmlFiles: Boolean,
+        inputs: List<MmlInputSource>,
+        metaWriter: ((Boolean, MidiMessage, OutputStream?) -> Int)?,
+        output: OutputStream,
+        disableRunningStatus: Boolean
     ) {
-        val kind =
-            if (verbosity == MmlDiagnosticVerbosity.Error) "error"
-            else if (verbosity == MmlDiagnosticVerbosity.Warning) "warning"
-            else "information";
-        val loc =
-            if (location != null) "$location.file $location.lineNumber, $location.linePosition) : " else ""
-        val msg = if (args.any()) String.format(format, args) else format
-        val output = "$loc$kind: $msg"
-        if (verbosity != MmlDiagnosticVerbosity.Error || continueOnError)
-            println(output)
-        else
-            throw MmlException(output, null)
+        val music = compile(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
+        music.save(output, disableRunningStatus, metaWriter)
     }
 
     fun compile(args: List<String>) {
@@ -85,7 +62,7 @@ This option is for core MML operation hackers."""
     fun compileCore(args: List<String>) {
 
         if (!args.any()) {
-            report(MmlDiagnosticVerbosity.Error, null, help, listOf())
+            report(MmlDiagnosticVerbosity.Error, null, help)
             return
         }
 
@@ -124,7 +101,7 @@ This option is for core MML operation hackers."""
                         continue;
                     }
                     if (arg == "--help") {
-                        report(MmlDiagnosticVerbosity.Error, null, help, null)
+                        report(MmlDiagnosticVerbosity.Error, null, help)
                         return
                     }
                 }
@@ -148,86 +125,11 @@ This option is for core MML operation hackers."""
         report(
             MmlDiagnosticVerbosity.Information,
             null,
-            "Written SMF file ... $outFilename",
-            listOf()
-        )
-    }
-
-    class MmlCompilerOptions {
-        var skipDefaultMmlFiles = false
-        var disableRunningStatus = false
-        var metaWriter: ((Boolean, MidiMessage, OutputStream?) -> Int)? = null
-    }
-
-    fun compile(
-        skipDefaultMmlFiles: Boolean,
-        inputs: List<MmlInputSource>,
-        metaWriter: ((Boolean, MidiMessage, OutputStream?) -> Int)?,
-        output: OutputStream,
-        disableRunningStatus: Boolean
-    ) {
-        val music = compile(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
-        music.save(output, disableRunningStatus, metaWriter)
-    }
-
-    fun compile(skipDefaultMmlFiles: Boolean, vararg mmlParts: String): MidiMusic {
-        val sources = mmlParts.map { mml -> MmlInputSource("<string>", mml) }
-        return compile(skipDefaultMmlFiles, inputs = sources.toTypedArray())
-    }
-
-    fun compile(skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource): MidiMusic {
-        return generateMusic(
-            buildSemanticTree(
-                tokenizeInputs(
-                    skipDefaultMmlFiles,
-                    inputs.toList()
-                )
-            )
-        )
-    }
-
-    // used by language server and compiler.
-    fun tokenizeInputs(skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>): MmlTokenSet {
-        var actualInputs =
-            if (!skipDefaultMmlFiles)
-                Util.defaultIncludes.map { f ->
-                    MmlInputSource(
-                        f,
-                        resolver.getEntity(f)
-                    )
-                } + inputs
-            else inputs
-
-        // input sources -> tokenizer sources
-        val tokenizerSources = MmlInputSourceReader.parse(report, resolver, inputs);
-
-        // tokenizer sources -> token streams
-        return MmlTokenizer.tokenize(report, tokenizerSources);
-    }
-
-    // used by language server and compiler.
-    private fun buildSemanticTree(tokens: MmlTokenSet): MmlSemanticTreeSet {
-        // token streams -> semantic trees
-        return MmlSemanticTreeBuilder.compile(tokens, report);
-    }
-
-    private fun generateMusic(tree: MmlSemanticTreeSet): MidiMusic {
-        // semantic trees -> simplified streams
-        MmlMacroExpander.expand(tree, report);
-
-        // simplified streams -> raw events
-        val resolved = MmlEventStreamGenerator.generate(tree, report);
-
-        // raw events -> SMF
-        val smf = MmlSmfGenerator.generate(resolved);
-
-        return smf;
-    }
-
-    init {
-        report = { v, k, f, a -> reportOnConsole(v, k, f, (a ?: listOf()).toTypedArray()) }
+            "Written SMF file ... $outFilename")
     }
 }
+
+
 
 fun MidiMusic.save(
     output: OutputStream,

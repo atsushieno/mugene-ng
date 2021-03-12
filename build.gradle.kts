@@ -74,6 +74,9 @@ kotlin {
             kotlin.srcDir("build/generated-src/commonAntlr/kotlin")
         }
         val commonMain by getting {
+            dependencies {
+                implementation("dev.atsushieno:ktmidi-kotlinMultiplatform:0.1.2")
+            }
             dependsOn(commonAntlr)
         }
         val commonTest by getting {
@@ -153,16 +156,16 @@ tasks.getByName("compileKotlinJvm").dependsOn("generateKotlinCommonGrammarSource
 
 afterEvaluate {
     publishing {
-        publications {
-            create<MavenPublication>("all") {
-                groupId = "dev.atsushieno"
+        val ver = version.toString()
+        for (p in publications) {
+            (p as MavenPublication).apply {
+                groupId = group.toString()
                 if (name.contains("metadata")) {
                     artifactId = "mugene"
                 } else {
-                    artifactId = "mugene-$name"
+                    artifactId = "mugene-${name}"
                 }
-
-                version = version
+                version = ver
             }
         }
     }

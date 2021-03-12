@@ -78,7 +78,8 @@ abstract class MmlValueExprResolver(val expr: MmlValueExpr) {
 
     abstract fun resolve(ctx: MmlResolveContext, type: MmlDataType)
 
-    val byteValue = intValue.toByte()
+    val byteValue
+        get() = intValue.toByte()
 
     val byteArrayValue: ByteArray
         get() =

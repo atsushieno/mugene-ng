@@ -7,10 +7,24 @@ import org.antlr.v4.kotlinruntime.ParserRuleContext
 import org.antlr.v4.kotlinruntime.Token
 import org.antlr.v4.kotlinruntime.TokenFactory
 import org.antlr.v4.kotlinruntime.TokenSource
+import org.antlr.v4.kotlinruntime.tree.TerminalNode
 import org.antlr.v4.kotlinruntime.tree.pattern.DEFAULT_CHANNEL
 
+class SimpleEOFToken(source: TokenSource) : Token {
+    override val channel: Int = DEFAULT_CHANNEL
+    override val charPositionInLine: Int = 0
+    override val inputStream: CharStream? = null
+    override val line: Int = 0
+    override val startIndex: Int = 0
+    override val stopIndex: Int = 0
+    override val text: String? = null
+    override val tokenIndex: Int = Token.EOF
+    override val tokenSource: TokenSource? = source
+    override val type: Int = Token.EOF
+}
 
 class WrappedToken(src: MmlToken, sourceTokenSource: TokenSource) : Token {
+    val mmlToken = src
     override val channel = DEFAULT_CHANNEL
     override val charPositionInLine = src.location.linePosition
     override val inputStream: CharStream? = null
@@ -52,9 +66,9 @@ class WrappedTokenSource(val ts: TokenStream) : TokenSource {
         get() = ts.source[ts.position].location.file
     override var tokenFactory: TokenFactory<*> = WrappedTokenFactory<Token>()
 
-    override fun nextToken() =
-        if (ts.position < ts.source.size) WrappedToken(ts.source.last(), this)
-        else WrappedToken(ts.source[ts.position], this)
+    override fun nextToken() : Token =
+        if (ts.position == ts.source.size) SimpleEOFToken(this)
+        else WrappedToken(ts.source[ts.position++], this)
 
     override fun readInputStream(): CharStream? {
         TODO("Not yet implemented")
@@ -66,15 +80,21 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
 
     private val skippedArgument = MmlConstantExpr (MmlLineInfo.empty, MmlDataType.String, "DEFAULT ARGUMENT")
 
-    override fun visitExpressionOrOptOperationUses(ctx: MugeneParser.ExpressionOrOptOperationUsesContext): Any {
-        return when (ctx.ruleIndex) {
-            0 -> mutableListOf<MmlOperationUse>()
-            else -> getSingleContent(ctx)
-        }
+    override fun visitTerminal(node: TerminalNode): Any? {
+        val wt = node.symbol as WrappedToken?
+        return wt?.mmlToken ?: super.visitTerminal(node)
+    }
+
+    override fun visitExpressionOrOperationUses(ctx: MugeneParser.ExpressionOrOperationUsesContext): Any {
+        return getSingleContent(ctx)
+    }
+
+    override fun visitExpression(ctx: MugeneParser.ExpressionContext): Any {
+        return getSingleContent(ctx)
     }
 
     override fun visitOperationUses(ctx: MugeneParser.OperationUsesContext): Any {
-        return when (ctx.ruleIndex) {
+        return when (ctx.altNumber) {
             0 -> mutableListOf<MmlOperationUse>().apply { addAll(getSingleContent(ctx) as List<MmlOperationUse>) }
             1 -> {
                 val l = visit(ctx.getChild(0)!!)!! as MutableList<MmlOperationUse>
@@ -86,53 +106,50 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
     }
 
     override fun visitOperationUse(ctx: MugeneParser.OperationUseContext): Any {
-        val i = visit(ctx.getChild(0)!!)!! as MmlToken
-        val o = MmlOperationUse (i.value as String, i.location)
-        val l = visit(ctx.getChild(1)!!)!! as List<MmlValueExpr>
-        for(a in l)
-            o.arguments.add(if (a == skippedArgument) null else a);
-        return o;
-    }
-
-    override fun visitArgumentsOptCurly(ctx: MugeneParser.ArgumentsOptCurlyContext): Any {
-        return when (ctx.ruleIndex) {
-            0 -> getSingleContent(ctx)
-            1 -> visit(ctx.getChild(1)!!)!!
-            else -> error ("Unexpected parser error; unexpected token index")
-        }
-    }
-
-    override fun visitOptArguments(ctx: MugeneParser.OptArgumentsContext): Any {
-        return when (ctx.ruleIndex) {
-            0 -> mutableListOf<MmlValueExpr>()
-            1 -> getSingleContent(ctx)
-            else -> error ("Unexpected parser error; unexpected token index")
-        }
-    }
-
-    override fun visitArguments(ctx: MugeneParser.ArgumentsContext): Any {
-        return when (ctx.ruleIndex) {
-            0 -> mutableListOf<MmlValueExpr>().apply { add(getSingleContent(ctx) as MmlValueExpr) }
-            1 -> {
-                val a = visit(ctx.getChild(0)!!)!! as MmlValueExpr
-                val l = visit(ctx.getChild(2)!!)!! as MutableList<MmlValueExpr>
-                l.add(0, a)
-                l
+        when (ctx.altNumber) {
+            0, 1 -> {
+                val i = visit(ctx.getChild(0)!!)!! as MmlToken
+                val o = MmlOperationUse (i.value as String, i.location)
+                if (ctx.ruleIndex == 1) {
+                    val l = visit(ctx.getChild(1)!!)!! as List<MmlValueExpr>
+                    for (a in l)
+                        o.arguments.add(if (a == skippedArgument) null else a)
+                }
+                return o
             }
             else -> error ("Unexpected parser error; unexpected token index")
         }
     }
 
-    override fun visitOptArgument(ctx: MugeneParser.OptArgumentContext): Any {
-        return when (ctx.ruleIndex) {
-            0 -> skippedArgument
-            1 -> getSingleContent(ctx)
+    override fun visitArgumentsOptCurly(ctx: MugeneParser.ArgumentsOptCurlyContext): Any {
+        return when (ctx.altNumber) {
+            0 -> getSingleContent(ctx)
+            1 -> mutableListOf<MmlValueExpr>() // empty
+            2 -> visit(ctx.getChild(1)!!)!!
+            else -> error ("Unexpected parser error; unexpected token index")
+        }
+    }
+
+    override fun visitArguments(ctx: MugeneParser.ArgumentsContext): Any {
+        return when (ctx.altNumber) {
+            0 -> mutableListOf<MmlValueExpr>().apply { add(getSingleContent(ctx) as MmlValueExpr) }
+            1 -> {
+                val args = visit(ctx.getChild(0)!!)!! as MutableList<MmlValueExpr?>
+                val commas = visit(ctx.getChild(2)!!)!! as Int
+                val arg = visit(ctx.getChild(2)!!)!! as MmlValueExpr
+                // add default arguments (one comma works as a normal parameter separator, so -1)
+                for (i in 0 until commas - 1)
+                    args.add(skippedArgument)
+                // add last argument (cannot omit)
+                args.add(arg)
+                args
+            }
             else -> error ("Unexpected parser error; unexpected token index")
         }
     }
 
     override fun visitConditionalExpr(ctx: MugeneParser.ConditionalExprContext): Any {
-        return when (ctx.ruleIndex) {
+        return when (ctx.altNumber) {
             0 -> getSingleContent(ctx)
             1 -> {
                 val c = visit(ctx.getChild(0)!!) as MmlValueExpr
@@ -145,7 +162,7 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
     }
 
     override fun visitComparisonExpr(ctx: MugeneParser.ComparisonExprContext): Any {
-        return when (ctx.ruleIndex) {
+        return when (ctx.altNumber) {
             0 -> getSingleContent(ctx)
             1 -> {
                 val l = visit(ctx.getChild(0)!!) as MmlValueExpr
@@ -158,7 +175,7 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
     }
 
     override fun visitComparisonOperator(ctx: MugeneParser.ComparisonOperatorContext): Any {
-        return when(ctx.ruleIndex) {
+        return when (ctx.altNumber) {
             0 -> ComparisonType.Lesser
             1 -> ComparisonType.LesserEqual
             2 -> ComparisonType.Greater
@@ -168,11 +185,11 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
     }
 
     override fun visitAddSubExpr(ctx: MugeneParser.AddSubExprContext): Any {
-        if (ctx.ruleIndex == 0)
+        if (ctx.altNumber == 0)
             return getSingleContent(ctx)
         val l = visit(ctx.getChild(0)!!) as MmlValueExpr
         val r = visit(ctx.getChild(1)!!) as MmlValueExpr
-        return when (ctx.ruleIndex) {
+        return when (ctx.altNumber) {
             1 -> MmlAddExpr(l, r)
             2 -> MmlAddExpr(l, r)
             3 -> MmlSubtractExpr(l, r)
@@ -181,11 +198,11 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
     }
 
     override fun visitMulDivModExpr(ctx: MugeneParser.MulDivModExprContext): Any {
-        if (ctx.ruleIndex == 0)
+        if (ctx.altNumber == 0)
             return getSingleContent(ctx)
         val l = visit(ctx.getChild(0)!!) as MmlValueExpr
         val r = visit(ctx.getChild(1)!!) as MmlValueExpr
-        return when (ctx.ruleIndex) {
+        return when (ctx.altNumber) {
             1 -> MmlMultiplyExpr(l, r)
             2 -> MmlDivideExpr(l, r)
             3 -> MmlModuloExpr(l, r)
@@ -194,7 +211,7 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
     }
 
     override fun visitPrimaryExpr(ctx: MugeneParser.PrimaryExprContext): Any {
-        return when (ctx.ruleIndex) {
+        return when (ctx.altNumber) {
             0, 1, 3, 4 -> getSingleContent(ctx)
             2 -> MmlParenthesizedExpr (visit(ctx.getChild(1)!!) as MmlValueExpr)
             else -> error ("Unexpected parser error; unexpected token index")
@@ -202,7 +219,7 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
     }
 
     override fun visitUnaryExpr(ctx: MugeneParser.UnaryExprContext): Any {
-        return when (ctx.ruleIndex) {
+        return when (ctx.altNumber) {
             0 -> getSingleContent(ctx)
             1 -> {
                 val expr = visit(ctx.getChild(1)!!) as MmlValueExpr
@@ -228,7 +245,7 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
 
     override fun visitStepConstant(ctx: MugeneParser.StepConstantContext): Any {
         val mul =
-            when (ctx.ruleIndex) {
+            when (ctx.altNumber) {
                 0 -> 1
                 1 -> -1
                 else -> error ("Unexpected parser error; unexpected token index")
@@ -241,7 +258,7 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
     }
 
     override fun visitNumberOrLengthConstant(ctx: MugeneParser.NumberOrLengthConstantContext): Any {
-        when (ctx.ruleIndex) {
+        when (ctx.altNumber) {
             0 -> {
                 val t = visit(ctx.getChild(0)!!) as MmlToken
                 return MmlConstantExpr (t.location, MmlDataType.Number, t.value)
@@ -249,11 +266,11 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
             1 -> {
                 val t = visit(ctx.getChild(0)!!) as MmlToken
                 var d = visit(ctx.getChild(1)!!) as Int
-                return MmlConstantExpr (t.location, MmlDataType.Length, MmlLength ((t.value as Double).toInt()).apply { dots = d });
+                return MmlConstantExpr (t.location, MmlDataType.Length, MmlLength ((t.value as Double).toInt()).apply { dots = d })
             }
             2 -> {
                 val d = getSingleContent(ctx) as Int
-                return MmlMultiplyExpr ( MmlConstantExpr (ctx.start!!.toMmlLineInfo(), MmlDataType.Number, MmlValueExprResolver.lengthDotsToMultiplier (d)), MmlVariableReferenceExpr (ctx.start!!.toMmlLineInfo(), "__length"));
+                return MmlMultiplyExpr ( MmlConstantExpr (ctx.start!!.toMmlLineInfo(), MmlDataType.Number, MmlValueExprResolver.lengthDotsToMultiplier (d)), MmlVariableReferenceExpr (ctx.start!!.toMmlLineInfo(), "__length"))
             }
             else -> error ("Unexpected parser error; unexpected token index")
         }
@@ -262,7 +279,15 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
     private fun Token.toMmlLineInfo() = MmlLineInfo(tokenSource!!.sourceName ?: "", line, charPositionInLine)
 
     override fun visitDots(ctx: MugeneParser.DotsContext): Any {
-        return when (ctx.ruleIndex) {
+        return when (ctx.altNumber) {
+            0 -> 1
+            1 -> getSingleContent(ctx) as Int + 1
+            else -> error ("Unexpected parser error; unexpected token index")
+        }
+    }
+
+    override fun visitCommas(ctx: MugeneParser.CommasContext): Any {
+        return when (ctx.altNumber) {
             0 -> 1
             1 -> getSingleContent(ctx) as Int + 1
             else -> error ("Unexpected parser error; unexpected token index")

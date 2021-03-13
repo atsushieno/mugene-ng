@@ -307,12 +307,13 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
             result.tracks.add(buildTrackOperationList(track))
     }
 
-    private fun antlrCompile(reporter: MmlDiagnosticReporter, stream: TokenStream) : Any {
+    private fun antlrCompile(reporter: MmlDiagnosticReporter, stream: TokenStream, parseFunc: (MugeneParser) -> ParserRuleContext) : Any {
         val tokenStream = CommonTokenStream(WrappedTokenSource(stream))
         val parser = MugeneParser(tokenStream)
-        val tree = parser.expressionOrOptOperationUses()
+        val tree = parseFunc(parser)
         val visitor = MugeneParserVisitorImpl(reporter)
-        return visitor.visit(tree)!!
+        val ret = visitor.visit(tree)!!
+        return ret
     }
 
     private fun buildVariableDeclaration(src: MmlVariableDefinition): MmlSemanticVariable {
@@ -323,7 +324,8 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
 
         // This is the rewritten code for Kotlin...
         val stream = TokenStream(src.defaultValueTokens, src.location)
-        ret.defaultValue = antlrCompile(reporter, stream) as MmlValueExpr
+        val typed = antlrCompile(reporter, stream, { parser -> parser.expression() })
+        ret.defaultValue = typed as MmlValueExpr
         // ...end of that.
 
         //ret.defaultValue = Parser.MmlParser(compiler, stream.source).ParseExpression()
@@ -350,7 +352,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
     }
 
     private fun compileOperationTokens(data: MutableList<MmlOperationUse>, stream: TokenStream) {
-        data.addAll(antlrCompile(reporter, stream) as List<MmlOperationUse>)
+        data.addAll(antlrCompile(reporter, stream, { parser -> parser.operationUses() }) as List<MmlOperationUse>)
     }
 
     init {

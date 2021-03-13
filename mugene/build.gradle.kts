@@ -1,33 +1,23 @@
-
 buildscript {
     repositories {
-        // used for local development and while building by travis ci and jitpack.io
         mavenLocal()
-        // used to download antlr4
         mavenCentral()
-        // used to download antlr-kotlin-runtime
         maven("https://jitpack.io")
     }
 
     dependencies {
-        // add the plugin to the classpath
         classpath("com.strumenta.antlr-kotlin:antlr-kotlin-gradle-plugin:-SNAPSHOT")
     }
 }
 
 repositories {
-    // used for local development and while building by travis ci and jitpack.io
     mavenLocal()
-    // used to download antlr4
     mavenCentral()
-    // used to download antlr-kotlin-runtime
     maven("https://jitpack.io")
 }
 
-// end of copy(1)
-
 plugins {
-    kotlin("multiplatform") version "1.5.0-M1"
+    kotlin("multiplatform") version "1.4.31"
     `maven-publish`
 }
 

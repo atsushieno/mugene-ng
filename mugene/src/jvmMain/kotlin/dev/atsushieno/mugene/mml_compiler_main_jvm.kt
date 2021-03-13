@@ -18,6 +18,14 @@ class MmlCompilerJvm : MmlCompiler() {
         var metaWriter: ((Boolean, MidiMessage, OutputStream?) -> Int)? = null
     }
 
+    fun compile(args: List<String>) {
+        try {
+            compileCore(args)
+        } catch (ex: MmlException) {
+            System.err.println(ex.message)
+        }
+    }
+
     fun compile(
         skipDefaultMmlFiles: Boolean,
         inputs: List<MmlInputSource>,

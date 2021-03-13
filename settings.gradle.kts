@@ -1,2 +1,2 @@
-rootProject.name = "mugene"
-include("mugene-console")
+rootProject.name = "mugene-ng"
+include("mugene", "mugene-console")

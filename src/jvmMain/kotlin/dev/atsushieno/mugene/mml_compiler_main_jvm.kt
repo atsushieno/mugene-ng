@@ -29,18 +29,6 @@ class MmlCompilerJvm : MmlCompiler() {
         music.save(output, disableRunningStatus, metaWriter)
     }
 
-    fun compile(args: List<String>) {
-        try {
-            compileCore(args)
-        } catch (ex: MmlException) {
-            System.err.println(ex.message)
-        } catch (ex: Exception) {
-            if (verbose)
-                throw ex
-            System.err.println(ex.toString())
-        }
-    }
-
     private val help = """MML compiler mugene
 
 Usage: mugene [options] mml_files
@@ -128,8 +116,6 @@ This option is for core MML operation hackers."""
             "Written SMF file ... $outFilename")
     }
 }
-
-
 
 fun MidiMusic.save(
     output: OutputStream,

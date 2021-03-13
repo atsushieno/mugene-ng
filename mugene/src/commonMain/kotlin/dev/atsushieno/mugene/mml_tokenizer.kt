@@ -167,7 +167,7 @@ class MmlLine(val location: MmlLineInfo, var text: String) {
     fun tryMatch(target: String): Boolean {
         if (location.linePosition + target.length > text.length)
             return false
-        if (text.indexOf(target, location.linePosition) < 0)
+        if (text.indexOf(target, location.linePosition) != 0)
             return false
         location.linePosition += target.length
         return true
@@ -1224,9 +1224,8 @@ class MmlTokenizer(private val reporter: MmlDiagnosticReporter, private val sour
                         loop = false
                         continue
                     }
+                    else -> arg.defaultValueTokens.add(source.lexer.createParsedToken())
                 }
-
-                arg.defaultValueTokens.add(source.lexer.createParsedToken())
             }
         }
     }

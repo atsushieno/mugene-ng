@@ -30,4 +30,8 @@ jar {
                 'Main-Class': 'MainKt'
         )
     }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        //configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }

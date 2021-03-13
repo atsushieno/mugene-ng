@@ -666,7 +666,7 @@ abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal v
             throw lexerError("Identifier character is expected")
         while (isIdentifier(line.peekChar(), false))
             line.readChar()
-        return line.text.substring(start, line.location.linePosition - start)
+        return line.text.substring(start, line.location.linePosition)
     }
 
     fun expectNext(tokenType: MmlTokenType) {

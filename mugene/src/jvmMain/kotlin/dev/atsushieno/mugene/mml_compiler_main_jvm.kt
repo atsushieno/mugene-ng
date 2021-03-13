@@ -93,8 +93,8 @@ This option is for core MML operation hackers."""
                         continue
                     }
                     if (arg.startsWith("--output:")) {
-                        explicitFilename = arg.substring(9);
-                        continue;
+                        explicitFilename = arg.substring(9)
+                        continue
                     }
                     if (arg == "--help") {
                         report(MmlDiagnosticVerbosity.Error, null, help)
@@ -104,19 +104,19 @@ This option is for core MML operation hackers."""
             }
             val argAsFile = File(arg)
             outFilename = argAsFile.nameWithoutExtension + extension
-            inputFilenames.add(arg);
+            inputFilenames.add(arg)
         }
         if (explicitFilename != null)
-            outFilename = explicitFilename;
+            outFilename = explicitFilename
 
         // FIXME: stream resolver should be processed within the actual parsing phase.
         // This makes it redundant to support #include
         val inputs = mutableListOf<MmlInputSource>()
         for (fname in inputFilenames)
-            inputs.add(MmlInputSource(fname, resolver.getEntity(fname)));
+            inputs.add(MmlInputSource(fname, resolver.getEntity(fname)))
 
         FileOutputStream(outFilename).use {
-            compile(noDefault, inputs, metaWriter, it, disableRunningStatus);
+            compile(noDefault, inputs, metaWriter, it, disableRunningStatus)
         }
         report(
             MmlDiagnosticVerbosity.Information,
@@ -130,17 +130,17 @@ fun MidiMusic.save(
     disableRunningStatus: Boolean = false,
     metaWriter: ((Boolean, MidiMessage, OutputStream?) -> Int)? = null
 ) {
-    val writer = SmfWriter(output).apply { this.disableRunningStatus = disableRunningStatus };
+    val writer = SmfWriter(output).apply { this.disableRunningStatus = disableRunningStatus }
     if (metaWriter != null)
         writer.metaEventWriter = metaWriter!!
-    writer.writeMusic(this);
+    writer.writeMusic(this)
 }
 
 fun MidiMusic.toBytes(
     disableRunningStatus: Boolean = false,
     metaWriter: ((Boolean, MidiMessage, OutputStream?) -> Int)? = null
 ): Array<Byte> {
-    val ms = ByteArrayOutputStream();
-    this.save(ms, disableRunningStatus, metaWriter);
+    val ms = ByteArrayOutputStream()
+    this.save(ms, disableRunningStatus, metaWriter)
     return ms.toByteArray().toTypedArray()
 }

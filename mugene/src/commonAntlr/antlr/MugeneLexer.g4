@@ -1,9 +1,6 @@
 lexer grammar MugeneLexer;
 
-Identifier : [a-zA-Z_][a-zA-Z0-9_]* ;
-
 StringLiteral : '"' [.*] '"';
-NumberLiteral : [0-9]+;
 Comma : ',';
 OpenParen : '(';
 CloseParen : ')';
@@ -27,4 +24,7 @@ KeywordNumber : 'number' ;
 KeywordLength : 'length' ;
 KeywordString : 'string' ;
 KeywordBuffer : 'buffer' ;
+
+NumberLiteral : [0-9]+;
+Identifier : [a-zA-Z_][a-zA-Z0-9_]* ;
 

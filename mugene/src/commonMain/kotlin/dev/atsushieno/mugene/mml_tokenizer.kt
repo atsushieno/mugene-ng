@@ -167,7 +167,7 @@ class MmlLine(val location: MmlLineInfo, var text: String) {
     fun tryMatch(target: String): Boolean {
         if (location.linePosition + target.length > text.length)
             return false
-        if (text.indexOf(target, location.linePosition) != 0)
+        if (text.indexOf(target, location.linePosition) != location.linePosition)
             return false
         location.linePosition += target.length
         return true

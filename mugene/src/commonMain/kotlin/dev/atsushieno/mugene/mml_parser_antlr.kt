@@ -1,5 +1,6 @@
 package dev.atsushieno.mugene
 
+import dev.atsushieno.mugene.parser.MugeneLexer
 import dev.atsushieno.mugene.parser.MugeneParser
 import dev.atsushieno.mugene.parser.MugeneParserBaseVisitor
 import org.antlr.v4.kotlinruntime.CharStream
@@ -34,7 +35,35 @@ class WrappedToken(src: MmlToken, sourceTokenSource: TokenSource) : Token {
     override val text = src.value.toString()
     override val tokenIndex = src.tokenType.ordinal
     override val tokenSource = sourceTokenSource
-    override val type = src.tokenType.ordinal
+    override val type = when (src.tokenType) {
+        MmlTokenType.Asterisk -> MugeneParser.Tokens.Asterisk.ordinal
+        MmlTokenType.BackSlashGreater -> MugeneParser.Tokens.BackSlashGreater.ordinal
+        MmlTokenType.BackSlashGreaterEqual -> MugeneParser.Tokens.BackSlashGreaterEqual.ordinal
+        MmlTokenType.BackSlashLesser -> MugeneParser.Tokens.BackSlashLesser.ordinal
+        MmlTokenType.BackSlashLesserEqual -> MugeneParser.Tokens.BackSlashLesserEqual.ordinal
+        MmlTokenType.Caret -> MugeneParser.Tokens.Caret.ordinal
+        MmlTokenType.CloseCurly -> MugeneParser.Tokens.CloseCurly.ordinal
+        MmlTokenType.CloseParen -> MugeneParser.Tokens.CloseParen.ordinal
+        MmlTokenType.Colon -> MugeneParser.Tokens.Colon.ordinal
+        MmlTokenType.Comma -> MugeneParser.Tokens.Comma.ordinal
+        MmlTokenType.Dollar -> MugeneParser.Tokens.Dollar.ordinal
+        MmlTokenType.Identifier -> MugeneParser.Tokens.Identifier.ordinal
+        MmlTokenType.KeywordBuffer -> MugeneParser.Tokens.KeywordBuffer.ordinal
+        MmlTokenType.KeywordLength -> MugeneParser.Tokens.KeywordLength.ordinal
+        MmlTokenType.KeywordNumber -> MugeneParser.Tokens.KeywordNumber.ordinal
+        MmlTokenType.KeywordString -> MugeneParser.Tokens.KeywordString.ordinal
+        MmlTokenType.Minus -> MugeneParser.Tokens.Minus.ordinal
+        MmlTokenType.NumberLiteral -> MugeneParser.Tokens.NumberLiteral.ordinal
+        MmlTokenType.OpenCurly -> MugeneParser.Tokens.OpenCurly.ordinal
+        MmlTokenType.OpenParen -> MugeneParser.Tokens.OpenParen.ordinal
+        MmlTokenType.Percent -> MugeneParser.Tokens.Percent.ordinal
+        MmlTokenType.Period -> MugeneParser.Tokens.Dot.ordinal
+        MmlTokenType.Plus -> MugeneParser.Tokens.Plus.ordinal
+        MmlTokenType.Question -> MugeneParser.Tokens.Question.ordinal
+        MmlTokenType.Slash -> MugeneParser.Tokens.Slash.ordinal
+        MmlTokenType.StringLiteral -> MugeneParser.Tokens.StringLiteral.ordinal
+        else -> 0
+    }
 }
 
 class WrappedTokenFactory<T> : TokenFactory<T> where T : Token {

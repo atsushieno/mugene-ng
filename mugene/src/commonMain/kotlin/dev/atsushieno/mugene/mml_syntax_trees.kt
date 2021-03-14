@@ -402,8 +402,10 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
     }
 
     private fun compileOperationTokens(data: MutableList<MmlOperationUse>, stream: TokenStream) {
-        var results = antlrCompile(reporter, stream, { parser -> parser.operationUses() })
-        data.addAll(results as List<MmlOperationUse>)
+        if (stream.source.isNotEmpty()) {
+            var results = antlrCompile(reporter, stream, { parser -> parser.operationUses() })
+            data.addAll(results as List<MmlOperationUse>)
+        }
     }
 
     init {

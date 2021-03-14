@@ -334,7 +334,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
                 conflictingAlts: BitSet,
                 configs: ATNConfigSet
             ) {
-                TODO("Attempting full context. Not yet implemented")
+                //TODO("Attempting full context. Not yet implemented")
             }
 
             override fun reportContextSensitivity(

@@ -85,6 +85,8 @@ abstract class MmlValueExprResolver(val expr: MmlValueExpr) {
         get() =
             if (resolvedValue is String || resolvedValue is StringBuilder)
                 stringToBytes(stringValue)
+            else if (resolvedValue == null)
+                byteArrayOf()
             else
                 byteArrayOf(byteValue)
 

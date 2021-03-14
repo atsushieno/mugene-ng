@@ -39,11 +39,13 @@ abstract class MmlValueExprResolver(val expr: MmlValueExpr) {
                         return value.toDouble()
                     if (value is MmlLength)
                         return value.getSteps(baseCount).toDouble()
+                    if (value == null)
+                        return 0.toDouble()
                     else
                         reporter(
                             MmlDiagnosticVerbosity.Error,
                             location,
-                            "Cannot convert from length to $type)")
+                            "Cannot convert from value `$value` of number to $type)")
                     return null
                 }
                 MmlDataType.Length -> {

@@ -420,7 +420,7 @@ abstract class MmlSourceLineSet {
         val line = MmlLine.create(
             prev.location.file,
             prev.location.lineNumber + 1,
-            prev.location.linePosition,
+            0,
             text
         )
         lines.add(line)

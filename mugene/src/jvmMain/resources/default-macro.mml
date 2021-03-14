@@ -20,9 +20,9 @@
 #variable __dummy_msg:string
 #macro ASSERT_STEP val:number,label:string { \
 	__LET {"__dummy_step", $__timeline_position - $val } \
-	__FORMAT { "__dummy_msg", \
-		"WARNING: step assertion failed. Label: {0}, expected position: {1}, actual: {2}.", \
-		$label, $val, $__dummy_step } \
+	__LET { "__dummy_msg", \
+		"WARNING: step assertion failed. Label: " + $label + \
+		"expected position: " + $val + ", actual: " + $__dummy_step + "." } \
 	DEBUG $__dummy_step ? $__dummy_msg, "" \
 	}
 

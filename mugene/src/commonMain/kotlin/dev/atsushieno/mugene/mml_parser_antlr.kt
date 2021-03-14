@@ -11,7 +11,7 @@ import org.antlr.v4.kotlinruntime.tree.TerminalNode
 import org.antlr.v4.kotlinruntime.tree.pattern.DEFAULT_CHANNEL
 
 class SimpleEOFToken(source: TokenSource) : Token {
-    override val channel: Int = DEFAULT_CHANNEL
+    override val channel: Int = -1
     override val charPositionInLine: Int = 0
     override val inputStream: CharStream? = null
     override val line: Int = 0
@@ -95,7 +95,25 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
 
     override fun visitOperationUses(ctx: MugeneParser.OperationUsesContext): Any {
         return when (ctx.altNumber) {
-            0 -> mutableListOf<MmlOperationUse>().apply { addAll(getSingleContent(ctx) as List<MmlOperationUse>) }
+            0 -> {
+                // FIXME: this smells like a bug in antlr-kotlin that it sets altNumber = 0 to the left branch
+                //  (`operationUse`) which is supposed to only return a single MmlOperationUse child.
+                //
+                // correct implementation:
+                //mutableListOf<MmlOperationUse>().apply {
+                //    val content = getSingleContent(ctx)
+                //    add(content as MmlOperationUse)
+                //}
+                // sloppy implementation:
+                val content = getSingleContent(ctx)
+                if (content is MmlOperationUse)
+                    mutableListOf<MmlOperationUse>().apply {
+                        add(content)
+                    }
+                else if (content is MutableList<MmlOperationUse>)
+                    content
+                else error ("Unexpected parser error; unexpected token index")
+            }
             1 -> {
                 val l = visit(ctx.getChild(0)!!)!! as MutableList<MmlOperationUse>
                 l.add(visit(ctx.getChild(1)!!)!! as MmlOperationUse)
@@ -110,7 +128,7 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
             0, 1 -> {
                 val i = visit(ctx.getChild(0)!!)!! as MmlToken
                 val o = MmlOperationUse (i.value as String, i.location)
-                if (ctx.ruleIndex == 1) {
+                if (ctx.altNumber == 1) {
                     val l = visit(ctx.getChild(1)!!)!! as List<MmlValueExpr>
                     for (a in l)
                         o.arguments.add(if (a == skippedArgument) null else a)

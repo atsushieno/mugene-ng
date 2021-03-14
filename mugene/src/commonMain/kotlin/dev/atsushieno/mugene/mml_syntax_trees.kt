@@ -1,7 +1,10 @@
 package dev.atsushieno.mugene
 
+import com.strumenta.kotlinmultiplatform.BitSet
 import dev.atsushieno.mugene.parser.MugeneParser
 import org.antlr.v4.kotlinruntime.*
+import org.antlr.v4.kotlinruntime.atn.ATNConfigSet
+import org.antlr.v4.kotlinruntime.dfa.DFA
 
 class MmlSemanticTreeSet {
     constructor() {
@@ -310,6 +313,53 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
     private fun antlrCompile(reporter: MmlDiagnosticReporter, stream: TokenStream, parseFunc: (MugeneParser) -> ParserRuleContext) : Any {
         val tokenStream = CommonTokenStream(WrappedTokenSource(stream))
         val parser = MugeneParser(tokenStream)
+        parser.addErrorListener(object : ANTLRErrorListener {
+            override fun reportAmbiguity(
+                recognizer: Parser,
+                dfa: DFA,
+                startIndex: Int,
+                stopIndex: Int,
+                exact: Boolean,
+                ambigAlts: BitSet,
+                configs: ATNConfigSet
+            ) {
+                TODO("Ambiguity. Not yet implemented")
+            }
+
+            override fun reportAttemptingFullContext(
+                recognizer: Parser,
+                dfa: DFA,
+                startIndex: Int,
+                stopIndex: Int,
+                conflictingAlts: BitSet,
+                configs: ATNConfigSet
+            ) {
+                TODO("Attempting full context. Not yet implemented")
+            }
+
+            override fun reportContextSensitivity(
+                recognizer: Parser,
+                dfa: DFA,
+                startIndex: Int,
+                stopIndex: Int,
+                prediction: Int,
+                configs: ATNConfigSet
+            ) {
+                TODO("Context sensitivity. Not yet implemented")
+            }
+
+            override fun syntaxError(
+                recognizer: Recognizer<*, *>,
+                offendingSymbol: Any?,
+                line: Int,
+                charPositionInLine: Int,
+                msg: String,
+                e: RecognitionException?
+            ) {
+                reporter(MmlDiagnosticVerbosity.Error, MmlLineInfo("(unknown)", line, charPositionInLine), msg + "\n")
+            }
+
+        })
         val tree = parseFunc(parser)
         val visitor = MugeneParserVisitorImpl(reporter)
         val ret = visitor.visit(tree)!!
@@ -352,7 +402,8 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
     }
 
     private fun compileOperationTokens(data: MutableList<MmlOperationUse>, stream: TokenStream) {
-        data.addAll(antlrCompile(reporter, stream, { parser -> parser.operationUses() }) as List<MmlOperationUse>)
+        var results = antlrCompile(reporter, stream, { parser -> parser.operationUses() })
+        data.addAll(results as List<MmlOperationUse>)
     }
 
     init {

@@ -17,7 +17,7 @@ class SimpleEOFToken(source: TokenSource) : Token {
     override val line: Int = 0
     override val startIndex: Int = 0
     override val stopIndex: Int = 0
-    override val text: String? = null
+    override val text: String? = "" // If we set null, that causes NPE at error reporting.
     override val tokenIndex: Int = Token.EOF
     override val tokenSource: TokenSource? = source
     override val type: Int = Token.EOF

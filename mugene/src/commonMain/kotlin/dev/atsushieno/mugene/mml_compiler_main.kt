@@ -43,7 +43,7 @@ abstract class MmlCompiler {
             else if (verbosity == MmlDiagnosticVerbosity.Warning) "warning"
             else "information"
         val loc =
-            if (location != null) "$location.file $location.lineNumber, $location.linePosition) : " else ""
+            if (location != null) "${location.file} (${location.lineNumber}, ${location.linePosition}) : " else ""
         val output = "$loc$kind: $message"
         if (verbosity != MmlDiagnosticVerbosity.Error || continueOnError)
             println(output)

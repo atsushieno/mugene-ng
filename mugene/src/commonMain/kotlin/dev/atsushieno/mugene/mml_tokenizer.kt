@@ -155,7 +155,7 @@ class MmlLineInfo(var file: String, line: Int, column: Int) {
 
     fun clone() = MmlLineInfo(file, lineNumber, linePosition)
 
-    override fun toString() = "Location: $file ($lineNumber, $linePosition)"
+    override fun toString() = "Location: $file (${lineNumber}, ${linePosition})"
 }
 
 class MmlLine(val location: MmlLineInfo, var text: String) {

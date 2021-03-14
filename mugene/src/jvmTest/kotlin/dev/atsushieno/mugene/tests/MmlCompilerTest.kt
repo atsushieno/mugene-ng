@@ -6,6 +6,27 @@ import kotlin.test.assertEquals
 
 class MmlCompilerTest {
     @Test
+    fun negativeStepConstantArgument() {
+        MmlTestUtility.testCompile("note-macro", "#macro x arg:length=%-1 { }", true)
+    }
+
+    @Test
+    fun compileNoteMacro() {
+        MmlTestUtility.testCompile("note-macro", """
+#macro n key:number, step:length=${'$'}__length, gate:length=%-1, vel:number=${'$'}__velocity, timing:number=${'$'}__timing, offvel:number=0   { \
+	__LET{"__current_note_step", ${'$'}gate + %1 ? ${'$'}gate, ${'$'}step }  \
+	__LET{"__current_note_gate", ${'$'}__current_note_step * ${'$'}__gate_rel * {1 / ${'$'}__gate_rel_denom} - ${'$'}__gate_abs} \
+	__LET{"__current_note_gate", ${'$'}__current_note_gate \< 0 ? 0, ${'$'}__current_note_gate } \
+	NOP${'$'}timing \
+	NON${'$'}key, ${'$'}vel \
+	NOP${'$'}__current_note_gate \
+	__ON_MIDI_NOTE_OFF{${'$'}__current_note_gate, ${'$'}key, ${'$'}vel} \
+	NOFF${'$'}key, ${'$'}offvel \
+	NOP${'$'}step - ${'$'}__current_note_gate \
+	NOP0-${'$'}timing }
+        """, true)
+    }
+    @Test
     fun simpleTrackAndNotes() {
         val bytes = MmlTestUtility.testCompile("SimpleCompilation", "1   o5cde")
         val expected = intArrayOf(

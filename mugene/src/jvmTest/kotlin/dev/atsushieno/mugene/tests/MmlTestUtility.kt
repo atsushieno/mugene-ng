@@ -7,12 +7,12 @@ import java.io.ByteArrayOutputStream
 
 class MmlTestUtility {
     companion object {
-        fun testCompile (testLabel: String, mml: String) : ByteArray {
+        fun testCompile (testLabel: String, mml: String, skipDefault: Boolean = false) : ByteArray {
             val sources = mutableListOf<MmlInputSource> ()
             sources.add ( MmlInputSource ("fakefilename.mml", mml))
             val outs = ByteArrayOutputStream ()
             outs.use {
-                MmlCompilerJvm().compile(false, sources, null, outs, false)
+                MmlCompilerJvm().compile(skipDefault, sources, null, outs, false)
                 return outs.toByteArray()
             }
         }

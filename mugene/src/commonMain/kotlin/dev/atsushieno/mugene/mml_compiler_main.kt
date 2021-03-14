@@ -41,7 +41,7 @@ abstract class MmlCompiler {
         val kind =
             if (verbosity == MmlDiagnosticVerbosity.Error) "error"
             else if (verbosity == MmlDiagnosticVerbosity.Warning) "warning"
-            else "information";
+            else "information"
         val loc =
             if (location != null) "$location.file $location.lineNumber, $location.linePosition) : " else ""
         val output = "$loc$kind: $message"
@@ -80,29 +80,29 @@ abstract class MmlCompiler {
             else inputs
 
         // input sources -> tokenizer sources
-        val tokenizerSources = MmlInputSourceReader.parse(report, resolver, inputs);
+        val tokenizerSources = MmlInputSourceReader.parse(report, resolver, actualInputs.toMutableList())
 
         // tokenizer sources -> token streams
-        return MmlTokenizer.tokenize(report, tokenizerSources);
+        return MmlTokenizer.tokenize(report, tokenizerSources)
     }
 
     // used by language server and compiler.
     private fun buildSemanticTree(tokens: MmlTokenSet): MmlSemanticTreeSet {
         // token streams -> semantic trees
-        return MmlSemanticTreeBuilder.compile(tokens, report);
+        return MmlSemanticTreeBuilder.compile(tokens, report)
     }
 
     private fun generateMusic(tree: MmlSemanticTreeSet): MidiMusic {
         // semantic trees -> simplified streams
-        MmlMacroExpander.expand(tree, report);
+        MmlMacroExpander.expand(tree, report)
 
         // simplified streams -> raw events
-        val resolved = MmlEventStreamGenerator.generate(tree, report);
+        val resolved = MmlEventStreamGenerator.generate(tree, report)
 
         // raw events -> SMF
-        val smf = MmlSmfGenerator.generate(resolved);
+        val smf = MmlSmfGenerator.generate(resolved)
 
-        return smf;
+        return smf
     }
 
     init {

@@ -110,9 +110,8 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
                     mutableListOf<MmlOperationUse>().apply {
                         add(content)
                     }
-                else if (content is MutableList<MmlOperationUse>)
-                    content
-                else error ("Unexpected parser error; unexpected token index")
+                else
+                    content as MutableList<*> // MutableList<MmlOperationUse>, but generics are gone.
             }
             1 -> {
                 val l = visit(ctx.getChild(0)!!)!! as MutableList<MmlOperationUse>

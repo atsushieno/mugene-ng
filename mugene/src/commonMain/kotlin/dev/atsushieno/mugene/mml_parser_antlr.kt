@@ -1,6 +1,5 @@
 package dev.atsushieno.mugene
 
-import dev.atsushieno.mugene.parser.MugeneLexer
 import dev.atsushieno.mugene.parser.MugeneParser
 import dev.atsushieno.mugene.parser.MugeneParserBaseVisitor
 import org.antlr.v4.kotlinruntime.CharStream

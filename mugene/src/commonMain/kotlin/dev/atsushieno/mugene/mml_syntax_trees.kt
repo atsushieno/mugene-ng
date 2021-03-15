@@ -323,7 +323,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
                 ambigAlts: BitSet,
                 configs: ATNConfigSet
             ) {
-                TODO("Ambiguity. Not yet implemented")
+                reporter(MmlDiagnosticVerbosity.Error, MmlLineInfo.empty, "reportAmbiguity(startIndex: $startIndex, stopIndex: $stopIndex, exact: $exact)")
             }
 
             override fun reportAttemptingFullContext(
@@ -356,7 +356,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
                 msg: String,
                 e: RecognitionException?
             ) {
-                reporter(MmlDiagnosticVerbosity.Error, MmlLineInfo("(unknown)", line, charPositionInLine), msg + "\n")
+                reporter(MmlDiagnosticVerbosity.Error, MmlLineInfo("(unknown)", line, charPositionInLine), msg)
             }
 
         })

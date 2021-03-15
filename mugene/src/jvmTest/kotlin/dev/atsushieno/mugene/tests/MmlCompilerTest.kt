@@ -11,6 +11,16 @@ class MmlCompilerTest {
     }
 
     @Test
+    fun argumentWithoutCurly() {
+        MmlTestUtility.testCompile("note-macro", "#macro DEBUG val { __PRINT \$val }", true)
+    }
+
+    @Test
+    fun argumentOptCurly() {
+        MmlTestUtility.testCompile("note-macro", "#macro DEBUG val { __PRINT {\$val} }", true)
+    }
+
+    @Test
     fun compileNoteMacro() {
         MmlTestUtility.testCompile("note-macro", """
 #macro n key:number, step:length=${'$'}__length, gate:length=%-1, vel:number=${'$'}__velocity, timing:number=${'$'}__timing, offvel:number=0   { \
@@ -26,6 +36,7 @@ class MmlCompilerTest {
 	NOP0-${'$'}timing }
         """, true)
     }
+
     @Test
     fun simpleTrackAndNotes() {
         val bytes = MmlTestUtility.testCompile("SimpleCompilation", "1   o5cde")

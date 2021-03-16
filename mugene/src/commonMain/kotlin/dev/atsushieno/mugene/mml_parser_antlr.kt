@@ -1,14 +1,8 @@
 package dev.atsushieno.mugene
 
+/*
 import dev.atsushieno.mugene.parser.MugeneParser
 import dev.atsushieno.mugene.parser.MugeneParserBaseVisitor
-import org.antlr.v4.kotlinruntime.CharStream
-import org.antlr.v4.kotlinruntime.ParserRuleContext
-import org.antlr.v4.kotlinruntime.Token
-import org.antlr.v4.kotlinruntime.TokenFactory
-import org.antlr.v4.kotlinruntime.TokenSource
-import org.antlr.v4.kotlinruntime.tree.TerminalNode
-import org.antlr.v4.kotlinruntime.tree.pattern.DEFAULT_CHANNEL
 
 class SimpleEOFToken(source: TokenSource) : Token {
     override val channel: Int = -1
@@ -339,3 +333,4 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
         }
     }
 }
+*/

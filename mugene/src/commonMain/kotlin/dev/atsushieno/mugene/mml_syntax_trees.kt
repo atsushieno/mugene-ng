@@ -1,10 +1,24 @@
 package dev.atsushieno.mugene
 
-import com.strumenta.kotlinmultiplatform.BitSet
-import dev.atsushieno.mugene.parser.MugeneParser
-import org.antlr.v4.kotlinruntime.*
-import org.antlr.v4.kotlinruntime.atn.ATNConfigSet
-import org.antlr.v4.kotlinruntime.dfa.DFA
+import com.github.h0tk3y.betterParse.combinators.and
+import com.github.h0tk3y.betterParse.combinators.leftAssociative
+import com.github.h0tk3y.betterParse.combinators.oneOrMore
+import com.github.h0tk3y.betterParse.combinators.optional
+import com.github.h0tk3y.betterParse.combinators.or
+import com.github.h0tk3y.betterParse.combinators.separatedTerms
+import com.github.h0tk3y.betterParse.combinators.times
+import com.github.h0tk3y.betterParse.combinators.use
+import com.github.h0tk3y.betterParse.combinators.zeroOrMore
+import com.github.h0tk3y.betterParse.grammar.Grammar
+import com.github.h0tk3y.betterParse.lexer.Token
+import com.github.h0tk3y.betterParse.lexer.TokenMatch
+import com.github.h0tk3y.betterParse.lexer.TokenMatchesSequence
+import com.github.h0tk3y.betterParse.lexer.TokenProducer
+import com.github.h0tk3y.betterParse.lexer.regexToken
+import com.github.h0tk3y.betterParse.parser.ParseResult
+import com.github.h0tk3y.betterParse.parser.Parser
+import com.github.h0tk3y.betterParse.parser.parse
+
 
 class MmlSemanticTreeSet {
     constructor() {
@@ -310,6 +324,14 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
             result.tracks.add(buildTrackOperationList(track))
     }
 
+    private fun <T> betterParseCompile(reporter: MmlDiagnosticReporter, stream: TokenStream) : Any {
+        val tokenProducer = MugeneTokenProducer(stream)
+        val tokenMatchesSequence = TokenMatchesSequence(tokenProducer)
+        val parser = MugeneParser()
+        return parser.parse(tokenMatchesSequence)
+    }
+
+    /*
     private fun antlrCompile(reporter: MmlDiagnosticReporter, stream: TokenStream, parseFunc: (MugeneParser) -> ParserRuleContext) : Any {
         val tokenStream = CommonTokenStream(WrappedTokenSource(stream))
         val parser = MugeneParser(tokenStream)
@@ -365,6 +387,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
         val ret = visitor.visit(tree)!!
         return ret
     }
+    */
 
     private fun buildVariableDeclaration(src: MmlVariableDefinition): MmlSemanticVariable {
         val ret = MmlSemanticVariable(src.location, src.name, src.type)
@@ -374,7 +397,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
 
         // This is the rewritten code for Kotlin...
         val stream = TokenStream(src.defaultValueTokens, src.location)
-        val typed = antlrCompile(reporter, stream, { parser -> parser.expression() })
+        val typed = betterParseCompile<MmlValueExpr>(reporter, stream)
         ret.defaultValue = typed as MmlValueExpr
         // ...end of that.
 
@@ -403,7 +426,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
 
     private fun compileOperationTokens(data: MutableList<MmlOperationUse>, stream: TokenStream) {
         if (stream.source.isNotEmpty()) {
-            var results = antlrCompile(reporter, stream, { parser -> parser.operationUses() })
+            var results = betterParseCompile<List<MmlOperationUse>>(reporter, stream)
             data.addAll(results as List<MmlOperationUse>)
         }
     }

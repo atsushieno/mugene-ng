@@ -56,18 +56,19 @@ kotlin {
 */
 
     sourceSets {
+        /*
         val commonAntlr by creating {
             dependencies {
                 api(kotlin("stdlib-common"))
-                api("com.strumenta.antlr-kotlin:antlr-kotlin-runtime:-SNAPSHOT")
             }
             kotlin.srcDir("build/generated-src/commonAntlr/kotlin")
         }
+        */
         val commonMain by getting {
             dependencies {
                 implementation("dev.atsushieno:ktmidi-kotlinMultiplatform:0.1.2")
             }
-            dependsOn(commonAntlr)
+        //    dependsOn(commonAntlr)
         }
         val commonTest by getting {
             dependencies {
@@ -78,6 +79,7 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation("dev.atsushieno:ktmidi-jvm:0.1.2")
+                implementation("org.antlr:antlr4-runtime:4.9.2")
             }
         }
         val jvmTest by getting {
@@ -111,6 +113,7 @@ kotlin {
 
 // in antlr-kotlin-plugin <0.0.5, the configuration was applied by the plugin.
 // starting from verison 0.0.5, you have to apply it manually:
+/*
 tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generateKotlinCommonGrammarSource") {
     // the classpath used to run antlr code generation
     antlrClasspath = configurations.detachedConfiguration(
@@ -141,7 +144,7 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
 // not required if you add the generated sources to version control
 // you can call the task manually in this case to update the generated sources
 tasks.getByName("compileKotlinJvm").dependsOn("generateKotlinCommonGrammarSource")
-
+*/
 // end of copy(2)
 
 afterEvaluate {

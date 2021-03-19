@@ -2,65 +2,73 @@ package dev.atsushieno.mugene
 
 import dev.atsushieno.mugene.parser.MugeneParser
 import dev.atsushieno.mugene.parser.MugeneParserBaseVisitor
-import org.antlr.v4.kotlinruntime.CharStream
-import org.antlr.v4.kotlinruntime.ParserRuleContext
-import org.antlr.v4.kotlinruntime.Token
-import org.antlr.v4.kotlinruntime.TokenFactory
-import org.antlr.v4.kotlinruntime.TokenSource
-import org.antlr.v4.kotlinruntime.tree.TerminalNode
-import org.antlr.v4.kotlinruntime.tree.pattern.DEFAULT_CHANNEL
+import org.antlr.v4.runtime.CharStream
+import org.antlr.v4.runtime.Token
+import org.antlr.v4.runtime.TokenFactory
+import org.antlr.v4.runtime.TokenSource
+import org.antlr.v4.runtime.tree.TerminalNode
+import org.antlr.v4.runtime.ANTLRErrorListener
+import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.Parser
+import org.antlr.v4.runtime.ParserRuleContext
+import org.antlr.v4.runtime.RecognitionException
+import org.antlr.v4.runtime.Recognizer
+import org.antlr.v4.runtime.Token.DEFAULT_CHANNEL
+import org.antlr.v4.runtime.atn.ATNConfigSet
+import org.antlr.v4.runtime.dfa.DFA
+import java.util.*
 
-class SimpleEOFToken(source: TokenSource) : Token {
-    override val channel: Int = -1
-    override val charPositionInLine: Int = 0
-    override val inputStream: CharStream? = null
-    override val line: Int = 0
-    override val startIndex: Int = 0
-    override val stopIndex: Int = 0
-    override val text: String? = "" // If we set null, that causes NPE at error reporting.
-    override val tokenIndex: Int = Token.EOF
-    override val tokenSource: TokenSource? = source
-    override val type: Int = Token.EOF
+class SimpleEOFToken(private val source: TokenSource) : Token {
+    override fun getChannel() : Int = -1
+    override fun getCharPositionInLine(): Int = 0
+    override fun getInputStream(): CharStream? = null
+    override fun getLine(): Int = 0
+    override fun getStartIndex(): Int = 0
+    override fun getStopIndex(): Int = 0
+    override fun getText(): String = "" // If we set null, that causes NPE at error reporting.
+    override fun getTokenIndex(): Int = Token.EOF
+    override fun getTokenSource(): TokenSource? = source
+    override fun getType(): Int = Token.EOF
 }
 
-class WrappedToken(src: MmlToken, sourceTokenSource: TokenSource) : Token {
+class WrappedToken(private val src: MmlToken, private val sourceTokenSource: TokenSource) : Token {
     val mmlToken = src
-    override val channel = DEFAULT_CHANNEL
-    override val charPositionInLine = src.location.linePosition
-    override val inputStream: CharStream? = null
-    override val line = src.location.lineNumber
-    override val startIndex = src.location.linePosition
-    override val stopIndex = src.location.linePosition + (src.value?.toString()?.length ?: 0)
-    override val text = src.value.toString()
-    override val tokenIndex = src.tokenType.ordinal
-    override val tokenSource = sourceTokenSource
-    override val type = when (src.tokenType) {
-        MmlTokenType.Asterisk -> MugeneParser.Tokens.Asterisk.ordinal
-        MmlTokenType.BackSlashGreater -> MugeneParser.Tokens.BackSlashGreater.ordinal
-        MmlTokenType.BackSlashGreaterEqual -> MugeneParser.Tokens.BackSlashGreaterEqual.ordinal
-        MmlTokenType.BackSlashLesser -> MugeneParser.Tokens.BackSlashLesser.ordinal
-        MmlTokenType.BackSlashLesserEqual -> MugeneParser.Tokens.BackSlashLesserEqual.ordinal
-        MmlTokenType.Caret -> MugeneParser.Tokens.Caret.ordinal
-        MmlTokenType.CloseCurly -> MugeneParser.Tokens.CloseCurly.ordinal
-        MmlTokenType.CloseParen -> MugeneParser.Tokens.CloseParen.ordinal
-        MmlTokenType.Colon -> MugeneParser.Tokens.Colon.ordinal
-        MmlTokenType.Comma -> MugeneParser.Tokens.Comma.ordinal
-        MmlTokenType.Dollar -> MugeneParser.Tokens.Dollar.ordinal
-        MmlTokenType.Identifier -> MugeneParser.Tokens.Identifier.ordinal
-        MmlTokenType.KeywordBuffer -> MugeneParser.Tokens.KeywordBuffer.ordinal
-        MmlTokenType.KeywordLength -> MugeneParser.Tokens.KeywordLength.ordinal
-        MmlTokenType.KeywordNumber -> MugeneParser.Tokens.KeywordNumber.ordinal
-        MmlTokenType.KeywordString -> MugeneParser.Tokens.KeywordString.ordinal
-        MmlTokenType.Minus -> MugeneParser.Tokens.Minus.ordinal
-        MmlTokenType.NumberLiteral -> MugeneParser.Tokens.NumberLiteral.ordinal
-        MmlTokenType.OpenCurly -> MugeneParser.Tokens.OpenCurly.ordinal
-        MmlTokenType.OpenParen -> MugeneParser.Tokens.OpenParen.ordinal
-        MmlTokenType.Percent -> MugeneParser.Tokens.Percent.ordinal
-        MmlTokenType.Period -> MugeneParser.Tokens.Dot.ordinal
-        MmlTokenType.Plus -> MugeneParser.Tokens.Plus.ordinal
-        MmlTokenType.Question -> MugeneParser.Tokens.Question.ordinal
-        MmlTokenType.Slash -> MugeneParser.Tokens.Slash.ordinal
-        MmlTokenType.StringLiteral -> MugeneParser.Tokens.StringLiteral.ordinal
+    override fun getChannel() = DEFAULT_CHANNEL
+    override fun getCharPositionInLine() = src.location.linePosition
+    override fun getInputStream(): CharStream? = null
+    override fun getLine() = src.location.lineNumber
+    override fun getStartIndex() = src.location.linePosition
+    override fun getStopIndex() = src.location.linePosition + (src.value?.toString()?.length ?: 0)
+    override fun getText() = src.value.toString()
+    override fun getTokenIndex() = src.tokenType.ordinal
+    override fun getTokenSource() = sourceTokenSource
+    override fun getType() = when (src.tokenType) {
+        MmlTokenType.BackSlashGreater -> MugeneParser.BackSlashGreater
+        MmlTokenType.Asterisk -> MugeneParser.Asterisk
+        MmlTokenType.BackSlashGreaterEqual -> MugeneParser.BackSlashGreaterEqual
+        MmlTokenType.BackSlashLesser -> MugeneParser.BackSlashLesser
+        MmlTokenType.BackSlashLesserEqual -> MugeneParser.BackSlashLesserEqual
+        MmlTokenType.Caret -> MugeneParser.Caret
+        MmlTokenType.CloseCurly -> MugeneParser.CloseCurly
+        MmlTokenType.CloseParen -> MugeneParser.CloseParen
+        MmlTokenType.Colon -> MugeneParser.Colon
+        MmlTokenType.Comma -> MugeneParser.Comma
+        MmlTokenType.Dollar -> MugeneParser.Dollar
+        MmlTokenType.Identifier -> MugeneParser.Identifier
+        MmlTokenType.KeywordBuffer -> MugeneParser.KeywordBuffer
+        MmlTokenType.KeywordLength -> MugeneParser.KeywordLength
+        MmlTokenType.KeywordNumber -> MugeneParser.KeywordNumber
+        MmlTokenType.KeywordString -> MugeneParser.KeywordString
+        MmlTokenType.Minus -> MugeneParser.Minus
+        MmlTokenType.NumberLiteral -> MugeneParser.NumberLiteral
+        MmlTokenType.OpenCurly -> MugeneParser.OpenCurly
+        MmlTokenType.OpenParen -> MugeneParser.OpenParen
+        MmlTokenType.Percent -> MugeneParser.Percent
+        MmlTokenType.Period -> MugeneParser.Dot
+        MmlTokenType.Plus -> MugeneParser.Plus
+        MmlTokenType.Question -> MugeneParser.Question
+        MmlTokenType.Slash -> MugeneParser.Slash
+        MmlTokenType.StringLiteral -> MugeneParser.StringLiteral
         else -> 0
     }
 }
@@ -70,8 +78,12 @@ class WrappedTokenFactory<T> : TokenFactory<T> where T : Token {
         TODO("Not yet implemented")
     }
 
+    /** This is the method used to create tokens in the lexer and in the
+     * error handling strategy. If text!=null, than the start and stop positions
+     * are wiped to -1 in the text override is set in the CommonToken.
+     */
     override fun create(
-        source: Pair<TokenSource?, CharStream?>,
+        source: org.antlr.v4.runtime.misc.Pair<TokenSource, CharStream>?,
         type: Int,
         text: String?,
         channel: Int,
@@ -86,21 +98,18 @@ class WrappedTokenFactory<T> : TokenFactory<T> where T : Token {
 }
 
 class WrappedTokenSource(val ts: TokenStream) : TokenSource {
-    override val charPositionInLine: Int
-        get() = ts.source[ts.position].location.linePosition
-    override val line: Int
-        get() = ts.source[ts.position].location.lineNumber
-    override val sourceName: String?
-        get() = ts.source[ts.position].location.file
-    override var tokenFactory: TokenFactory<*> = WrappedTokenFactory<Token>()
+    override fun getCharPositionInLine(): Int = ts.source[ts.position].location.linePosition
+    override fun getLine(): Int = ts.source[ts.position].location.lineNumber
+    override fun getSourceName(): String? = ts.source[ts.position].location.file
+
+    override fun getTokenFactory(): TokenFactory<*> = WrappedTokenFactory<Token>()
+    override fun setTokenFactory(factory: TokenFactory<*>?) = TODO("Not yet implemented")
 
     override fun nextToken() : Token =
         if (ts.position == ts.source.size) SimpleEOFToken(this)
         else WrappedToken(ts.source[ts.position++], this)
 
-    override fun readInputStream(): CharStream? {
-        TODO("Not yet implemented")
-    }
+    override fun getInputStream(): CharStream? = TODO("Not yet implemented")
 }
 
 class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : MugeneParserBaseVisitor<Any>() {
@@ -338,4 +347,72 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
             else -> error ("Unexpected parser error; unexpected token index")
         }
     }
+}
+
+actual fun antlrCompileOperationUses(treeBuilder: MmlSemanticTreeBuilder, reporter: MmlDiagnosticReporter, stream: TokenStream) : Any
+    = treeBuilder.antlrCompile(reporter, stream, { parser -> parser.operationUses() } )
+actual fun antlrCompileExpression(treeBuilder: MmlSemanticTreeBuilder, reporter: MmlDiagnosticReporter, stream: TokenStream) : Any
+    = treeBuilder.antlrCompile(reporter, stream, { parser -> parser.expression() } )
+
+private fun MmlSemanticTreeBuilder.antlrCompile(
+    reporter: MmlDiagnosticReporter,
+    stream: TokenStream,
+    parseFunc: (MugeneParser) -> ParserRuleContext
+): Any {
+    val tokenStream = CommonTokenStream(WrappedTokenSource(stream))
+    val parser = MugeneParser(tokenStream)
+    parser.addErrorListener(object : ANTLRErrorListener {
+        override fun reportAmbiguity(
+            recognizer: Parser,
+            dfa: DFA,
+            startIndex: Int,
+            stopIndex: Int,
+            exact: Boolean,
+            ambigAlts: BitSet,
+            configs: ATNConfigSet
+        ) {
+            reporter(
+                MmlDiagnosticVerbosity.Error,
+                MmlLineInfo.empty,
+                "reportAmbiguity(startIndex: $startIndex, stopIndex: $stopIndex, exact: $exact)"
+            )
+        }
+
+        override fun reportAttemptingFullContext(
+            recognizer: Parser,
+            dfa: DFA,
+            startIndex: Int,
+            stopIndex: Int,
+            conflictingAlts: BitSet,
+            configs: ATNConfigSet
+        ) {
+            //TODO("Attempting full context. Not yet implemented")
+        }
+
+        override fun reportContextSensitivity(
+            recognizer: Parser,
+            dfa: DFA,
+            startIndex: Int,
+            stopIndex: Int,
+            prediction: Int,
+            configs: ATNConfigSet
+        ) {
+            TODO("Context sensitivity. Not yet implemented")
+        }
+
+        override fun syntaxError(
+            recognizer: Recognizer<*, *>,
+            offendingSymbol: Any?,
+            line: Int,
+            charPositionInLine: Int,
+            msg: String,
+            e: RecognitionException?
+        ) {
+            reporter(MmlDiagnosticVerbosity.Error, MmlLineInfo("(unknown)", line, charPositionInLine), msg)
+        }
+
+    })
+    val tree = parseFunc(parser)
+    val visitor = MugeneParserVisitorImpl(reporter)
+    return visitor.visitExpressionOrOperationUses(tree as MugeneParser.ExpressionOrOperationUsesContext)!!
 }

@@ -405,8 +405,8 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
 
     private fun buildTrackOperationList(src: MmlTrack): MmlSemanticTrack {
         val ret = MmlSemanticTrack(src.number)
-        if (ret.data.any())
-            compileOperationTokens(ret.data, TokenStream(src.tokens, ret.data.first().location!!))
+        if (src.tokens.any())
+            compileOperationTokens(ret.data, TokenStream(src.tokens, src.tokens.first().location))
         return ret
     }
 

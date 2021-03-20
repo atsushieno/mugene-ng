@@ -302,7 +302,7 @@ class MmlResolvedTrack(val number: Double, source: MmlSemanticTreeSet) {
 
     init {
         for (m in source.macros)
-            if (m.targetTracks.contains(number))
+            if (m.targetTracks.isEmpty() || m.targetTracks.contains(number))
                 macros[m.name] = m
     }
 }

@@ -63,6 +63,12 @@ class MmlCompilerTest {
         for (i in expected.indices)
             assertEquals(expected[i], bytes[i], "bytes at $i")
     }
+
+    @Test
+    fun simpleLoopRest() {
+        MmlTestUtility.testCompile("SimpleCompilation", "#macro r len:number {  }\n1   [r1]4", true)
+    }
+
     @Test
     fun simpleMacroDefinition() {
         MmlTestUtility.testCompile("Macro definition", "#macro\tCH_INIT ch:number { CH\$ch }")

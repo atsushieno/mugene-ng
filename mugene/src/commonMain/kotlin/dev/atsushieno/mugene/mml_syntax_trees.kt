@@ -489,10 +489,10 @@ class MmlPrimitiveOperation {
         val LoopBreak = MmlPrimitiveOperation().apply { name = "__LOOP_BREAK" };
         val LoopEnd = MmlPrimitiveOperation().apply { name = "__LOOP_END" };
         //#if !UNHACK_LOOP
-        //val LoopBegin2 =  MmlPrimitiveOperation().apply { name = "[" };
-        //val LoopBreak2 =  MmlPrimitiveOperation().apply { name = ":" };
-        //val LoopBreak3 =  MmlPrimitiveOperation().apply { name = "/" };
-        //val LoopEnd2 =  MmlPrimitiveOperation().apply { name = "]" };
+        val LoopBegin2 =  MmlPrimitiveOperation().apply { name = "[" };
+        val LoopBreak2 =  MmlPrimitiveOperation().apply { name = ":" };
+        val LoopBreak3 =  MmlPrimitiveOperation().apply { name = "/" };
+        val LoopEnd2 =  MmlPrimitiveOperation().apply { name = "]" };
         //#endif
 
         init {
@@ -514,7 +514,7 @@ class MmlPrimitiveOperation {
                 LoopBreak,
                 LoopEnd,
                 //#if !UNHACK_LOOP
-                //LoopBegin2, LoopBreak2, LoopBreak3, LoopEnd2
+                LoopBegin2, LoopBreak2, LoopBreak3, LoopEnd2
                 //#endif
             )
         }

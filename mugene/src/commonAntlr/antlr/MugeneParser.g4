@@ -13,19 +13,16 @@ operationUses :
 	;
 
 operationUse :
-	canBeIdentifier
-	| canBeIdentifier argumentsOptCurly
+	canBeIdentifier argumentsOptCurly?
 	;
 
 argumentsOptCurly :
-	arguments
-	| OpenCurly CloseCurly
-	| OpenCurly arguments CloseCurly
+	OpenCurly arguments? CloseCurly
+	| arguments
 	;
 
 arguments :
-	argument
-	| arguments commas argument
+	argument (commas arguments)?
 	;
 
 argument :
@@ -76,9 +73,9 @@ primaryExpr :
 	;
 
 unaryExpr :
-	numberOrLengthConstant
-	| Minus numberOrLengthConstant
+	Minus numberOrLengthConstant
 	| Caret numberOrLengthConstant
+	| numberOrLengthConstant
 	;
 
 variableReference :

@@ -21,6 +21,16 @@ class MmlCompilerTest {
     }
 
     @Test
+    fun macroArgumentsProcessed() {
+        MmlTestUtility.testCompile("arguments", "#variable __octave:number = 5\n#macro o val:number { __LET{\"__octave\", \$val} }\n1   o5", true)
+    }
+
+    @Test
+    fun negativeVariableBinding() {
+        MmlTestUtility.testCompile("arguments", "#variable __trans_c:number = 0\n#macro Kc- { __LET{\"__trans_c\", -1} }", true)
+    }
+
+    @Test
     fun compileNoteMacro() {
         MmlTestUtility.testCompile("note-macro", """
 #macro n key:number, step:length=${'$'}__length, gate:length=%-1, vel:number=${'$'}__velocity, timing:number=${'$'}__timing, offvel:number=0   { \
@@ -42,14 +52,16 @@ class MmlCompilerTest {
         val bytes = MmlTestUtility.testCompile("SimpleCompilation", "1   o5cde")
         val expected = intArrayOf(
             'M'.toInt(), 'T'.toInt(), 'h'.toInt(), 'd'.toInt(), 0, 0, 0, 6, 0, 1, 0, 1, 0, 0x30,
-            'M'.toInt(), 'T'.toInt(), 'r'.toInt(), 'k'.toInt(), 0, 0, 0, 0x1C,
-            0, 0x90, 0x3C, 100,
-            0x30, 0x80, 0x3C, 0,
-            0, 0x90, 0x3E, 100,
-            0x30, 0x80, 0x3E, 0,
-            0, 0x90, 0x40, 100,
-            0x30, 0x80, 0x40, 0).map { i -> i.toByte() }.toByteArray()
-        assertEquals(expected, bytes, "MIDI bytes")
+            'M'.toInt(), 'T'.toInt(), 'r'.toInt(), 'k'.toInt(), 0, 0, 0, 0x19,
+            0, 0x90, 0x3B, 100,
+            0x30, 0x80, 0x3B, 0,
+            0, 0x90, 0x3D, 100,
+            0x30, 0x80, 0x3D, 0,
+            0, 0x90, 0x3F, 100,
+            0x30, 0x80, 0x3F, 0, 0).map { i -> i.toByte() }.toByteArray()
+        assertEquals(expected.size, bytes.size, "MIDI bytes")
+        for (i in expected.indices)
+            assertEquals(expected[i], bytes[i], "bytes at $i")
     }
     @Test
     fun simpleMacroDefinition() {

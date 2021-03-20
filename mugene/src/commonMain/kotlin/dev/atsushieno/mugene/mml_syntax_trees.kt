@@ -323,7 +323,16 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
                 ambigAlts: BitSet,
                 configs: ATNConfigSet
             ) {
-                reporter(MmlDiagnosticVerbosity.Error, MmlLineInfo.empty, "reportAmbiguity(startIndex: $startIndex, stopIndex: $stopIndex, exact: $exact)")
+                when (dfa.atnStartState.ruleIndex) {
+                    // known ambiguity between `OpenCurly arguments CloseCurly` in argumentsOptCurly
+                    //   vs. `OpenCurly expression CloseCurly` in primaryExpr.
+                    3, 11 -> return
+                    else -> reporter(
+                        MmlDiagnosticVerbosity.Error,
+                        MmlLineInfo.empty,
+                        "reportAmbiguity(startIndex: $startIndex, stopIndex: $stopIndex, exact: $exact)"
+                    )
+                }
             }
 
             override fun reportAttemptingFullContext(
@@ -345,7 +354,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
                 prediction: Int,
                 configs: ATNConfigSet
             ) {
-                TODO("Context sensitivity. Not yet implemented")
+                reporter(MmlDiagnosticVerbosity.Warning, MmlLineInfo.empty, "reportContextSensitivity")
             }
 
             override fun syntaxError(

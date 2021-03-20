@@ -414,5 +414,8 @@ private fun MmlSemanticTreeBuilder.antlrCompile(
     })
     val tree = parseFunc(parser)
     val visitor = MugeneParserVisitorImpl(reporter)
-    return visitor.visitExpressionOrOperationUses(tree as MugeneParser.ExpressionOrOperationUsesContext)!!
+    if (tree is MugeneParser.ExpressionContext)
+        return visitor.visitExpression(tree)
+    else
+        return visitor.visitOperationUses(tree as MugeneParser.OperationUsesContext)
 }

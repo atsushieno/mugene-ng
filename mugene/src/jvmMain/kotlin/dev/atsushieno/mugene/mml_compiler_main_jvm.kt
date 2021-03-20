@@ -144,3 +144,4 @@ fun MidiMusic.toBytes(
     this.save(ms, disableRunningStatus, metaWriter)
     return ms.toByteArray().toTypedArray()
 }
+

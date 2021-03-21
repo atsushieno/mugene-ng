@@ -51,14 +51,14 @@ class MmlCompilerTest {
         val actual = MmlTestUtility.testCompile("SimpleCompilation", "1   o5cde")
         val expected = intArrayOf(
             'M'.toInt(), 'T'.toInt(), 'h'.toInt(), 'd'.toInt(), 0, 0, 0, 6, 0, 1, 0, 1, 0, 0x30,
-            'M'.toInt(), 'T'.toInt(), 'r'.toInt(), 'k'.toInt(), 0, 0, 0, 0x1B,
+            'M'.toInt(), 'T'.toInt(), 'r'.toInt(), 'k'.toInt(), 0, 0, 0, 0x1C,
             0, 0x90, 0x3B, 100,
             0x30, 0x80, 0x3B, 0,
             0, 0x90, 0x3D, 100,
             0x30, 0x80, 0x3D, 0,
             0, 0x90, 0x3F, 100,
             0x30, 0x80, 0x3F, 0,
-            0, 0xFF, 0x2F).map { i -> i.toByte() }.toByteArray()
+            0, 0xFF, 0x2F, 0).map { i -> i.toByte() }.toByteArray()
         assertArrayEquals(expected.toTypedArray(), actual.toTypedArray(), "MIDI bytes")
     }
 

@@ -34,5 +34,5 @@ fun <T>assertArrayEquals(expected: Array<T> , actual: Array<T>, message: String)
                 break
         }
     }
-    assertTrue(report.isNotEmpty(), report)
+    assertTrue(report.isNotEmpty(), message + report)
 }

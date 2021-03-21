@@ -2,7 +2,6 @@
 package dev.atsushieno.mugene.tests
 
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class MmlCompilerTest {
     @Test
@@ -49,19 +48,18 @@ class MmlCompilerTest {
 
     @Test
     fun simpleTrackAndNotes() {
-        val bytes = MmlTestUtility.testCompile("SimpleCompilation", "1   o5cde")
+        val actual = MmlTestUtility.testCompile("SimpleCompilation", "1   o5cde")
         val expected = intArrayOf(
             'M'.toInt(), 'T'.toInt(), 'h'.toInt(), 'd'.toInt(), 0, 0, 0, 6, 0, 1, 0, 1, 0, 0x30,
-            'M'.toInt(), 'T'.toInt(), 'r'.toInt(), 'k'.toInt(), 0, 0, 0, 0x19,
+            'M'.toInt(), 'T'.toInt(), 'r'.toInt(), 'k'.toInt(), 0, 0, 0, 0x1B,
             0, 0x90, 0x3B, 100,
             0x30, 0x80, 0x3B, 0,
             0, 0x90, 0x3D, 100,
             0x30, 0x80, 0x3D, 0,
             0, 0x90, 0x3F, 100,
-            0x30, 0x80, 0x3F, 0, 0).map { i -> i.toByte() }.toByteArray()
-        assertEquals(expected.size, bytes.size, "MIDI bytes")
-        for (i in expected.indices)
-            assertEquals(expected[i], bytes[i], "bytes at $i")
+            0x30, 0x80, 0x3F, 0,
+            0, 0xFF, 0x2F).map { i -> i.toByte() }.toByteArray()
+        assertArrayEquals(expected.toTypedArray(), actual.toTypedArray(), "MIDI bytes")
     }
 
     @Test

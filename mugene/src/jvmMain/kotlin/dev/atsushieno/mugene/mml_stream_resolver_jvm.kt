@@ -5,38 +5,6 @@ import java.io.FileReader
 
 //region input sources to tokenizer sources
 
-class MergeStreamResolver(vararg resolvers: StreamResolver) : StreamResolver() {
-    private val resolvers: MutableList<StreamResolver> = resolvers.toMutableList()
-
-    override fun resolveFilePath(file: String): String? {
-        for (r in resolvers) {
-            val ret = r.resolveFilePath(file)
-            if (ret != null)
-                return ret
-        }
-        return null
-    }
-
-    override fun onGetEntity(file: String): String? {
-        for (r in resolvers) {
-            val ret = r.onGetEntity(file)
-            if (ret != null)
-                return ret
-        }
-        return null
-    }
-
-    override fun pushInclude(file: String) {
-        for (r in resolvers)
-            r.pushInclude(file)
-    }
-
-    override fun popInclude() {
-        for (r in resolvers)
-            r.popInclude()
-    }
-}
-
 class LocalFileStreamResolver : StreamResolver() {
 
     override fun resolveFilePath(file: String): String? {

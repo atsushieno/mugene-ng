@@ -28,25 +28,25 @@ class MmlSmfGenerator(private val source: MmlResolvedMusic) {
             var evt: MidiEvent? = null
             if (ev.arguments[0] == 0xFF.toByte())
                 evt = MidiEvent(
-                    ev.arguments[0].toInt(),
-                    ev.arguments[1].toInt(),
+                    ev.arguments[0].toUByte().toInt(),
+                    ev.arguments[1].toUByte().toInt(),
                     0,
                     ev.arguments.drop(2).toByteArray()
                 )
             else if (ev.arguments.size == 3)
                 evt = MidiEvent(
-                    ev.arguments[0].toInt(),
-                    ev.arguments[1].toInt(),
-                    ev.arguments[2].toInt(),
+                    ev.arguments[0].toUByte().toInt(),
+                    ev.arguments[1].toUByte().toInt(),
+                    ev.arguments[2].toUByte().toInt(),
                     null
                 )
             else
-                evt = MidiEvent(ev.arguments[0].toInt(), 0, 0, ev.arguments.drop(1).toByteArray())
+                evt = MidiEvent(ev.arguments[0].toUByte().toInt(), 0, 0, ev.arguments.drop(1).toByteArray())
             val msg = MidiMessage(ev.tick - cur, evt)
             rtrk.messages.add(msg)
             cur = ev.tick
         }
-        rtrk.messages.add(MidiMessage(0, MidiEvent(0xFF, 0x2F, 0, ByteArray(0))))
+        rtrk.messages.add(MidiMessage(0, MidiEvent(0xFF, 0x2F, 0, byteArrayOf())))
         return rtrk
     }
 

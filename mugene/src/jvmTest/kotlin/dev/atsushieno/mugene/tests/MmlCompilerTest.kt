@@ -50,14 +50,14 @@ class MmlCompilerTest {
     fun simpleTrackAndNotes() {
         val actual = MmlTestUtility.testCompile("SimpleCompilation", "1   o5cde")
         val expected = intArrayOf(
-            'M'.toInt(), 'T'.toInt(), 'h'.toInt(), 'd'.toInt(), 0, 0, 0, 6, 0, 1, 0, 1, 0, 0x30,
-            'M'.toInt(), 'T'.toInt(), 'r'.toInt(), 'k'.toInt(), 0, 0, 0, 0x1C,
-            0, 0x90, 0x3B, 100,
-            0x30, 0x80, 0x3B, 0,
-            0, 0x90, 0x3D, 100,
-            0x30, 0x80, 0x3D, 0,
-            0, 0x90, 0x3F, 100,
-            0x30, 0x80, 0x3F, 0,
+            U.M, U.T, L.h, L.d, 0, 0, 0, 6, 0, 1, 0, 1, 0, 0x30, // at 14
+            U.M, U.T, L.r, L.k, 0, 0, 0, 0x1C, // at 22
+            0, 0x90, 0x3C, 100,
+            0x30, 0x80, 0x3C, 0,
+            0, 0x90, 0x3E, 100,
+            0x30, 0x80, 0x3E, 0,
+            0, 0x90, 0x40, 100,
+            0x30, 0x80, 0x40, 0,
             0, 0xFF, 0x2F, 0).map { i -> i.toByte() }.toByteArray()
         assertArrayEquals(expected.toTypedArray(), actual.toTypedArray(), "MIDI bytes")
     }
@@ -79,6 +79,32 @@ class MmlCompilerTest {
 
     @Test
     fun metaTitle() {
-        MmlTestUtility.testCompile("meta","#meta title \"test\"")
+        val actual = MmlTestUtility.testCompile("meta","#meta title \"test\"")
+        val expected = intArrayOf(
+            U.M, U.T, L.h, L.d, 0, 0, 0, 6, 0, 1, 0, 1, 0, 0x30,
+            U.M, U.T, L.r, L.k, 0, 0, 0, 0x0C,
+            0, 0xFF, 3, 4, L.t, L.e, L.s, L.t,
+            0, 0xFF, 0x2F, 0).map { i -> i.toByte() }.toByteArray()
+        assertArrayEquals(expected.toTypedArray(), actual.toTypedArray(), "MIDI bytes")
+    }
+
+    // U and L cannot share case-insensitively identical fields for JNI signature...
+    class U {
+        companion object {
+            val M = 'M'.toInt()
+            val T = 'T'.toInt()
+        }
+    }
+
+    class L {
+        companion object {
+            val h = 'h'.toInt()
+            val d = 'd'.toInt()
+            val r = 'r'.toInt()
+            val k = 'k'.toInt()
+            val e = 'e'.toInt()
+            val s = 's'.toInt()
+            val t = 't'.toInt()
+        }
     }
 }

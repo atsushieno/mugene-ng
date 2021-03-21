@@ -1058,7 +1058,7 @@ class MmlTokenizer(private val reporter: MmlDiagnosticReporter, private val sour
                 val identifier = source.lexer.readNewIdentifier()
                 source.lexer.skipWhitespaces(true)
                 val textLoc = source.lexer.line.location
-                var text = source.lexer.readStringLiteral()
+                var textValue = source.lexer.readStringLiteral()
                 when (identifier) {
                     "title",
                     "copyright",
@@ -1074,7 +1074,7 @@ class MmlTokenizer(private val reporter: MmlDiagnosticReporter, private val sour
                     typeLocation = typeLoc
                     metaType = metaMap[identifier]!!
                     textLocation = textLoc
-                    text = text
+                    text = textValue
                 })
                 source.lexer.newIdentifierMode = false
             }

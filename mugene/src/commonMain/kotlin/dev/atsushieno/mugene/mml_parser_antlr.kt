@@ -106,8 +106,6 @@ class WrappedTokenSource(val ts: TokenStream) : TokenSource {
 class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : MugeneParserBaseVisitor<Any>() {
     private fun getSingleContent(ctx: ParserRuleContext) = visit(ctx.getChild(0)!!)!!
 
-    private val skippedArgument = MmlConstantExpr (MmlLineInfo.empty, MmlDataType.String, "DEFAULT ARGUMENT")
-
     override fun visitTerminal(node: TerminalNode): Any? {
         val wt = node.symbol as WrappedToken?
         return wt?.mmlToken ?: super.visitTerminal(node)
@@ -144,7 +142,7 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
         if (ctx.findArgumentsOptCurly() != null) {
             val l = visit(ctx.findArgumentsOptCurly()!!)!! as List<MmlValueExpr>
             for (a in l)
-                o.arguments.add(if (a == skippedArgument) null else a)
+                o.arguments.add(if (a == MmlValueExpr.skippedArgument) null else a)
         }
         return o
     }
@@ -165,7 +163,7 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
         val arg = visit(ctx.findArgument()!!)!! as MmlValueExpr
         // add default arguments (one comma works as a normal parameter separator, so -1)
         for (i in 0 until commas - 1)
-            args.add(0, skippedArgument)
+            args.add(0, MmlValueExpr.skippedArgument)
         // add last argument (cannot omit)
         args.add(0, arg)
         return args

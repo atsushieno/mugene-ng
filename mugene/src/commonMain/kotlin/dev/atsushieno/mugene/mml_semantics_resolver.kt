@@ -432,7 +432,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
             val extraTailArgsIfApplied =
                 if (listIndex == start + count - 1) extraTailArgs else null
 
-            val arguments = oper.arguments.requireNoNulls()
+            val arguments = oper.arguments.map { a -> a ?: MmlValueExpr.skippedArgument }
 
             when (oper.name) {
                 "__PRINT" -> {

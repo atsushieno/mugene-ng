@@ -88,6 +88,8 @@ class MmlSemanticVariable {
 
 abstract class MmlValueExpr {
     companion object {
+        val skippedArgument = MmlConstantExpr (MmlLineInfo.empty, MmlDataType.String, "DEFAULT ARGUMENT")
+
         fun computeLength(baseValue: Int, dots: Int): Int {
             var ret = baseValue
             var add = baseValue / 2

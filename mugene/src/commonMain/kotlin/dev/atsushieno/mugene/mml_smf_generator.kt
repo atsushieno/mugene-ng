@@ -14,7 +14,7 @@ class MmlSmfGenerator(private val source: MmlResolvedMusic) {
         }
     }
 
-    var result: MidiMusic = MidiMusic().apply { deltaTimeSpec = (source.baseCount / 4).toByte() }
+    var result: MidiMusic = MidiMusic().apply { deltaTimeSpec = source.baseCount / 4 }
 
     private fun generateSong() {
         for (t in source.tracks)

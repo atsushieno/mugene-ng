@@ -1,7 +1,6 @@
 package dev.atsushieno.mugene
 
 import dev.atsushieno.ktmidi.MidiMessage
-import dev.atsushieno.ktmidi.MidiMusic
 import dev.atsushieno.ktmidi.SmfWriter
 import dev.atsushieno.ktmidi.SmfWriterExtension
 import java.io.*
@@ -15,7 +14,7 @@ class MmlCompilerJvm : MmlCompiler() {
     class MmlCompilerOptions {
         var skipDefaultMmlFiles = false
         var disableRunningStatus = false
-        var metaWriter: ((Boolean, MidiMessage, OutputStream?) -> Int)? = null
+        var metaWriter: ((Boolean, MidiMessage, MutableList<Byte>) -> Int)? = null
     }
 
     fun compile(args: List<String>) {
@@ -29,12 +28,17 @@ class MmlCompilerJvm : MmlCompiler() {
     fun compile(
         skipDefaultMmlFiles: Boolean,
         inputs: List<MmlInputSource>,
-        metaWriter: ((Boolean, MidiMessage, OutputStream?) -> Int)?,
-        output: OutputStream,
+        metaWriter: ((Boolean, MidiMessage, MutableList<Byte>) -> Int)?,
+        output: MutableList<Byte>,
         disableRunningStatus: Boolean
     ) {
         val music = compile(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
-        music.save(output, disableRunningStatus, metaWriter)
+        val writer = SmfWriter(output).apply {
+            this.disableRunningStatus = disableRunningStatus
+            if (metaWriter != null)
+                this.metaEventWriter = metaWriter
+        }
+        writer.writeMusic(music)
     }
 
     private val help = """MML compiler mugene
@@ -115,32 +119,14 @@ This option is for core MML operation hackers."""
         for (fname in inputFilenames)
             inputs.add(MmlInputSource(fname, resolver.getEntity(fname)))
 
+        val outputBytes = mutableListOf<Byte>()
+        compile(noDefault, inputs, metaWriter, outputBytes, disableRunningStatus)
         FileOutputStream(outFilename).use {
-            compile(noDefault, inputs, metaWriter, it, disableRunningStatus)
+            it.write(outputBytes.toByteArray())
         }
         report(
             MmlDiagnosticVerbosity.Information,
             null,
             "Written SMF file ... $outFilename")
     }
-}
-
-fun MidiMusic.save(
-    output: OutputStream,
-    disableRunningStatus: Boolean = false,
-    metaWriter: ((Boolean, MidiMessage, OutputStream?) -> Int)? = null
-) {
-    val writer = SmfWriter(output).apply { this.disableRunningStatus = disableRunningStatus }
-    if (metaWriter != null)
-        writer.metaEventWriter = metaWriter!!
-    writer.writeMusic(this)
-}
-
-fun MidiMusic.toBytes(
-    disableRunningStatus: Boolean = false,
-    metaWriter: ((Boolean, MidiMessage, OutputStream?) -> Int)? = null
-): Array<Byte> {
-    val ms = ByteArrayOutputStream()
-    this.save(ms, disableRunningStatus, metaWriter)
-    return ms.toByteArray().toTypedArray()
 }

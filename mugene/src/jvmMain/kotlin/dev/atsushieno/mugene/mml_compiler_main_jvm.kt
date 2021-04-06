@@ -55,12 +55,18 @@ This option is for core MML operation hackers."""
         var outFilename: String? = null
         var explicitFilename: String? = null
         var disableRunningStatus = false
-        val extension = ".mid"
+        var extension = ".mid"
         val metaWriter = SmfWriterExtension.DEFAULT_META_EVENT_WRITER
         var noDefault = false
+        var midi2 = false
 
         for (arg in args) {
             when (arg) {
+                "--midi2" -> {
+                    midi2 = true
+                    extension = ".umpmf"
+                    continue
+                }
                 "--nodefault" -> {
                     noDefault = true
                     continue
@@ -104,7 +110,10 @@ This option is for core MML operation hackers."""
             inputs.add(MmlInputSource(fname, resolver.getEntity(fname)))
 
         val outputBytes = mutableListOf<Byte>()
-        compile(noDefault, inputs, metaWriter, outputBytes, disableRunningStatus)
+        if (midi2)
+            compile2(noDefault, inputs, outputBytes)
+        else
+            compile(noDefault, inputs, metaWriter, outputBytes, disableRunningStatus)
         FileOutputStream(outFilename).use {
             it.write(outputBytes.toByteArray())
         }

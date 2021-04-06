@@ -1,6 +1,7 @@
 package dev.atsushieno.mugene
 
 import dev.atsushieno.ktmidi.Midi2Music
+import dev.atsushieno.ktmidi.Midi2MusicWriter
 import dev.atsushieno.ktmidi.MidiMessage
 import dev.atsushieno.ktmidi.MidiMusic
 import dev.atsushieno.ktmidi.SmfWriter
@@ -79,14 +80,7 @@ abstract class MmlCompiler {
 
     fun compile2(skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, output: MutableList<Byte>) {
         val music = compile2(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
-        val ints = serializeMidi2MusicToBytes(music)
-        val bytes = ints.flatMap { i32 -> sequence {
-            yield((i32 shr 24).toByte())
-            yield(((i32 shr 16) and 0xFF).toByte())
-            yield(((i32 shr 8) and 0xFF).toByte())
-            yield((i32 and 0xFF).toByte())
-        }.asIterable() }
-        output.addAll(bytes)
+        Midi2MusicWriter(output).writeMusic(music)
     }
 
     // used by language server and compiler.
@@ -135,28 +129,4 @@ abstract class MmlCompiler {
     init {
         report = { v, k, m -> reportOnConsole(v, k, m) }
     }
-}
-
-fun serializeMidi2MusicToBytes(music: Midi2Music) : List<Int> {
-    // Data Format:
-    //   identifier: 0xAAAAAAAAAAAAAAAA (16 bytes)
-    //   i32 numTracks
-    //   tracks
-    //        identifier: 0xEEEEEEEEEEEEEEEE (16 bytes)
-    //       i32 numUMPs
-    //       umps (i32, i64 or i128)
-    val ret = mutableListOf<Int>()
-    (0..3).forEach { _ -> ret.add(0xAAAAAAAA.toInt()) }
-    ret.add(music.tracks.size)
-    for(track in music.tracks) {
-        (0..3).forEach { _ -> ret.add(0xEEEEEEEE.toInt()) }
-        ret.add(track.messages.size)
-        for (message in track.messages)
-            when (message.category) {
-                5 -> ret.addAll(sequenceOf(message.int1, message.int2, message.int3, message.int4))
-                3, 4 -> ret.addAll(sequenceOf(message.int1, message.int2))
-                else -> ret.add(message.int1)
-            }
-    }
-    return ret
 }

@@ -79,8 +79,10 @@ class MmlMidi2Generator(private val source: MmlResolvedMusic) {
         for (ev in source.events) {
             var wasSysex = false
             lateinit var evt: Ump
-            if (ev.arguments[0] == 0xFF.toByte())
+            if (ev.arguments[0] == 0xFF.toByte()) {
                 println("META events are not implemented in MIDI2 generator") // FIXME: we have to determine how to deal with META events
+                continue
+            }
             else if (ev.arguments[0] == 0xFF.toByte())
                 wasSysex = true // later
             else if ((ev.arguments[0].toUnsigned() and 0xF0) == 0xF0)

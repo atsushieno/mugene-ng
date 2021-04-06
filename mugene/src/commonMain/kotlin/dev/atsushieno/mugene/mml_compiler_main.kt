@@ -1,7 +1,9 @@
 package dev.atsushieno.mugene
 
+import dev.atsushieno.ktmidi.Midi2Music
 import dev.atsushieno.ktmidi.MidiMessage
 import dev.atsushieno.ktmidi.MidiMusic
+import dev.atsushieno.ktmidi.SmfWriter
 
 internal class Util {
     companion object {
@@ -52,19 +54,39 @@ abstract class MmlCompiler {
     }
 
     fun compile(skipDefaultMmlFiles: Boolean, vararg mmlParts: String): MidiMusic {
-        val sources = mmlParts.map { mml -> MmlInputSource("<string>", mml) }
-        return compile(skipDefaultMmlFiles, inputs = sources.toTypedArray())
+        val sources = mmlParts.map { mml -> MmlInputSource("<string>", mml) }.toTypedArray()
+        return compile(skipDefaultMmlFiles, inputs = sources)
     }
 
-    fun compile(skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource): MidiMusic {
-        return generateMusic(
-            buildSemanticTree(
-                tokenizeInputs(
-                    skipDefaultMmlFiles,
-                    inputs.toList()
-                )
-            )
-        )
+    fun compile(skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) = generateMusic(buildSemanticTree(tokenizeInputs(skipDefaultMmlFiles, inputs.toList())))
+
+    fun compile(skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, metaWriter: ((Boolean, MidiMessage, MutableList<Byte>) -> Int)?, output: MutableList<Byte>, disableRunningStatus: Boolean) {
+        val music = compile(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
+        val writer = SmfWriter(output).apply {
+            this.disableRunningStatus = disableRunningStatus
+            if (metaWriter != null)
+                this.metaEventWriter = metaWriter
+        }
+        writer.writeMusic(music)
+    }
+
+    fun compile2(skipDefaultMmlFiles: Boolean, vararg mmlParts: String): Midi2Music {
+        val sources = mmlParts.map { mml -> MmlInputSource("<string>", mml) }.toTypedArray()
+        return compile2(skipDefaultMmlFiles, inputs = sources)
+    }
+
+    fun compile2(skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) = generateMusic2(buildSemanticTree(tokenizeInputs(skipDefaultMmlFiles, inputs.toList())))
+
+    fun compile2(skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, output: MutableList<Byte>) {
+        val music = compile2(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
+        val ints = serializeMidi2MusicToBytes(music)
+        val bytes = ints.flatMap { i32 -> sequence {
+            yield((i32 shr 24).toByte())
+            yield(((i32 shr 16) and 0xFF).toByte())
+            yield(((i32 shr 8) and 0xFF).toByte())
+            yield((i32 and 0xFF).toByte())
+        }.asIterable() }
+        output.addAll(bytes)
     }
 
     // used by language server and compiler.
@@ -95,17 +117,46 @@ abstract class MmlCompiler {
     private fun generateMusic(tree: MmlSemanticTreeSet): MidiMusic {
         // semantic trees -> simplified streams
         MmlMacroExpander.expand(tree, report)
-
         // simplified streams -> raw events
         val resolved = MmlEventStreamGenerator.generate(tree, report)
-
         // raw events -> SMF
-        val smf = MmlSmfGenerator.generate(resolved)
+        return MmlSmfGenerator.generate(resolved)
+    }
 
-        return smf
+    private fun generateMusic2(tree: MmlSemanticTreeSet): Midi2Music {
+        // semantic trees -> simplified streams
+        MmlMacroExpander.expand(tree, report)
+        // simplified streams -> raw events
+        val resolved = MmlEventStreamGenerator.generate(tree, report)
+        // raw events -> SMF
+        return MmlMidi2Generator.generate(resolved)
     }
 
     init {
         report = { v, k, m -> reportOnConsole(v, k, m) }
     }
+}
+
+fun serializeMidi2MusicToBytes(music: Midi2Music) : List<Int> {
+    // Data Format:
+    //   identifier: 0xAAAAAAAAAAAAAAAA (16 bytes)
+    //   i32 numTracks
+    //   tracks
+    //        identifier: 0xEEEEEEEEEEEEEEEE (16 bytes)
+    //       i32 numUMPs
+    //       umps (i32, i64 or i128)
+    val ret = mutableListOf<Int>()
+    (0..3).forEach { _ -> ret.add(0xAAAAAAAA.toInt()) }
+    ret.add(music.tracks.size)
+    for(track in music.tracks) {
+        (0..3).forEach { _ -> ret.add(0xEEEEEEEE.toInt()) }
+        ret.add(track.messages.size)
+        for (message in track.messages)
+            when (message.category) {
+                5 -> ret.addAll(sequenceOf(message.int1, message.int2, message.int3, message.int4))
+                3, 4 -> ret.addAll(sequenceOf(message.int1, message.int2))
+                else -> ret.add(message.int1)
+            }
+    }
+    return ret
 }

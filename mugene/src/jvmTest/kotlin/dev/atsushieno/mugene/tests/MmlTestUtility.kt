@@ -16,6 +16,13 @@ class MmlTestUtility {
             MmlCompilerJvm().compile(skipDefault, sources, null, outs, false)
             return outs.toByteArray()
         }
+        fun testCompile2 (testLabel: String, mml: String, skipDefault: Boolean = false) : ByteArray {
+            val sources = mutableListOf<MmlInputSource> ()
+            sources.add ( MmlInputSource ("fakefilename.mml", mml))
+            val outs = mutableListOf<Byte> ()
+            MmlCompilerJvm().compile2(skipDefault, sources, outs)
+            return outs.toByteArray()
+        }
     }
 }
 

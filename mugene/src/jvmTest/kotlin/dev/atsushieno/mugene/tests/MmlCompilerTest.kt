@@ -1,6 +1,7 @@
 
 package dev.atsushieno.mugene.tests
 
+import dev.atsushieno.ktmidi.toUnsigned
 import kotlin.test.Test
 
 class MmlCompilerTest {
@@ -60,6 +61,12 @@ class MmlCompilerTest {
             0x30, 0x80, 0x40, 0,
             0, 0xFF, 0x2F, 0).map { i -> i.toByte() }.toByteArray()
         assertArrayEquals(expected.toTypedArray(), actual.toTypedArray(), "MIDI bytes")
+    }
+
+    @Test
+    fun simpleTrackAndNotesMidi2() {
+        val actual = MmlTestUtility.testCompile2("SimpleCompilation", "1   o5cde")
+        for(b in actual) print(b.toUnsigned().toString(16) + ':')
     }
 
     @Test

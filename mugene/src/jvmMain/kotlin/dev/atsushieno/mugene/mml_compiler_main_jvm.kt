@@ -25,22 +25,6 @@ class MmlCompilerJvm : MmlCompiler() {
         }
     }
 
-    fun compile(
-        skipDefaultMmlFiles: Boolean,
-        inputs: List<MmlInputSource>,
-        metaWriter: ((Boolean, MidiMessage, MutableList<Byte>) -> Int)?,
-        output: MutableList<Byte>,
-        disableRunningStatus: Boolean
-    ) {
-        val music = compile(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
-        val writer = SmfWriter(output).apply {
-            this.disableRunningStatus = disableRunningStatus
-            if (metaWriter != null)
-                this.metaEventWriter = metaWriter
-        }
-        writer.writeMusic(music)
-    }
-
     private val help = """MML compiler mugene
 
 Usage: mugene [options] mml_files

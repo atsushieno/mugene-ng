@@ -2,9 +2,9 @@
 
 ## What is this?
 
-This is an ongoing port of my [mugene](https://github.com/atsushieno/mugene/) [Music Macro Language](https://en.wikipedia.org/wiki/Music_Macro_Language) compiler to Kotlin (from C#), so that I can go forward and improve the entire ecosystem and toolchains.
+This is the successor of my [mugene](https://github.com/atsushieno/mugene/) [Music Macro Language](https://en.wikipedia.org/wiki/Music_Macro_Language) compiler to Kotlin (from C#), so that I can go forward and improve the entire ecosystem and toolchains.
 
-While it is named as next-gen, there is nothing improved from former C# project so far.  But at this state, future development will happen here, not in C# repo.
+The new version in Kotlin has preliminary support for MIDI 2.0 UMP stream format beyond what C# version did. Any new features will be developer in this project.
 
 Everything, including the project name, is subject to change at this moment, so if you want to use it you might want to use some revisions off of the `main` branch.
 

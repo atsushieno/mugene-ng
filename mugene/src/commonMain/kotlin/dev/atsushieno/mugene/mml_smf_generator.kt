@@ -66,7 +66,7 @@ class MmlMidi2Generator(private val source: MmlResolvedMusic) {
         }
     }
 
-    var result: Midi2Music = Midi2Music()
+    var result: Midi2Music = Midi2Music().apply { deltaTimeSpec = source.baseCount / 4 }
 
     private fun generateSong() {
         for (t in source.tracks)

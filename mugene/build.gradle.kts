@@ -17,7 +17,7 @@ repositories {
 }
 
 plugins {
-    kotlin("multiplatform") version "1.4.31"
+    kotlin("multiplatform") version "1.4.32"
     `maven-publish`
 }
 
@@ -44,7 +44,7 @@ kotlin {
             }
         }
     }
-/*
+    /*
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")
     val nativeTarget = when {
@@ -53,7 +53,7 @@ kotlin {
         isMingwX64 -> mingwX64("native")
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
-*/
+    */
 
     sourceSets {
         val commonAntlr by creating {
@@ -65,7 +65,7 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi-kotlinMultiplatform:0.1.12")
+                implementation("dev.atsushieno:ktmidi-kotlinMultiplatform:0.1.13")
             }
             dependsOn(commonAntlr)
         }
@@ -77,8 +77,7 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi-jvm:0.1.12")
-                implementation("dev.atsushieno:ktmidi-jvm-desktop:0.1.12")
+                implementation("dev.atsushieno:ktmidi-jvm:0.1.13")
             }
         }
         val jvmTest by getting {
@@ -88,7 +87,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi-js:0.1.12")
+                implementation("dev.atsushieno:ktmidi-js:0.1.13")
             }
         }
         val jsTest by getting {
@@ -96,14 +95,14 @@ kotlin {
                 implementation(kotlin("test-js"))
             }
         }
-/*
+        /*
         val nativeMain by getting {
             dependencies {
                 implementation("dev.atsushieno:ktmidi-native:0.1.9")
             }
         }
         val nativeTest by getting
-*/
+        */
     }
 }
 

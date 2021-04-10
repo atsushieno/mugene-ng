@@ -1,5 +1,6 @@
 package dev.atsushieno.mugene
 
+import dev.atsushieno.ktmidi.Midi2DeltaTimeConverter
 import dev.atsushieno.ktmidi.Midi2Music
 import dev.atsushieno.ktmidi.Midi2MusicWriter
 import dev.atsushieno.ktmidi.MidiMessage
@@ -71,15 +72,16 @@ abstract class MmlCompiler {
         writer.writeMusic(music)
     }
 
-    fun compile2(skipDefaultMmlFiles: Boolean, vararg mmlParts: String): Midi2Music {
+    fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, vararg mmlParts: String): Midi2Music {
         val sources = mmlParts.map { mml -> MmlInputSource("<string>", mml) }.toTypedArray()
-        return compile2(skipDefaultMmlFiles, inputs = sources)
+        return compile2(outputDeltaTime, skipDefaultMmlFiles, inputs = sources)
     }
 
-    fun compile2(skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) = generateMusic2(buildSemanticTree(tokenizeInputs(skipDefaultMmlFiles, inputs.toList())))
+    fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) =
+        generateMusic2(outputDeltaTime, buildSemanticTree(tokenizeInputs(skipDefaultMmlFiles, inputs.toList())))
 
-    fun compile2(skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, output: MutableList<Byte>) {
-        val music = compile2(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
+    fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, output: MutableList<Byte>) {
+        val music = compile2(outputDeltaTime, skipDefaultMmlFiles, inputs = inputs.toTypedArray())
         Midi2MusicWriter(output).writeMusic(music)
     }
 
@@ -117,13 +119,17 @@ abstract class MmlCompiler {
         return MmlSmfGenerator.generate(resolved)
     }
 
-    private fun generateMusic2(tree: MmlSemanticTreeSet): Midi2Music {
+    private fun generateMusic2(outputDeltaTime: Boolean, tree: MmlSemanticTreeSet): Midi2Music {
         // semantic trees -> simplified streams
         MmlMacroExpander.expand(tree, report)
         // simplified streams -> raw events
         val resolved = MmlEventStreamGenerator.generate(tree, report)
-        // raw events -> SMF
-        return MmlMidi2Generator.generate(resolved)
+        // raw events -> UMP music format
+        val umpmf = MmlMidi2Generator.generate(resolved)
+        if (outputDeltaTime)
+            return umpmf
+        // convert DeltaTimes to JR Timestamps (which UMP players can directly play each track)
+        return Midi2DeltaTimeConverter.convertDeltaTimeToJRTimestamp(umpmf)
     }
 
     init {

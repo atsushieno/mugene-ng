@@ -30,18 +30,23 @@ class MmlCompilerJvm : MmlCompiler() {
 Usage: mugene [options] mml_files
 
 Options:
---output
-specify explicit output file name.
---verbose
-prints debugging aid.
---disable-running-status
-disables running status in SMF.
---encoding
-uses specified encoding.
-Shift_JIS, euc-jp, iso-2022-jp etc.
---nodefault
-prevents default mml files being included.
-This option is for core MML operation hackers."""
+    --midi2
+        outputs MIDI 2.0 UMP based music format file (with JR Timestamp).
+    --midi2x
+        outputs MIDI 2.0 UMP based music format file with SMF-style delta time.
+    --output
+        specify explicit output file name.
+    --verbose
+        prints debugging aid.
+    --disable-running-status
+        disables running status in SMF.
+    --encoding
+        uses specified encoding.
+        Shift_JIS, euc-jp, iso-2022-jp etc.
+    --nodefault
+        prevents default mml files being included.
+        This option is for core MML operation hackers.
+"""
 
     fun compileCore(args: List<String>) {
 
@@ -59,12 +64,19 @@ This option is for core MML operation hackers."""
         val metaWriter = SmfWriterExtension.DEFAULT_META_EVENT_WRITER
         var noDefault = false
         var midi2 = false
+        var outputDeltaTime = false
 
         for (arg in args) {
             when (arg) {
                 "--midi2" -> {
                     midi2 = true
-                    extension = ".umpmf"
+                    extension = ".umps"
+                    continue
+                }
+                "--midi2x" -> {
+                    midi2 = true
+                    outputDeltaTime = true
+                    extension = ".umpx"
                     continue
                 }
                 "--nodefault" -> {
@@ -111,7 +123,7 @@ This option is for core MML operation hackers."""
 
         val outputBytes = mutableListOf<Byte>()
         if (midi2)
-            compile2(noDefault, inputs, outputBytes)
+            compile2(outputDeltaTime, noDefault, inputs, outputBytes)
         else
             compile(noDefault, inputs, metaWriter, outputBytes, disableRunningStatus)
         FileOutputStream(outFilename).use {

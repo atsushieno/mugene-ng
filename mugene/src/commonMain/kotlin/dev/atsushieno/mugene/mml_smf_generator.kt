@@ -78,12 +78,11 @@ class MmlMidi2Generator(private val source: MmlResolvedMusic) {
         var cur = 0
         for (ev in source.events) {
             var wasSysex = false
+            var wasMetaSysex8 = false
             lateinit var evt: Ump
-            if (ev.arguments[0] == 0xFF.toByte()) {
-                println("META events are not implemented in MIDI2 generator") // FIXME: we have to determine how to deal with META events
-                continue
-            }
-            else if (ev.arguments[0] == 0xFF.toByte())
+            if (ev.arguments[0] == 0xFF.toByte())
+                wasMetaSysex8 = true
+            else if (ev.arguments[0] == 0xF0.toByte())
                 wasSysex = true // later
             else if ((ev.arguments[0].toUnsigned() and 0xF0) == 0xF0)
                 evt = Ump(umpSystemMessage(0, ev.arguments[0], ev.arguments[1], ev.arguments[2]))
@@ -93,10 +92,14 @@ class MmlMidi2Generator(private val source: MmlResolvedMusic) {
                     ev.arguments[0] % 0x10,
                     ev.arguments[1],
                     ev.arguments[2]))
-            if (ev.tick > 0)
+            if (ev.tick != cur)
                 rtrk.messages.addAll(umpJRTimestamps(0, ev.tick.toLong() - cur).map { i -> Ump(i) })
 
-            if (wasSysex)
+            if (wasMetaSysex8)
+                // those extra 4 bytes are for sysex ManufacturerID, deviceID, subID1, and subID2. They are all dummy values.
+                umpSysex8Process(0, listOf<Byte>(0, 0, 0, 0) + ev.arguments.drop(1), ev.arguments.size + 4 - 1, 0,
+                    { lv1, lv2, _ -> rtrk.messages.add(Ump((lv1 / 0x100000000).toInt(), (lv1 % 0x100000000).toInt(), (lv2 / 0x100000000).toInt(), (lv2 % 0x100000000).toInt())) }, null)
+            else if (wasSysex)
                 umpSysex7Process(0, ev.arguments.drop(1),
                     { lv, _ -> rtrk.messages.add(Ump((lv / 0x100000000).toInt(), (lv % 0x100000000).toInt())) }, null)
             else

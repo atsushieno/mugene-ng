@@ -36,6 +36,7 @@ kotlin {
         }
     }
     js(LEGACY) {
+        binaries.executable()
         browser {
             testTask {
                 useKarma {
@@ -91,6 +92,7 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-nodejs:0.0.7")
+                implementation(npm("webpack-node-externals", "2.5.2"))
                 implementation("dev.atsushieno:ktmidi-js:0.2.2")
             }
         }

@@ -12,4 +12,3 @@ class MmlCompilerJs : MmlCompilerConsole() {
         fs.writeFile(filename, Buffer.from(bytes)) { err -> println(err) }
 }
 
-

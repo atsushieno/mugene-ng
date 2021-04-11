@@ -1,7 +1,6 @@
-import dev.atsushieno.mugene.MmlCompilerJvm
-import dev.atsushieno.mugene.MmlException
+package dev.atsushieno.mugene
 
-/*
+
 fun main(args: Array<String>) {
     try {
         MmlCompilerJvm().compile(args.toList())
@@ -9,4 +8,3 @@ fun main(args: Array<String>) {
         println(ex.message)
     }
 }
-*/

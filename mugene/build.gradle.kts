@@ -36,7 +36,6 @@ kotlin {
         }
     }
     js(LEGACY) {
-        binaries.executable()
         browser {
             testTask {
                 useKarma {

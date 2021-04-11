@@ -564,6 +564,16 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                         chord.add(mop)
                     recordNextAsChord = false
                 }
+                "__MIDI_NG" -> {
+                    oper.validateArguments(rctx, arguments.size)
+                    val mop = MmlResolvedEvent("MIDI_NG", rctx.timelinePosition)
+                    for (arg in arguments)
+                        mop.arguments.add(arg.resolver.byteValue)
+                    currentOutput.add(mop)
+                    if (recordNextAsChord)
+                        chord.add(mop)
+                    recordNextAsChord = false
+                }
                 "__SYNC_NOFF_WITH_NEXT" -> {
                     recordNextAsChord = true
                 }

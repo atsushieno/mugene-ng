@@ -87,6 +87,17 @@ class MmlMidi2Generator(private val source: MmlResolvedMusic) {
                 wasSysex = true // later
             else if ((ev.arguments[0].toUnsigned() and 0xF0) == 0xF0)
                 evt = Ump(umpSystemMessage(0, ev.arguments[0], ev.arguments[1], ev.arguments[2]))
+            else if (ev.operation == "MIDI_NG") {
+                val umpLong = umpMidi2ChannelMessage8_8_32(
+                    ev.arguments[1] / 0x10,
+                    ev.arguments[0],
+                    ev.arguments[1] % 0x10,
+                    ev.arguments[2].toInt(),
+                    ev.arguments[3].toInt(),
+                    ev.arguments[4] * 0x1000000 + ev.arguments[5] * 0x10000 + ev.arguments[6] * 0x100 + ev.arguments[7].toLong()
+                )
+                evt = Ump((umpLong shr 32).toInt(), (umpLong and 0xFFFFFFFF).toInt())
+            }
             else
                 evt = Ump(umpMidi1Message(0,
                     (ev.arguments[0] and 0xF0.toByte()),

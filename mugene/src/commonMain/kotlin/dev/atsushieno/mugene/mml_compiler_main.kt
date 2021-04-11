@@ -15,6 +15,12 @@ internal class Util {
             "gs-sysex.mml",
             "nrpn-gs-xg.mml",
         )
+        val defaultIncludes2 = listOf(
+            "default-macro2.mml",
+            "drum-part.mml",
+            "gs-sysex.mml",
+            "nrpn-gs-xg.mml",
+        )
     }
 }
 
@@ -27,10 +33,6 @@ enum class MmlDiagnosticVerbosity {
 typealias MmlDiagnosticReporter = (verbosity: MmlDiagnosticVerbosity, location: MmlLineInfo?, message: String) -> Unit
 
 abstract class MmlCompiler {
-    companion object {
-        val defaultIncludes = Util.defaultIncludes
-    }
-
     var verbose = false
 
     abstract var resolver: StreamResolver
@@ -60,7 +62,7 @@ abstract class MmlCompiler {
         return compile(skipDefaultMmlFiles, inputs = sources)
     }
 
-    fun compile(skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) = generateMusic(buildSemanticTree(tokenizeInputs(skipDefaultMmlFiles, inputs.toList())))
+    fun compile(skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) = generateMusic(buildSemanticTree(tokenizeInputs(false, skipDefaultMmlFiles, inputs.toList())))
 
     fun compile(skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, metaWriter: ((Boolean, MidiMessage, MutableList<Byte>) -> Int)?, output: MutableList<Byte>, disableRunningStatus: Boolean) {
         val music = compile(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
@@ -78,7 +80,7 @@ abstract class MmlCompiler {
     }
 
     fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) =
-        generateMusic2(outputDeltaTime, buildSemanticTree(tokenizeInputs(skipDefaultMmlFiles, inputs.toList())))
+        generateMusic2(outputDeltaTime, buildSemanticTree(tokenizeInputs(true, skipDefaultMmlFiles, inputs.toList())))
 
     fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, output: MutableList<Byte>) {
         val music = compile2(outputDeltaTime, skipDefaultMmlFiles, inputs = inputs.toTypedArray())
@@ -86,16 +88,13 @@ abstract class MmlCompiler {
     }
 
     // used by language server and compiler.
-    fun tokenizeInputs(skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>): MmlTokenSet {
+    fun tokenizeInputs(isMidi2: Boolean, skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>): MmlTokenSet {
+        val defaults = if (isMidi2) Util.defaultIncludes2 else Util.defaultIncludes
         var actualInputs =
             if (!skipDefaultMmlFiles)
-                Util.defaultIncludes.map { f ->
-                    MmlInputSource(
-                        f,
-                        resolver.getEntity(f)
-                    )
-                } + inputs
-            else inputs
+                defaults.map { f -> MmlInputSource(f, resolver.getEntity(f)) } + inputs
+            else
+                inputs
 
         // input sources -> tokenizer sources
         val tokenizerSources = MmlInputSourceReader.parse(report, resolver, actualInputs.toMutableList())

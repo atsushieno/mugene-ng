@@ -480,6 +480,7 @@ class MmlPrimitiveOperation {
         val Format = MmlPrimitiveOperation().apply { name = "__FORMAT" };
         val Apply = MmlPrimitiveOperation().apply { name = "__APPLY" };
         val Midi = MmlPrimitiveOperation().apply { name = "__MIDI" };
+        val MidiNG = MmlPrimitiveOperation().apply { name = "__MIDI_NG" };
         val SyncNoteOffWithNext =
             MmlPrimitiveOperation().apply { name = "__SYNC_NOFF_WITH_NEXT" };
         val OnMidiNoteOff = MmlPrimitiveOperation().apply { name = "__ON_MIDI_NOTE_OFF" };
@@ -506,6 +507,7 @@ class MmlPrimitiveOperation {
                 Format,
                 Apply,
                 Midi,
+                MidiNG,
                 SyncNoteOffWithNext,
                 OnMidiNoteOff,
                 MidiMeta,

@@ -8,8 +8,9 @@ import dev.atsushieno.ktmidi.MidiMusic
 import dev.atsushieno.ktmidi.MidiTrack
 import dev.atsushieno.ktmidi.Ump
 import dev.atsushieno.ktmidi.umpfactory.*
-import dev.atsushieno.ktmidi.toUnsigned
 import kotlin.experimental.and
+
+internal fun Byte.toUnsigned() : Int = if (this < 0) 0x100 + this else this.toInt()
 
 class MmlSmfGenerator(private val source: MmlResolvedMusic) {
     companion object {

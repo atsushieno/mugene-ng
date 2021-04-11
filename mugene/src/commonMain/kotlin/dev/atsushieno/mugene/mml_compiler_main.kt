@@ -1,11 +1,11 @@
 package dev.atsushieno.mugene
 
-import dev.atsushieno.ktmidi.Midi2DeltaTimeConverter
 import dev.atsushieno.ktmidi.Midi2Music
-import dev.atsushieno.ktmidi.Midi2MusicWriter
 import dev.atsushieno.ktmidi.MidiMessage
 import dev.atsushieno.ktmidi.MidiMusic
 import dev.atsushieno.ktmidi.SmfWriter
+import dev.atsushieno.ktmidi.convertDeltaTimesToJRTimestamps
+import dev.atsushieno.ktmidi.write
 
 internal class Util {
     companion object {
@@ -82,7 +82,7 @@ abstract class MmlCompiler {
 
     fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, output: MutableList<Byte>) {
         val music = compile2(outputDeltaTime, skipDefaultMmlFiles, inputs = inputs.toTypedArray())
-        Midi2MusicWriter(output).writeMusic(music)
+        music.write(output)
     }
 
     // used by language server and compiler.
@@ -129,7 +129,7 @@ abstract class MmlCompiler {
         if (outputDeltaTime)
             return umpmf
         // convert DeltaTimes to JR Timestamps (which UMP players can directly play each track)
-        return Midi2DeltaTimeConverter.convertDeltaTimeToJRTimestamp(umpmf)
+        return umpmf.convertDeltaTimesToJRTimestamps()
     }
 
     init {

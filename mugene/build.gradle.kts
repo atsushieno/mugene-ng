@@ -65,7 +65,7 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi-kotlinMultiplatform:0.2.1")
+                implementation("dev.atsushieno:ktmidi-kotlinMultiplatform:0.2.2")
             }
             dependsOn(commonAntlr)
         }
@@ -77,7 +77,7 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi-jvm:0.2.1")
+                implementation("dev.atsushieno:ktmidi-jvm:0.2.2")
             }
         }
         val jvmTest by getting {
@@ -87,7 +87,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi-js:0.2.1")
+                implementation("dev.atsushieno:ktmidi-js:0.2.2")
             }
         }
         val jsTest by getting {
@@ -98,7 +98,7 @@ kotlin {
         /*
         val nativeMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi-native:0.2.1")
+                implementation("dev.atsushieno:ktmidi-native:0.2.2")
             }
         }
         val nativeTest by getting

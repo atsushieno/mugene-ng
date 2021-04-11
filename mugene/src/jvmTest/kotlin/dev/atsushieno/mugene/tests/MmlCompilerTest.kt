@@ -1,7 +1,7 @@
 
 package dev.atsushieno.mugene.tests
 
-import dev.atsushieno.ktmidi.toUnsigned
+import dev.atsushieno.mugene.toUnsigned
 import kotlin.test.Test
 
 class MmlCompilerTest {

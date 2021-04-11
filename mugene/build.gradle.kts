@@ -13,6 +13,7 @@ buildscript {
 repositories {
     mavenLocal()
     mavenCentral()
+    jcenter() // kotlinx-nodejs requires this...!
     maven("https://jitpack.io")
 }
 
@@ -42,6 +43,8 @@ kotlin {
                     webpackConfig.cssSupport.enabled = true
                 }
             }
+        }
+        nodejs {
         }
     }
     /*
@@ -87,6 +90,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-nodejs:0.0.7")
                 implementation("dev.atsushieno:ktmidi-js:0.2.2")
             }
         }

@@ -136,3 +136,4 @@ abstract class MmlCompiler {
         report = { v, k, m -> reportOnConsole(v, k, m) }
     }
 }
+

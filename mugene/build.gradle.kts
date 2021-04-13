@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         mavenLocal()
+        google()
         mavenCentral()
         maven("https://jitpack.io")
     }
@@ -12,21 +13,28 @@ buildscript {
 
 repositories {
     mavenLocal()
+    google()
     mavenCentral()
     jcenter() // kotlinx-nodejs requires this...!
     maven("https://jitpack.io")
 }
 
 plugins {
+    id("com.android.library") version "4.1.3"
     kotlin("multiplatform") version "1.4.32"
     `maven-publish`
 }
 
 group = "dev.atsushieno"
-version = "0.2.0"
+version = "0.2.1"
 
+val ktmidi_version = "0.2.3"
 
 kotlin {
+    android {
+        publishLibraryVariantsGroupedByFlavor = true
+        publishLibraryVariants("debug", "release")
+    }
     jvm {
         compilations.all {
             kotlinOptions.jvmTarget = "1.8"
@@ -36,6 +44,7 @@ kotlin {
         }
     }
     js(LEGACY) {
+        binaries.executable()
         browser {
             testTask {
                 useKarma {
@@ -68,7 +77,7 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi-kotlinMultiplatform:0.2.2")
+                implementation("dev.atsushieno:ktmidi-kotlinMultiplatform:$ktmidi_version")
             }
             dependsOn(commonAntlr)
         }
@@ -80,7 +89,7 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi-jvm:0.2.2")
+                implementation("dev.atsushieno:ktmidi-jvm:$ktmidi_version")
             }
         }
         val jvmTest by getting {
@@ -88,11 +97,21 @@ kotlin {
                 implementation(kotlin("test-junit"))
             }
         }
+        val androidMain by getting {
+            dependencies {
+                implementation("dev.atsushieno:ktmidi-android:$ktmidi_version")
+            }
+        }
+        val androidTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+                implementation("junit:junit:4.13.2")
+            }
+        }
         val jsMain by getting {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-nodejs:0.0.7")
-                implementation(npm("webpack-node-externals", "2.5.2"))
-                implementation("dev.atsushieno:ktmidi-js:0.2.2")
+                implementation("dev.atsushieno:ktmidi-js:$ktmidi_version")
             }
         }
         val jsTest by getting {
@@ -103,7 +122,7 @@ kotlin {
         /*
         val nativeMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi-native:0.2.2")
+                implementation("dev.atsushieno:ktmidi-native:$ktmidi_version")
             }
         }
         val nativeTest by getting
@@ -149,6 +168,23 @@ tasks.getByName("compileKotlinJvm").dependsOn("generateKotlinCommonGrammarSource
 
 // end of copy(2)
 
+android {
+    compileSdkVersion(30)
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    defaultConfig {
+        minSdkVersion(24)
+        targetSdkVersion(30)
+    }
+    buildTypes {
+        val debug by getting {
+            minifyEnabled(false)
+        }
+        val release by getting {
+            minifyEnabled(false)
+        }
+    }
+}
+
 afterEvaluate {
     publishing {
         val ver = version.toString()
@@ -157,6 +193,8 @@ afterEvaluate {
                 groupId = group.toString()
                 if (name.contains("metadata")) {
                     artifactId = "mugene"
+                } else if (name.contains("android")) {
+                    artifactId = "mugene-android"
                 } else {
                     artifactId = "mugene-${name}"
                 }

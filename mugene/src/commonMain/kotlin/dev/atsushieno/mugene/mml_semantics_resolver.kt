@@ -57,7 +57,7 @@ abstract class MmlValueExprResolver(val expr: MmlValueExpr) {
                     else if (value is Int)
                         denom = value
                     else if (value is Byte)
-                        denom = value.toInt()
+                        denom = value.toUnsigned()
                     else
                         reporter(
                             MmlDiagnosticVerbosity.Error,
@@ -95,7 +95,7 @@ abstract class MmlValueExprResolver(val expr: MmlValueExpr) {
     val intValue: Int
         get() =
             if (resolvedValue is Int) resolvedValue as Int
-            else if (resolvedValue is Byte) (resolvedValue as Byte).toInt()
+            else if (resolvedValue is Byte) (resolvedValue as Byte).toUnsigned()
             else if (resolvedValue is MmlLength) (resolvedValue as MmlLength).getSteps(baseCount)
             else (resolvedValue as Double).toInt()
 

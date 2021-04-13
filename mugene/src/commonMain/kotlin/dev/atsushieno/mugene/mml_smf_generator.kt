@@ -35,20 +35,20 @@ class MmlSmfGenerator(private val source: MmlResolvedMusic) {
             var evt: MidiEvent? = null
             if (ev.arguments[0] == 0xFF.toByte())
                 evt = MidiEvent(
-                    ev.arguments[0].toUByte().toInt(),
-                    ev.arguments[1].toUByte().toInt(),
+                    ev.arguments[0].toUnsigned(),
+                    ev.arguments[1].toUnsigned(),
                     0,
                     ev.arguments.drop(2).toByteArray()
                 )
             else if (ev.arguments.size == 3)
                 evt = MidiEvent(
-                    ev.arguments[0].toUByte().toInt(),
-                    ev.arguments[1].toUByte().toInt(),
-                    ev.arguments[2].toUByte().toInt(),
+                    ev.arguments[0].toUnsigned(),
+                    ev.arguments[1].toUnsigned(),
+                    ev.arguments[2].toUnsigned(),
                     null
                 )
             else
-                evt = MidiEvent(ev.arguments[0].toUByte().toInt(), 0, 0, ev.arguments.drop(1).toByteArray())
+                evt = MidiEvent(ev.arguments[0].toUnsigned(), 0, 0, ev.arguments.drop(1).toByteArray())
             val msg = MidiMessage(ev.tick - cur, evt)
             rtrk.messages.add(msg)
             cur = ev.tick
@@ -92,8 +92,8 @@ class MmlMidi2Generator(private val source: MmlResolvedMusic) {
                     ev.arguments[1] / 0x10,
                     ev.arguments[0],
                     ev.arguments[1] % 0x10,
-                    ev.arguments[2].toInt(),
-                    ev.arguments[3].toInt(),
+                    ev.arguments[2].toUnsigned(),
+                    ev.arguments[3].toUnsigned(),
                     ev.arguments[4] * 0x1000000 + ev.arguments[5] * 0x10000 + ev.arguments[6] * 0x100 + ev.arguments[7].toLong()
                 )
                 evt = Ump((umpLong shr 32).toInt(), (umpLong and 0xFFFFFFFF).toInt())

@@ -12,3 +12,4 @@ class MmlCompilerJs : MmlCompilerConsole() {
         fs.writeFile(filename, Buffer.from(bytes)) { err -> println(err) }
 }
 
+internal actual fun createDefaultCompiler() : MmlCompiler = MmlCompilerJs()

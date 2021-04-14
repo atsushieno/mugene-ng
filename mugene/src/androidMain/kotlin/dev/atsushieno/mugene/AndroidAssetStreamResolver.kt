@@ -1,9 +1,7 @@
 package dev.atsushieno.mugene
 
 import android.content.res.AssetManager
-import java.io.InputStream
 import java.io.InputStreamReader
-import java.io.Reader
 
 class AndroidAssetStreamResolver(private var assets: AssetManager) : StreamResolver() {
 
@@ -18,3 +16,4 @@ class AndroidAssetStreamResolver(private var assets: AssetManager) : StreamResol
         }
     }
 }
+

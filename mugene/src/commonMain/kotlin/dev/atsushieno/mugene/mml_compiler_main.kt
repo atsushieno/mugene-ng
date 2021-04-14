@@ -32,7 +32,13 @@ enum class MmlDiagnosticVerbosity {
 
 typealias MmlDiagnosticReporter = (verbosity: MmlDiagnosticVerbosity, location: MmlLineInfo?, message: String) -> Unit
 
+internal expect fun createDefaultCompiler(): MmlCompiler
+
 abstract class MmlCompiler {
+    companion object {
+        fun create(): MmlCompiler = createDefaultCompiler()
+    }
+
     var verbose = false
 
     abstract var resolver: StreamResolver

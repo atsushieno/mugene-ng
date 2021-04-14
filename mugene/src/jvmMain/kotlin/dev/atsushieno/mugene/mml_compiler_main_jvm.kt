@@ -15,3 +15,4 @@ class MmlCompilerJvm : MmlCompilerConsole() {
         }
 }
 
+internal actual fun createDefaultCompiler() : MmlCompiler = MmlCompilerJvm()

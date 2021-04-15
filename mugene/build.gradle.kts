@@ -18,7 +18,7 @@ plugins {
 }
 
 group = "dev.atsushieno"
-version = "0.2.4"
+version = "0.2.4.5"
 
 val ktmidi_version = "0.2.5"
 
@@ -160,9 +160,10 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
 tasks.getByName("compileKotlinJvm").dependsOn("generateKotlinCommonGrammarSource")
 // end of copy(2)
 tasks.getByName("compileKotlinJs").dependsOn("generateKotlinCommonGrammarSource")
+tasks.getByName("compileKotlinMetadata").dependsOn("generateKotlinCommonGrammarSource")
 afterEvaluate {
-    tasks.getByName("compileDebugKotlinAndroid")?.dependsOn("generateKotlinCommonGrammarSource")
-    tasks.getByName("compileReleaseKotlinAndroid")?.dependsOn("generateKotlinCommonGrammarSource")
+    tasks.getByName("compileDebugKotlinAndroid").dependsOn("generateKotlinCommonGrammarSource")
+    tasks.getByName("compileReleaseKotlinAndroid").dependsOn("generateKotlinCommonGrammarSource")
 }
 
 android {

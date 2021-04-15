@@ -131,4 +131,16 @@ class MmlCompilerTest {
             val t = 't'.toInt()
         }
     }
+
+    @Test
+    fun lengthMustBeNonNegative() {
+        val mml = """
+1	CH4 @47 V100 P79 l16 v100
+    E_64,127,0,4.,24
+    [g24]12
+    [c8c,,60c8c,,60c8c8 ]1
+    """
+        MmlTestUtility.testCompile2("midi2", mml)
+        MmlTestUtility.testCompile("midi1", mml)
+    }
 }

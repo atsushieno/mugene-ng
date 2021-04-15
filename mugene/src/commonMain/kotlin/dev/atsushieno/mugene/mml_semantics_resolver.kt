@@ -391,7 +391,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
             val list = track.data
             currentOutput = rtrk.events
             processOperations(rtrk, tctx, list, 0, list.size, listOf())
-            sort(currentOutput)
+            sort(rtrk.events)
         }
     }
 

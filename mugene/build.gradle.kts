@@ -11,21 +11,6 @@ buildscript {
     }
 }
 
-repositories {
-    mavenLocal()
-    google()
-    mavenCentral()
-    jcenter() // kotlinx-nodejs requires this...!
-    maven("https://jitpack.io")
-    maven {
-        url = uri("https://maven.pkg.github.com/atsushieno/ktmidi")
-        credentials {
-            username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-            password = project.findProperty("gpr.token") as String? ?: System.getenv("GITHUB_TOKEN")
-        }
-    }
-}
-
 plugins {
     id("com.android.library") version "4.1.3"
     kotlin("multiplatform") version "1.4.32"

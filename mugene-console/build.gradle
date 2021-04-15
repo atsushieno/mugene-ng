@@ -5,12 +5,6 @@ plugins {
 group 'dev.atsushieno'
 version '0.1.0-SNAPSHOT'
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven { url "https://jitpack.io" }
-}
-
 dependencies {
     implementation project(':mugene')
     implementation "org.jetbrains.kotlin:kotlin-stdlib"

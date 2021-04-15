@@ -1,15 +1,19 @@
 
 allprojects {
-
     repositories {
-        // used for local development and while building by travis ci and jitpack.io
         mavenLocal()
-        // used to download antlr4
+        google()
         mavenCentral()
-        // used to download antlr-kotlin-runtime
+        jcenter() // kotlinx-nodejs requires this...!
         maven { url "https://jitpack.io" }
+        maven {
+            url "https://maven.pkg.github.com/atsushieno/ktmidi"
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
-
 }
 
 // This is a workaround for https://youtrack.jetbrains.com/issue/KT-44884

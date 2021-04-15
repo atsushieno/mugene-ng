@@ -1,8 +1,9 @@
 
 package dev.atsushieno.ktmidi.tests
 
+import dev.atsushieno.ktmidi.MidiMusic
+import dev.atsushieno.ktmidi.read
 import dev.atsushieno.mugene.toUnsigned
-import dev.atsushieno.ktmidi.SmfReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -73,7 +74,8 @@ class MmlCompilerTest {
             0x30, 0x80, 0x40, 0,
             0, 0xFF, 0x2F, 0).map { i -> i.toByte() }.toByteArray()
         assertArrayEquals(expected.toTypedArray(), actual.toTypedArray(), "MIDI bytes")
-        val music = SmfReader.read(actual.toList())
+        val music = MidiMusic()
+        music.read(actual.toList())
         assertEquals(144, music.getTotalTicks(), "total ticks")
     }
 

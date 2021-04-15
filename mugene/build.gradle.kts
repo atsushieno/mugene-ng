@@ -17,6 +17,13 @@ repositories {
     mavenCentral()
     jcenter() // kotlinx-nodejs requires this...!
     maven("https://jitpack.io")
+    maven {
+        url = uri("https://maven.pkg.github.com/atsushieno/ktmidi")
+        credentials {
+            username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.token") as String? ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 plugins {

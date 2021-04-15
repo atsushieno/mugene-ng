@@ -1,9 +1,7 @@
-package dev.atsushieno.mugene.tests
+package dev.atsushieno.ktmidi.tests
 
 import dev.atsushieno.mugene.MmlCompiler
-import dev.atsushieno.mugene.MmlCompilerJvm
 import dev.atsushieno.mugene.MmlInputSource
-import java.io.ByteArrayOutputStream
 import kotlin.math.min
 import kotlin.test.assertTrue
 
@@ -13,14 +11,14 @@ class MmlTestUtility {
             val sources = mutableListOf<MmlInputSource> ()
             sources.add ( MmlInputSource ("fakefilename.mml", mml))
             val outs = mutableListOf<Byte> ()
-            MmlCompilerJvm().compile(skipDefault, sources, null, outs, false)
+            MmlCompiler.create().compile(skipDefault, sources, null, outs, false)
             return outs.toByteArray()
         }
         fun testCompile2 (testLabel: String, mml: String, skipDefault: Boolean = false, outputDeltaTime: Boolean = false) : ByteArray {
             val sources = mutableListOf<MmlInputSource> ()
             sources.add ( MmlInputSource ("fakefilename.mml", mml))
             val outs = mutableListOf<Byte> ()
-            MmlCompilerJvm().compile2(outputDeltaTime, skipDefault, sources, outs)
+            MmlCompiler.create().compile2(outputDeltaTime, skipDefault, sources, outs)
             return outs.toByteArray()
         }
     }

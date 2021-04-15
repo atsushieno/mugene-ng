@@ -44,7 +44,6 @@ kotlin {
         }
     }
     js(LEGACY) {
-        binaries.executable()
         browser {
             testTask {
                 useKarma {
@@ -78,6 +77,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("dev.atsushieno:ktmidi-kotlinMultiplatform:$ktmidi_version")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
             }
             dependsOn(commonAntlr)
         }
@@ -117,6 +117,7 @@ kotlin {
         val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.4.3")
             }
         }
         /*

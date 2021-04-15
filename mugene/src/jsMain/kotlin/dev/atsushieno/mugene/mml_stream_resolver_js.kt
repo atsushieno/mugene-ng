@@ -1,13 +1,17 @@
 package dev.atsushieno.mugene
 
+
 //region input sources to tokenizer sources
 
 class LocalFileStreamResolver : StreamResolver() {
 
     override fun resolveFilePath(file: String): String? {
-        if (!includes.any())
+        if (!includes.any()) {
+            if (!fs.existsSync(file))
+                return file
             return fs.realpathSync(file, options = "").toString()
-        if (fs.realpathSync(file, options = "").toString() == file)
+        }
+        if (fs.existsSync(file) && fs.realpathSync(file, options = "").toString() == file)
             return file
         return fs.realpathSync(includes.last() + '/' + file, options = "").toString()
     }

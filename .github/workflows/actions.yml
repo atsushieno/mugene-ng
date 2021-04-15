@@ -33,6 +33,6 @@ jobs:
       with:
         name: mugene-ng-artifacts
         path: |
-          mugene/build/libs/*.jar
-          mugene/build/outputs/aar/*.aar
+          build/libs/*.jar
+          build/outputs/aar/*.aar
 

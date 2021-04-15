@@ -26,9 +26,9 @@ plugins {
 }
 
 group = "dev.atsushieno"
-version = "0.2.3"
+version = "0.2.4"
 
-val ktmidi_version = "0.2.4"
+val ktmidi_version = "0.2.5"
 
 kotlin {
     android {
@@ -76,7 +76,7 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi-kotlinMultiplatform:$ktmidi_version")
+                implementation("dev.atsushieno:ktmidi:$ktmidi_version")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
             }
             dependsOn(commonAntlr)
@@ -192,7 +192,7 @@ afterEvaluate {
         for (p in publications) {
             (p as MavenPublication).apply {
                 groupId = group.toString()
-                if (name.contains("metadata")) {
+                if (name.contains("kotlinMultiplatform")) {
                     artifactId = "mugene"
                 } else if (name.contains("android")) {
                     artifactId = "mugene-android"
@@ -204,4 +204,3 @@ afterEvaluate {
         }
     }
 }
-

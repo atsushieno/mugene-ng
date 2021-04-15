@@ -173,11 +173,12 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
 // not required if you add the generated sources to version control
 // you can call the task manually in this case to update the generated sources
 tasks.getByName("compileKotlinJvm").dependsOn("generateKotlinCommonGrammarSource")
-tasks.getByName("compileKotlinJs").dependsOn("generateKotlinCommonGrammarSource")
-tasks.getByName("compileKotlinDebugAndroid").dependsOn("generateKotlinCommonGrammarSource")
-tasks.getByName("compileKotlinReleaseAndroid").dependsOn("generateKotlinCommonGrammarSource")
-
 // end of copy(2)
+tasks.getByName("compileKotlinJs").dependsOn("generateKotlinCommonGrammarSource")
+afterEvaluate {
+    tasks.getByName("compileDebugKotlinAndroid")?.dependsOn("generateKotlinCommonGrammarSource")
+    tasks.getByName("compileReleaseKotlinAndroid")?.dependsOn("generateKotlinCommonGrammarSource")
+}
 
 android {
     compileSdkVersion(30)

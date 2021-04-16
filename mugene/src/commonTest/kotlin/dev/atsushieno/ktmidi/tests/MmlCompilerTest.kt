@@ -1,6 +1,7 @@
 
 package dev.atsushieno.ktmidi.tests
 
+import dev.atsushieno.ktmidi.Midi2Music
 import dev.atsushieno.ktmidi.MidiMusic
 import dev.atsushieno.ktmidi.read
 import dev.atsushieno.mugene.toUnsigned
@@ -144,5 +145,16 @@ class MmlCompilerTest {
     """
         MmlTestUtility.testCompile2("midi2", mml)
         MmlTestUtility.testCompile("midi1", mml)
+    }
+
+    @Test
+    fun noteSkippingLength() {
+        val mml = """1	c8d8,,60e8"""
+        val midi1Bytes = MmlTestUtility.testCompile("midi1", mml)
+        val music = MidiMusic().apply { read(midi1Bytes.toList()) }
+        assertEquals(72, music.getTotalTicks(), "midi1 total ticks")
+        val midi2Bytes = MmlTestUtility.testCompile2("midi2", mml)
+        val music2 = Midi2Music().apply { read (midi2Bytes.toList()) }
+        assertEquals(72, music2.getTotalTicks(), "midi2 total ticks")
     }
 }

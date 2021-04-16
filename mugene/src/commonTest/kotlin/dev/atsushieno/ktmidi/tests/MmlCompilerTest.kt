@@ -153,7 +153,7 @@ class MmlCompilerTest {
         val midi1Bytes = MmlTestUtility.testCompile("midi1", mml)
         val music = MidiMusic().apply { read(midi1Bytes.toList()) }
         assertEquals(72, music.getTotalTicks(), "midi1 total ticks")
-        val midi2Bytes = MmlTestUtility.testCompile2("midi2", mml)
+        val midi2Bytes = MmlTestUtility.testCompile2("midi2", mml, outputDeltaTime = true)
         val music2 = Midi2Music().apply { read (midi2Bytes.toList()) }
         assertEquals(72, music2.getTotalTicks(), "midi2 total ticks")
     }

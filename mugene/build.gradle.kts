@@ -18,9 +18,9 @@ plugins {
 }
 
 group = "dev.atsushieno"
-version = "0.2.4.6"
+version = "0.2.5"
 
-val ktmidi_version = "0.2.5"
+val ktmidi_version = "0.2.6"
 
 kotlin {
     android {
@@ -36,6 +36,8 @@ kotlin {
         }
     }
     js(LEGACY) {
+        binaries.executable()
+        /*
         browser {
             testTask {
                 useKarma {
@@ -43,7 +45,7 @@ kotlin {
                     webpackConfig.cssSupport.enabled = true
                 }
             }
-        }
+        }*/
         nodejs {
         }
     }
@@ -102,7 +104,6 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-nodejs:0.0.7")
                 implementation("dev.atsushieno:ktmidi-js:$ktmidi_version")
             }
         }

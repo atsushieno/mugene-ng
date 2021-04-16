@@ -4,6 +4,10 @@ import dev.atsushieno.ktmidi.MidiMessage
 import dev.atsushieno.ktmidi.SmfWriterExtension
 
 abstract class MmlCompilerConsole : MmlCompiler() {
+    companion object {
+        fun create(): MmlCompilerConsole = createDefaultCompiler() as MmlCompilerConsole
+    }
+
     class MmlCompilerOptions {
         var skipDefaultMmlFiles = false
         var disableRunningStatus = false

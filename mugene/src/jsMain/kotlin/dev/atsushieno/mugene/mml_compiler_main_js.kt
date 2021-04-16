@@ -1,9 +1,11 @@
 package dev.atsushieno.mugene
 
-import Buffer
+private external fun require(module: String): dynamic
+private val fs = if(js("typeof(process) !== 'undefined'") as Boolean) require("fs") else null
+private val Buffer = require("buffer")
 
 class MmlCompilerJs : MmlCompilerConsole() {
-    override var resolver : StreamResolver = MergeStreamResolver(LocalFileStreamResolver())
+    override var resolver : StreamResolver = MergeStreamResolver(JsDevResourceStreamResolver(), LocalFileStreamResolver())
 
     override fun decodeStringUsingEncoding(s: String, charset: String): ByteArray =
         TODO("Not implemented")

@@ -18,7 +18,7 @@ plugins {
 }
 
 group = "dev.atsushieno"
-version = "0.2.5"
+version = "0.2.6"
 
 val ktmidi_version = "0.2.6"
 
@@ -94,6 +94,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation("dev.atsushieno:ktmidi-android:$ktmidi_version")
+                implementation("androidx.startup:startup-runtime:1.0.0")
             }
         }
         val androidTest by getting {

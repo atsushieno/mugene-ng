@@ -171,6 +171,7 @@ afterEvaluate {
 android {
     compileSdkVersion(30)
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    sourceSets["main"].assets.srcDir("src/commonMain/resources") // kind of hack...
     defaultConfig {
         minSdkVersion(24)
         targetSdkVersion(30)

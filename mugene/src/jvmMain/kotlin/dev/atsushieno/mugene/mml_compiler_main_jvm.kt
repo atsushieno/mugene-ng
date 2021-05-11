@@ -3,6 +3,14 @@ package dev.atsushieno.mugene
 import java.io.FileOutputStream
 import java.nio.charset.Charset
 
+fun main(args: Array<String>) {
+    try {
+        MmlCompilerConsole.create().compile(args.toList())
+    } catch (ex: MmlException) {
+        println(ex.message)
+    }
+}
+
 class MmlCompilerJvm : MmlCompilerConsole() {
     override var resolver : StreamResolver = MergeStreamResolver(LocalFileStreamResolver(), JarResourceStreamResolver())
 

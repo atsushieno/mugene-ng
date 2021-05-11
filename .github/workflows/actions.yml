@@ -26,7 +26,8 @@ jobs:
     - name: stupid NDK setup workaround for GitHub Actions
       run: sudo mkdir -p /usr/local/lib/android/sdk/ndk && sudo chmod 777 /usr/local/lib/android/sdk/ndk
     - name: build
-      run: ./gradlew --warning-mode all :mugene:generateKotlinCommonGrammarSource build mugene-console:jar
+      run: ./gradlew :mugene:generateKotlinCommonGrammarSource
+      run: ./gradlew build mugene-console:jar
       env:
         USERNAME: atsushieno
         GITHUB_TOKEN: ${{ secrets.MAVEN_PAT }}

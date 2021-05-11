@@ -32,7 +32,7 @@ jobs:
       env:
         USERNAME: atsushieno
         GITHUB_TOKEN: ${{ secrets.MAVEN_PAT }}
-
+        org.gradle.jvmargs: -Xmx512m "-XX:MaxMetaspaceSize=512m"
     - name: upload artifact
       if: success()
       uses: actions/upload-artifact@v2

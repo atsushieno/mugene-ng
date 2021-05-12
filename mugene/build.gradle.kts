@@ -1,3 +1,5 @@
+import org.gradle.api.publish.maven.*
+
 buildscript {
     repositories {
         mavenLocal()
@@ -14,13 +16,15 @@ buildscript {
 plugins {
     id("com.android.library") version "4.1.3"
     kotlin("multiplatform") version "1.4.32"
-    `maven-publish`
+    id("maven-publish")
+    id("maven")
+    id("signing")
 }
 
 group = "dev.atsushieno"
-version = "0.2.6"
+version = "0.2.6.1"
 
-val ktmidi_version = "0.2.6"
+val ktmidi_version = "0.2.7"
 
 kotlin {
     android {
@@ -183,7 +187,50 @@ android {
 }
 
 afterEvaluate {
+    val javadocJar by tasks.registering(Jar::class) {
+        archiveClassifier.set("javadoc")
+    }
+
     publishing {
+
+        repositories {
+            maven {
+                name = "OSSRH"
+                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                credentials {
+                    username = System.getenv("OSSRH_USERNAME")
+                    password = System.getenv("OSSRH_PASSWORD")
+                }
+            }
+        }
+
+        publications.withType<MavenPublication> {
+
+            artifact(javadocJar)
+
+            pom {
+                name.set("ktmidi")
+                description.set("Kotlin Multiplatform library for MIDI 1.0 and MIDI 2.0")
+                url.set("https://github.com/atsushieno/mugene-ng")
+                scm {
+                    url.set("https://github.com/atsushieno/mugene-ng")
+                }
+                licenses {
+                    license {
+                        name.set("the MIT License")
+                        url.set("https://github.com/atsushieno/mugene-ng/blob/main/LICENSE")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("atsushieno")
+                        name.set("Atsushi Eno")
+                        email.set("atsushieno@gmail.com")
+                    }
+                }
+            }
+        }
+
         val ver = version.toString()
         for (p in publications) {
             (p as MavenPublication).apply {
@@ -199,4 +246,7 @@ afterEvaluate {
             }
         }
     }
+
+    // keep it as is. It is replaced by CI release builds
+    signing {}
 }

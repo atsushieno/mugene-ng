@@ -31,7 +31,7 @@ jobs:
         GPG_KEY_CONTENTS: ${{ secrets.GPG_KEY_CONTENTS }}
         SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SIGNING_SECRET_KEY_RING_FILE }}
     - name: rewrite build.gradle to require signing
-      run: sed -i "s/signing {}/signing { sign publishing.publications }/" mugene/build.gradle
+      run: sed -i "s/signing {}/signing { sign publishing.publications }/" mugene/build.gradle.kts
     - name: publish
       run: |
         ./gradlew mugene:generateKotlinCommonGrammarSource

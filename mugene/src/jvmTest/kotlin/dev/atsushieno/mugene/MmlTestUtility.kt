@@ -1,7 +1,5 @@
-package dev.atsushieno.ktmidi.tests
+package dev.atsushieno.mugene
 
-import dev.atsushieno.mugene.MmlCompiler
-import dev.atsushieno.mugene.MmlInputSource
 import kotlin.math.min
 import kotlin.test.assertTrue
 

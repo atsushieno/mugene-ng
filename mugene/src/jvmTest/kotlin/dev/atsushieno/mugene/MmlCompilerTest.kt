@@ -1,10 +1,9 @@
 
-package dev.atsushieno.ktmidi.tests
+package dev.atsushieno.mugene
 
 import dev.atsushieno.ktmidi.Midi2Music
 import dev.atsushieno.ktmidi.MidiMusic
 import dev.atsushieno.ktmidi.read
-import dev.atsushieno.mugene.toUnsigned
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -135,8 +134,7 @@ class MmlCompilerTest {
         }
     }
 
-    // FIXME: this seems to fail only on CI runs. Enable this once we figured out how to fix it.
-    //@Test
+    @Test
     fun lengthMustBeNonNegative() {
         val mml = """
 1	CH4 @47 V100 P79 l16 v100
@@ -148,8 +146,7 @@ class MmlCompilerTest {
         MmlTestUtility.testCompile("midi1", mml)
     }
 
-    // FIXME: this seems to fail only on CI runs. Enable this once we figured out how to fix it.
-    //@Test
+    @Test
     fun noteSkippingLength() {
         val mml = """1	c8d8,,60e8"""
         val midi1Bytes = MmlTestUtility.testCompile("midi1", mml)

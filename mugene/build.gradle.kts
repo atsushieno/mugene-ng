@@ -22,7 +22,7 @@ plugins {
 }
 
 group = "dev.atsushieno"
-version = "0.2.6.2"
+version = "0.2.6.5"
 
 val ktmidi_version = "0.2.7"
 

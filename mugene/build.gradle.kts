@@ -22,7 +22,7 @@ plugins {
 }
 
 group = "dev.atsushieno"
-version = "0.2.6.5"
+version = "0.2.6.6"
 
 val ktmidi_version = "0.2.7"
 
@@ -210,7 +210,7 @@ afterEvaluate {
 
             pom {
                 name.set("ktmidi")
-                description.set("Kotlin Multiplatform library for MIDI 1.0 and MIDI 2.0")
+                description.set("mugene-ng MML (Music Macro Language) compiler for MIDI 1.0 and MIDI 2.0")
                 url.set("https://github.com/atsushieno/mugene-ng")
                 scm {
                     url.set("https://github.com/atsushieno/mugene-ng")

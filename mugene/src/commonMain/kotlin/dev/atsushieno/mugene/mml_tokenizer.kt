@@ -940,7 +940,7 @@ class MmlMatchLongestLexer(reporter: MmlDiagnosticReporter, resolver: StreamReso
             buffer[bufferPos++] = ch.toChar()
             line.readChar()
         }
-        return String(buffer.toCharArray(), 0, bufferPos)
+        return buffer.toCharArray().concatToString(0, 0 + bufferPos)
     }
 
     // examines if current token matches the argument identifier,

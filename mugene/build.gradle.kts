@@ -15,16 +15,16 @@ buildscript {
 
 plugins {
     id("com.android.library") version "4.1.3"
-    kotlin("multiplatform") version "1.4.32"
+    kotlin("multiplatform") version "1.5.10"
     id("maven-publish")
     id("maven")
     id("signing")
 }
 
 group = "dev.atsushieno"
-version = "0.2.6.7"
+version = "0.2.7"
 
-val ktmidi_version = "0.2.7"
+val ktmidi_version = "0.2.8"
 
 kotlin {
     android {

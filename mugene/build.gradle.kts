@@ -39,9 +39,10 @@ kotlin {
             useJUnit()
         }
     }
-    js(BOTH) {
-        /*
+    js(IR) {
         binaries.executable()
+        nodejs()
+        /*
         browser {
             testTask {
                 useKarma {
@@ -50,8 +51,6 @@ kotlin {
                 }
             }
         }*/
-        nodejs {
-        }
     }
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")
@@ -73,7 +72,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("dev.atsushieno:ktmidi:$ktmidi_version")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
             }
             dependsOn(commonAntlr)
         }
@@ -85,7 +84,6 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi-jvm:$ktmidi_version")
             }
         }
         val jvmTest by getting {
@@ -95,7 +93,6 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi-android:$ktmidi_version")
                 implementation("androidx.startup:startup-runtime:1.0.0")
             }
         }
@@ -107,18 +104,15 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi-js:$ktmidi_version")
             }
         }
         val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.4.3")
             }
         }
         val nativeMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi-native:$ktmidi_version")
             }
         }
         val nativeTest by getting
@@ -161,8 +155,9 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
 // you can call the task manually in this case to update the generated sources
 tasks.getByName("compileKotlinJvm").dependsOn("generateKotlinCommonGrammarSource")
 // end of copy(2)
-tasks.getByName("compileKotlinJsIr").dependsOn("generateKotlinCommonGrammarSource")
-tasks.getByName("compileKotlinJsLegacy").dependsOn("generateKotlinCommonGrammarSource")
+tasks.getByName("compileKotlinJs").dependsOn("generateKotlinCommonGrammarSource")
+//tasks.getByName("compileKotlinJsIr").dependsOn("generateKotlinCommonGrammarSource")
+//tasks.getByName("compileKotlinJsLegacy").dependsOn("generateKotlinCommonGrammarSource")
 tasks.getByName("compileKotlinMetadata").dependsOn("generateKotlinCommonGrammarSource")
 afterEvaluate {
     tasks.getByName("compileDebugKotlinAndroid").dependsOn("generateKotlinCommonGrammarSource")

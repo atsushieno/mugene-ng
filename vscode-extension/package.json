@@ -1,0 +1,90 @@
+{
+	"name": "vscode-language-mugene",
+	"description": "mugene MML compiler support",
+	"author": "Atsushi Eno",
+	"license": "MIT",
+	"version": "0.2.8",
+	"publisher": "atsushieno",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/atsushieno/mugene"
+	},
+	"engines": {
+		"vscode": "^1.33.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onLanguage:mugene",
+		"onCommand:mugene.compile"
+	],
+	"main": "./out/src/extension",
+	"contributes": {
+		"languages": [
+			{
+				"id": "mugene",
+				"extensions": [
+					".mugene",
+					".mml"
+				],
+				"aliases": [
+					"mugene",
+					"Mugene"
+				],
+				"mimetypes": [
+					"text/x-mugene"
+				]
+			}
+		],
+		"configuration": {
+			"type": "object",
+			"title": "Mugene LSP configuration",
+			"properties": {
+				"mugene.maxNumberOfProblems": {
+					"scope": "resource",
+					"type": "number",
+					"default": 100,
+					"description": "Controls the maximum number of problems produced by the server."
+				},
+				"mugene.trace.server": {
+					"scope": "window",
+					"type": "string",
+					"enum": [
+						"off",
+						"messages",
+						"verbose"
+					],
+					"default": "verbose",
+					"description": "Traces the communication between VSCode and the language server."
+				}
+			}
+		},
+		"commands": [
+			{
+				"command": "mugene.compile",
+				"title": "Compile Mugene MML",
+				"category": "mugene"
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "tsc -p ./",
+		"compile": "tsc -p ./",
+		"watch": "tsc -w -p ./",
+		"postcompile": "mkdir -p ./out/tools/mugene/ && cp -R ../mugene/bin/Debug/* ./out/tools/mugene/",
+		"update-vscode": "node ./node_modules/vscode/bin/install",
+		"postinstall": "node ./node_modules/vscode/bin/install"
+	},
+	"devDependencies": {
+		"@types/mocha": "^5.2.6",
+		"@types/node": "^11.13.8",
+		"@types/rx-lite": "^4.0.6",
+		"typescript": "^3.6.3",
+		"vscode": "^1.1.36"
+	},
+	"dependencies": {
+		"rx-lite": "^4.0.8",
+		"vscode-languageclient": "^5.2.1"
+	}
+}

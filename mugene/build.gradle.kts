@@ -16,6 +16,7 @@ buildscript {
 plugins {
     id("com.android.library") version "4.1.3"
     kotlin("multiplatform") version "1.5.20"
+    id("dev.petuska.npm.publish") version "2.0.3"
     id("maven-publish")
     id("maven")
     id("signing")

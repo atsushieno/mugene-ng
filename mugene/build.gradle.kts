@@ -15,16 +15,16 @@ buildscript {
 
 plugins {
     id("com.android.library") version "4.1.3"
-    kotlin("multiplatform") version "1.5.10"
+    kotlin("multiplatform") version "1.5.20"
     id("maven-publish")
     id("maven")
     id("signing")
 }
 
 group = "dev.atsushieno"
-version = "0.2.8"
+version = "0.2.9"
 
-val ktmidi_version = "0.3.1"
+val ktmidi_version = "0.3.2"
 
 kotlin {
     android {
@@ -39,9 +39,9 @@ kotlin {
             useJUnit()
         }
     }
-    js(LEGACY) {
-        binaries.executable()
+    js(BOTH) {
         /*
+        binaries.executable()
         browser {
             testTask {
                 useKarma {
@@ -161,7 +161,8 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
 // you can call the task manually in this case to update the generated sources
 tasks.getByName("compileKotlinJvm").dependsOn("generateKotlinCommonGrammarSource")
 // end of copy(2)
-tasks.getByName("compileKotlinJs").dependsOn("generateKotlinCommonGrammarSource")
+tasks.getByName("compileKotlinJsIr").dependsOn("generateKotlinCommonGrammarSource")
+tasks.getByName("compileKotlinJsLegacy").dependsOn("generateKotlinCommonGrammarSource")
 tasks.getByName("compileKotlinMetadata").dependsOn("generateKotlinCommonGrammarSource")
 afterEvaluate {
     tasks.getByName("compileDebugKotlinAndroid").dependsOn("generateKotlinCommonGrammarSource")

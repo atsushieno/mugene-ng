@@ -32,7 +32,7 @@ jobs:
         SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SIGNING_SECRET_KEY_RING_FILE }}
     - name: rewrite build.gradle to require signing
       run: sed -i "s/signing {}/signing { sign(publishing.publications) }/" mugene/build.gradle.kts
-    - name: publish Maven
+    - name: publish to Maven and Npm
       run: |
         ./gradlew mugene:generateKotlinCommonGrammarSource
         ./gradlew publish mugene-console:jar
@@ -45,9 +45,6 @@ jobs:
         SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SIGNING_SECRET_KEY_RING_FILE }}
         SONATYPE_STAGING_PROFILE_ID: ${{ secrets.SONATYPE_STAGING_PROFILE_ID }}
-    - name: publish Npm
-      run: ./gradlew mugene:publishJsNpmPublicationToNpmjs
-      env:
         NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
     - name: upload artifact
       if: success()

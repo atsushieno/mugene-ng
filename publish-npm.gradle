@@ -1,0 +1,18 @@
+
+ext["npmAuthToken"] = ''
+
+ext["npmAuthToken"] = System.getenv('NPM_AUTH_TOKEN') ?: ext["npmAuthToken"]
+
+npmPublishing {
+  readme = file("README.md")
+  organization = "dev.atsushieno"
+  bundleKotlinDependencies = true
+  shrinkwrapBundledDependencies = true
+  repositories {
+    npmjs {
+      registry = uri("https://registry.npmjs.org") // Registry to publish to
+      authToken = npmAuthToken
+    }
+  }
+}
+

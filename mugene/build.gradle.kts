@@ -1,5 +1,3 @@
-import org.gradle.api.publish.maven.*
-
 buildscript {
     repositories {
         mavenLocal()
@@ -40,18 +38,17 @@ kotlin {
             useJUnit()
         }
     }
-    js(IR) {
+    js(LEGACY) {
         binaries.executable()
-        nodejs()
-        /*
-        browser {
+        nodejs {
             testTask {
                 useKarma {
                     useChromeHeadless()
                     webpackConfig.cssSupport.enabled = true
                 }
             }
-        }*/
+        }
+        //browser()
     }
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")
@@ -247,3 +244,5 @@ afterEvaluate {
     // keep it as is. It is replaced by CI release builds
     signing {}
 }
+
+apply(from = "${rootDir}/publish-npm.gradle")

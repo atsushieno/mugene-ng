@@ -7,7 +7,6 @@ allprojects {
         mavenLocal()
         google()
         mavenCentral()
-        jcenter() // kotlinx-nodejs requires this...!
         maven { url "https://jitpack.io" }
         maven {
             url "https://maven.pkg.github.com/atsushieno/ktmidi"

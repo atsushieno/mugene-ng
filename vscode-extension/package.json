@@ -3,7 +3,7 @@
 	"description": "mugene MML compiler support",
 	"author": "Atsushi Eno",
 	"license": "MIT",
-	"version": "0.2.8",
+	"version": "0.2.11",
 	"publisher": "atsushieno",
 	"repository": {
 		"type": "git",
@@ -71,20 +71,18 @@
 	"scripts": {
 		"vscode:prepublish": "tsc -p ./",
 		"compile": "tsc -p ./",
-		"watch": "tsc -w -p ./",
-		"postcompile": "mkdir -p ./out/tools/mugene/ && cp -R ../mugene/bin/Debug/* ./out/tools/mugene/",
-		"update-vscode": "node ./node_modules/vscode/bin/install",
-		"postinstall": "node ./node_modules/vscode/bin/install"
+		"watch": "tsc -w -p ./"
 	},
 	"devDependencies": {
-		"@types/mocha": "^5.2.6",
-		"@types/node": "^11.13.8",
+		"@types/mocha": "^8.2.3",
+		"@types/node": "^16.0.1",
 		"@types/rx-lite": "^4.0.6",
-		"typescript": "^3.6.3",
-		"vscode": "^1.1.36"
+		"@types/vscode": "^1.1.37",
+		"typescript": "^4.3.5"
 	},
 	"dependencies": {
+		"@dev.atsushieno/mugene": "^0.2.11",
 		"rx-lite": "^4.0.8",
-		"vscode-languageclient": "^5.2.1"
+		"vscode-languageclient": "^7.0.0"
 	}
 }

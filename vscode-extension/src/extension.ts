@@ -17,7 +17,7 @@ if (fs.existsSync(module.path + "/" + mugeneJSPath)) {
 	mugene.dev.atsushieno.mugene.NodeModuleResourceStreamResolver.Companion.instance.basePath = module.path + "/" + mugeneDirPath;
 } else {
 	var mugene = require("@dev.atsushieno/mugene/mugene-ng-mugene.js");
-	mugene.dev.atsushieno.mugene.NodeModuleResourceStreamResolver.Companion.instance.basePath = __dirname;
+	mugene.dev.atsushieno.mugene.NodeModuleResourceStreamResolver.Companion.instance.basePath = __dirname + "/../../node_modules/@dev.atsushieno/mugene";
 }
 
 const mugene_scheme = "mugene";

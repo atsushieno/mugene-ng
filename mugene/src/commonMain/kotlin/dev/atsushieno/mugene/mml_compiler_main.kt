@@ -6,6 +6,8 @@ import dev.atsushieno.ktmidi.MidiMusic
 import dev.atsushieno.ktmidi.SmfWriter
 import dev.atsushieno.ktmidi.convertDeltaTimesToJRTimestamps
 import dev.atsushieno.ktmidi.write
+import kotlin.js.JsName
+import kotlin.jvm.JvmName
 
 internal class Util {
     companion object {
@@ -68,6 +70,10 @@ abstract class MmlCompiler {
         return compile(skipDefaultMmlFiles, inputs = sources)
     }
 
+    @JsName("compile")
+    @JvmName("doNotUseCompile")
+    fun compile(skipDefaultMmlFiles: Boolean, inputs: Array<MmlInputSource>) = generateMusic(buildSemanticTree(tokenizeInputs(false, skipDefaultMmlFiles, inputs.toList())))
+
     fun compile(skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) = generateMusic(buildSemanticTree(tokenizeInputs(false, skipDefaultMmlFiles, inputs.toList())))
 
     fun compile(skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, metaWriter: ((Boolean, MidiMessage, MutableList<Byte>) -> Int)?, output: MutableList<Byte>, disableRunningStatus: Boolean) {
@@ -84,6 +90,11 @@ abstract class MmlCompiler {
         val sources = mmlParts.map { mml -> MmlInputSource("<string>", mml) }.toTypedArray()
         return compile2(outputDeltaTime, skipDefaultMmlFiles, inputs = sources)
     }
+
+    @JsName("compile2")
+    @JvmName("doNotUseCompile2")
+    fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, inputs: Array<MmlInputSource>) =
+        generateMusic2(outputDeltaTime, buildSemanticTree(tokenizeInputs(true, skipDefaultMmlFiles, inputs.toList())))
 
     fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) =
         generateMusic2(outputDeltaTime, buildSemanticTree(tokenizeInputs(true, skipDefaultMmlFiles, inputs.toList())))

@@ -1,19 +1,20 @@
-/* --------------------------------------------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
 'use strict';
 
 //import * as fs from 'fs';
 import * as events from 'events';
 import * as vscode from 'vscode';
 import * as rx from 'rx-lite';
-var mugene = require("@dev.atsushieno/mugene/mugene-ng-mugene.js");
 
 import { /*workspace,*/ ExtensionContext } from 'vscode';
+import * as fs from 'fs';
 //import Module = require('module');
 //import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-languageclient';
 
+var mugeneJSPath = "../../../mugene/build/publications/npm/js/mugene-ng-mugene.js";
+if (fs.existsSync(module.path + "/" + mugeneJSPath))
+	var mugene = require(mugeneJSPath); // path under dev. environment.
+else
+	var mugene = require("@dev.atsushieno/mugene/mugene-ng-mugene.js");
 
 const mugene_scheme = "mugene";
 
@@ -111,8 +112,8 @@ function compileMugene (uri: vscode.Uri, _ : ExtensionContext) {
 	var input = new mugene.dev.atsushieno.mugene.MmlInputSource(uri.fsPath,
 		vscode.window.activeTextEditor.document.getText());
 
-	var compiler = new mugene.dev.atsushieno.mugene.MmlCompilerJs();
-	compiler.compile(false, [input], null);
+	var compiler = mugene.dev.atsushieno.mugene.MmlCompiler.Companion.create();
+	compiler.compile(false, [input]);
 /*
 	// The server is implemented in C#
 	let mugeneExePath = context.asAbsolutePath(path.join('out', 'tools', 'mugene', 'mugene.exe'));

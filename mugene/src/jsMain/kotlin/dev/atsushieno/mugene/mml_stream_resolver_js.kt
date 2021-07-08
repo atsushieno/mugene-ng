@@ -33,3 +33,14 @@ class JsDevResourceStreamResolver : LocalFileStreamResolver() {
         return super.resolveFilePath("../../../../mugene/build/processedResources/js/main/$file")
     }
 }
+
+class NodeModuleResourceStreamResolver(var basePath: String) : LocalFileStreamResolver() {
+
+    companion object {
+        val instance = NodeModuleResourceStreamResolver(".")
+    }
+
+    override fun resolveFilePath(file: String): String? {
+        return super.resolveFilePath("$basePath/$file")
+    }
+}

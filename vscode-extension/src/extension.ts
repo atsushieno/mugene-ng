@@ -10,11 +10,15 @@ import * as fs from 'fs';
 //import Module = require('module');
 //import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-languageclient';
 
-var mugeneJSPath = "../../../mugene/build/publications/npm/js/mugene-ng-mugene.js";
-if (fs.existsSync(module.path + "/" + mugeneJSPath))
+var mugeneDirPath = "../../../mugene/build/publications/npm/js";
+var mugeneJSPath = mugeneDirPath + "/mugene-ng-mugene.js";
+if (fs.existsSync(module.path + "/" + mugeneJSPath)) {
 	var mugene = require(mugeneJSPath); // path under dev. environment.
-else
+	mugene.dev.atsushieno.mugene.NodeModuleResourceStreamResolver.Companion.instance.basePath = module.path + "/" + mugeneDirPath;
+} else {
 	var mugene = require("@dev.atsushieno/mugene/mugene-ng-mugene.js");
+	mugene.dev.atsushieno.mugene.NodeModuleResourceStreamResolver.Companion.instance.basePath = __dirname;
+}
 
 const mugene_scheme = "mugene";
 

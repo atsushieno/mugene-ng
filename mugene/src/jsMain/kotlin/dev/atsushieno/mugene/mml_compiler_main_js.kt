@@ -5,7 +5,7 @@ private val fs = if(js("typeof(process) !== 'undefined'") as Boolean) require("f
 private val Buffer = require("buffer")
 
 class MmlCompilerJs : MmlCompilerConsole() {
-    override var resolver : StreamResolver = MergeStreamResolver(JsDevResourceStreamResolver(), LocalFileStreamResolver())
+    override var resolver : StreamResolver = MergeStreamResolver(NodeModuleResourceStreamResolver.instance, JsDevResourceStreamResolver(), LocalFileStreamResolver())
 
     override fun decodeStringUsingEncoding(s: String, charset: String): ByteArray =
         TODO("Not implemented")

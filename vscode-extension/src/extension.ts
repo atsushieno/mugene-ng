@@ -4,20 +4,20 @@
  * ------------------------------------------------------------------------------------------ */
 'use strict';
 
-import * as path from 'path';
-import * as os from 'os';
-import * as fs from 'fs';
+//import * as fs from 'fs';
 import * as events from 'events';
-import * as child_process from 'child_process';
 import * as vscode from 'vscode';
 import * as rx from 'rx-lite';
+var mugene = require("@dev.atsushieno/mugene/mugene-ng-mugene.js");
 
 import { /*workspace,*/ ExtensionContext } from 'vscode';
+//import Module = require('module');
 //import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-languageclient';
+
 
 const mugene_scheme = "mugene";
 
-var diagnostics : vscode.DiagnosticCollection;
+//var diagnostics : vscode.DiagnosticCollection;
 
 class MugeneTextDocumentContentProvider implements vscode.TextDocumentContentProvider, vscode.Disposable {
 	private _onDidChange = new vscode.EventEmitter<vscode.Uri> ();
@@ -60,6 +60,7 @@ class MugeneTextDocumentContentProvider implements vscode.TextDocumentContentPro
 }
 
 // Now I figured out that MSBuild compatible output syntax is kind of shit... but anyways.
+/*
 function getValidFilePathFromCompilerOutput (s: string) : string {
 	var parts = s.split(" (");
 	var path = "";
@@ -79,6 +80,7 @@ function getValidFilePathFromCompilerOutput (s: string) : string {
 	}
 	return null;
 }
+*/
 
 function showPreview (uri: vscode.Uri) {
 	if (!(uri instanceof vscode.Uri)) {
@@ -97,15 +99,21 @@ function getSpecialSchemeUri (uri: any): vscode.Uri {
 	});
 }
 
-let line_column_regex = / \(([0-9]+),\s([0-9]+)\)\s*:\s*([a-zA-Z]+)\s*:\s*(.*)/;
+//let line_column_regex = / \(([0-9]+),\s([0-9]+)\)\s*:\s*([a-zA-Z]+)\s*:\s*(.*)/;
 
-function compileMugene (uri: vscode.Uri, context : ExtensionContext) {
+function compileMugene (uri: vscode.Uri, _ : ExtensionContext) {
 	if (!(uri instanceof vscode.Uri)) {
 		if (vscode.window.activeTextEditor) {
 			uri = vscode.window.activeTextEditor.document.uri;
 		}
 	}
 
+	var input = new mugene.dev.atsushieno.mugene.MmlInputSource(uri.fsPath,
+		vscode.window.activeTextEditor.document.getText());
+
+	var compiler = new mugene.dev.atsushieno.mugene.MmlCompilerJs();
+	compiler.compile(false, [input], null);
+/*
 	// The server is implemented in C#
 	let mugeneExePath = context.asAbsolutePath(path.join('out', 'tools', 'mugene', 'mugene.exe'));
 	let mugeneCommand = (os.platform() === 'win32') ? mugeneExePath : "mono";
@@ -134,8 +142,10 @@ function compileMugene (uri: vscode.Uri, context : ExtensionContext) {
 	proc.stderr.on("data", (msg) => {
 		reports.push(parseCompilerOutput(uri.fsPath, msg));
 	});
+*/
 }
 
+/*
 function parseCompilerOutput(contextFile: string, msg: String | Buffer): vscode.Diagnostic {
 	var file = getValidFilePathFromCompilerOutput(msg.toString());
 	var line = 0;
@@ -156,6 +166,7 @@ function parseCompilerOutput(contextFile: string, msg: String | Buffer): vscode.
 	}
 	return new vscode.Diagnostic(new vscode.Range (line, col, line, col), msg.toString(), type);
 }
+*/
 
 function processDocument (_: vscode.TextDocument) : Promise<string> {
     // process vexflow

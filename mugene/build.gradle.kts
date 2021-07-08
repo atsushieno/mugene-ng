@@ -47,6 +47,7 @@ kotlin {
                     webpackConfig.cssSupport.enabled = true
                 }
             }
+            useCommonJs()
         }
         //browser()
     }

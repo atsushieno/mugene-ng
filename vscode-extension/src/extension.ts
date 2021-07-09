@@ -1,12 +1,12 @@
 'use strict';
 
-//import * as fs from 'fs';
+import * as fs from 'fs';
+import * as path from 'path';
 import * as events from 'events';
 import * as vscode from 'vscode';
 import * as rx from 'rx-lite';
 
 import { /*workspace,*/ ExtensionContext } from 'vscode';
-import * as fs from 'fs';
 //import Module = require('module');
 //import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-languageclient';
 
@@ -120,8 +120,11 @@ function compileMugene (uri: vscode.Uri, _ : ExtensionContext) {
 	var music = compiler.compile(false, [input]);
 	// FIXME: get error reports
 	var bytes = mugene.dev.atsushieno.mugene.midiMusicToByteArray(music);
-	// FIXME: normalize file name (strip source extension)
-	fs.writeFile(uri.fsPath + ".mid", Buffer.from(bytes), () => {});
+
+	var pathExt = path.extname(uri.fsPath);
+	var midiFilePath = uri.fsPath.substring(0, uri.fsPath.length - pathExt.length) + ".mid";
+
+	fs.writeFile(midiFilePath, Buffer.from(bytes), () => {});
 /*
 	// The server is implemented in C#
 	let mugeneExePath = context.asAbsolutePath(path.join('out', 'tools', 'mugene', 'mugene.exe'));

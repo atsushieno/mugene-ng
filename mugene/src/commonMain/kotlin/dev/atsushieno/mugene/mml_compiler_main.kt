@@ -46,7 +46,7 @@ abstract class MmlCompiler {
     abstract var resolver: StreamResolver
     var report: MmlDiagnosticReporter
 
-    private var continueOnError = false
+    var continueOnError = false
 
     private fun reportOnConsole(
         verbosity: MmlDiagnosticVerbosity,

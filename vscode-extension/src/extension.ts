@@ -22,7 +22,7 @@ if (fs.existsSync(module.path + "/" + mugeneJSPath)) {
 
 const mugene_scheme = "mugene";
 
-//var diagnostics : vscode.DiagnosticCollection;
+var diagnostics : vscode.DiagnosticCollection;
 
 class MugeneTextDocumentContentProvider implements vscode.TextDocumentContentProvider, vscode.Disposable {
 	private _onDidChange = new vscode.EventEmitter<vscode.Uri> ();
@@ -64,29 +64,6 @@ class MugeneTextDocumentContentProvider implements vscode.TextDocumentContentPro
 	}
 }
 
-// Now I figured out that MSBuild compatible output syntax is kind of shit... but anyways.
-/*
-function getValidFilePathFromCompilerOutput (s: string) : string {
-	var parts = s.split(" (");
-	var path = "";
-	for (var idx in parts) {
-		var part = parts [idx];
-		var test = path + (path == "" ? "" : " (") + part;
-		try {
-			var stat = fs.statSync(test);
-			if (stat.isFile) {
-				path = test;
-				continue;
-			}
-			return path;
-		} catch (err) {
-			return path;
-		}
-	}
-	return null;
-}
-*/
-
 function showPreview (uri: vscode.Uri) {
 	if (!(uri instanceof vscode.Uri)) {
 		if (vscode.window.activeTextEditor) {
@@ -104,8 +81,6 @@ function getSpecialSchemeUri (uri: any): vscode.Uri {
 	});
 }
 
-//let line_column_regex = / \(([0-9]+),\s([0-9]+)\)\s*:\s*([a-zA-Z]+)\s*:\s*(.*)/;
-
 function compileMugene (uri: vscode.Uri, _ : ExtensionContext) {
 	if (!(uri instanceof vscode.Uri)) {
 		if (vscode.window.activeTextEditor) {
@@ -116,69 +91,50 @@ function compileMugene (uri: vscode.Uri, _ : ExtensionContext) {
 	var input = new mugene.dev.atsushieno.mugene.MmlInputSource(uri.fsPath,
 		vscode.window.activeTextEditor.document.getText());
 
-	var compiler = mugene.dev.atsushieno.mugene.MmlCompiler.Companion.create();
-	var music = compiler.compile(false, [input]);
-	// FIXME: get error reports
-	var bytes = mugene.dev.atsushieno.mugene.midiMusicToByteArray(music);
+	// clean up existing diagnostic reports
+	if (diagnostics != null)
+		diagnostics.dispose();
 
-	var pathExt = path.extname(uri.fsPath);
-	var midiFilePath = uri.fsPath.substring(0, uri.fsPath.length - pathExt.length) + ".mid";
-
-	fs.writeFile(midiFilePath, Buffer.from(bytes), () => {});
-/*
-	// The server is implemented in C#
-	let mugeneExePath = context.asAbsolutePath(path.join('out', 'tools', 'mugene', 'mugene.exe'));
-	let mugeneCommand = (os.platform() === 'win32') ? mugeneExePath : "mono";
-	let arg = (os.platform() === 'win32') ? "" : mugeneExePath;
-		
+	// Collect error reports
 	var reports = new Array<vscode.Diagnostic> ();
-	var cwd = path.dirname(uri.fsPath);
-	if (arg == "")
-		var proc = child_process.spawn (mugeneCommand, ["--verbose", uri.fsPath], {cwd: cwd});
-	else
-		var proc = child_process.spawn (mugeneCommand, [arg, "--verbose", uri.fsPath], {cwd: cwd});
-	proc.on("exit", (code, _) => {
-		if (code == 0) {
-		    vscode.window.showInformationMessage("mugene successfully finished");
-		} else {
-	    	vscode.window.showInformationMessage("failed to run mugene, at exit code " + code);
-		}
-		if (diagnostics != null)
-			diagnostics.dispose();
-		diagnostics = vscode.languages.createDiagnosticCollection("mugene");
-		diagnostics.set (uri, reports);
-	});
-	proc.stdout.on("data", (msg) => {
-		reports.push(parseCompilerOutput(uri.fsPath, msg));
-	});
-	proc.stderr.on("data", (msg) => {
-		reports.push(parseCompilerOutput(uri.fsPath, msg));
-	});
-*/
+	var compiler = mugene.dev.atsushieno.mugene.MmlCompiler.Companion.create();
+	compiler.continueOnError = true;
+	compiler.report = function(verbosity: any, location: any, message: any) {
+		if (location.file == uri.fsPath)
+			reports.push(createDiagnostic(verbosity, location, message));
+		else
+			console.log(location.file + ": " + message);
+	};
+
+	var music = compiler.compile(false, [input]);
+	// Show compiler reports as vscode diagnostics
+	diagnostics = vscode.languages.createDiagnosticCollection("mugene");
+	diagnostics.set (uri, reports);
+
+	if (music != null) {
+		var bytes = mugene.dev.atsushieno.mugene.midiMusicToByteArray(music);
+
+		var pathExt = path.extname(uri.fsPath);
+		var midiFilePath = uri.fsPath.substring(0, uri.fsPath.length - pathExt.length) + ".mid";
+
+		fs.writeFile(midiFilePath, Buffer.from(bytes), () => {});
+
+		vscode.window.showInformationMessage("mugene successfully finished");
+	} else {
+		vscode.window.showInformationMessage("compilation failed.");
+	}
 }
 
-/*
-function parseCompilerOutput(contextFile: string, msg: String | Buffer): vscode.Diagnostic {
-	var file = getValidFilePathFromCompilerOutput(msg.toString());
-	var line = 0;
-	var col = 0;
+function createDiagnostic(verbosity: any, location: any, message: any): vscode.Diagnostic {
+	var line = location.lineNumber - 1;
+	var col = location.linePosition;
 	var type = vscode.DiagnosticSeverity.Information;
-	if (file == contextFile) {
-		msg = msg.slice (file.length); // " (n,m) error: msg"
-		var match = line_column_regex.exec(msg.toString());
-		if (match != null) {
-			line = Number.parseInt (match [1]) - 1;
-			col = Number.parseInt (match [2]) - 1;
-			switch (match [3].toLowerCase()) {
-				case "error": type = vscode.DiagnosticSeverity.Error; break;
-				case "warning": type = vscode.DiagnosticSeverity.Warning; break;
-			}
-			msg = match [4];
-		}
-	}
-	return new vscode.Diagnostic(new vscode.Range (line, col, line, col), msg.toString(), type);
+	if (verbosity == mugene.dev.atsushieno.mugene.MmlDiagnosticVerbosity.Error)
+		type = vscode.DiagnosticSeverity.Error;
+	else if (verbosity == mugene.dev.atsushieno.mugene.MmlDiagnosticVerbosity.Warning)
+		type = vscode.DiagnosticSeverity.Warning;
+	return new vscode.Diagnostic(new vscode.Range (line, col, line, col), message.toString(), type);
 }
-*/
 
 function processDocument (_: vscode.TextDocument) : Promise<string> {
     // process vexflow

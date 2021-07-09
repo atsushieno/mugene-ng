@@ -63,7 +63,12 @@
 		"commands": [
 			{
 				"command": "mugene.compile",
-				"title": "Compile Mugene MML",
+				"title": "Compile Mugene MML to SMF",
+				"category": "mugene"
+			},
+			{
+				"command": "mugene.compile2",
+				"title": "Compile Mugene MML to MIDI2 UMPX",
 				"category": "mugene"
 			}
 		]

@@ -82,6 +82,14 @@ function getSpecialSchemeUri (uri: any): vscode.Uri {
 }
 
 function compileMugene (uri: vscode.Uri, _ : ExtensionContext) {
+	compileMugeneCommon(false, uri, _);
+}
+
+function compileMugene2 (uri: vscode.Uri, _ : ExtensionContext) {
+	compileMugeneCommon(true, uri, _);
+}
+
+function compileMugeneCommon (isMidi2: Boolean, uri: vscode.Uri, _ : ExtensionContext) {
 	if (!(uri instanceof vscode.Uri)) {
 		if (vscode.window.activeTextEditor) {
 			uri = vscode.window.activeTextEditor.document.uri;
@@ -106,23 +114,35 @@ function compileMugene (uri: vscode.Uri, _ : ExtensionContext) {
 			console.log(location.file + ": " + message);
 	};
 
-	var music = compiler.compile(false, [input]);
+	if (isMidi2) {
+		var music = compiler.compile2(true, false, [input]);
+		if (music != null) {
+			var bytes = mugene.dev.atsushieno.mugene.midi2MusicToByteArray(music);
+	
+			var pathExt = path.extname(uri.fsPath);
+			var midiFilePath = uri.fsPath.substring(0, uri.fsPath.length - pathExt.length) + ".umpx";
+
+			fs.writeFile(midiFilePath, Buffer.from(bytes), () => {});
+		}
+	} else {
+		var music = compiler.compile(false, [input]);
+		if (music != null) {
+			var bytes = mugene.dev.atsushieno.mugene.midiMusicToByteArray(music);
+	
+			var pathExt = path.extname(uri.fsPath);
+			var midiFilePath = uri.fsPath.substring(0, uri.fsPath.length - pathExt.length) + ".mid";
+	
+			fs.writeFile(midiFilePath, Buffer.from(bytes), () => {});
+		}
+	}
+	if (music != null)	// either MIDI1 or MIDI2
+		vscode.window.showInformationMessage("mugene successfully finished");
+	else
+		vscode.window.showInformationMessage("compilation failed.");
+
 	// Show compiler reports as vscode diagnostics
 	diagnostics = vscode.languages.createDiagnosticCollection("mugene");
 	diagnostics.set (uri, reports);
-
-	if (music != null) {
-		var bytes = mugene.dev.atsushieno.mugene.midiMusicToByteArray(music);
-
-		var pathExt = path.extname(uri.fsPath);
-		var midiFilePath = uri.fsPath.substring(0, uri.fsPath.length - pathExt.length) + ".mid";
-
-		fs.writeFile(midiFilePath, Buffer.from(bytes), () => {});
-
-		vscode.window.showInformationMessage("mugene successfully finished");
-	} else {
-		vscode.window.showInformationMessage("compilation failed.");
-	}
 }
 
 function createDiagnostic(verbosity: any, location: any, message: any): vscode.Diagnostic {
@@ -152,8 +172,9 @@ export function activate(context: ExtensionContext) {
 function activateCompiler(context: ExtensionContext) {
 	// Compile command
 	let compileCommand = vscode.commands.registerCommand ("mugene.compile", uri => compileMugene (uri, context));
-
 	context.subscriptions.push(compileCommand);
+	let compile2Command = vscode.commands.registerCommand ("mugene.compile2", uri => compileMugene2 (uri, context));
+	context.subscriptions.push(compile2Command);
 }
 
 function activatePreview(context: ExtensionContext) {

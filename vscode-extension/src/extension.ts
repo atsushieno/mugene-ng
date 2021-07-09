@@ -117,7 +117,11 @@ function compileMugene (uri: vscode.Uri, _ : ExtensionContext) {
 		vscode.window.activeTextEditor.document.getText());
 
 	var compiler = mugene.dev.atsushieno.mugene.MmlCompiler.Companion.create();
-	compiler.compile(false, [input]);
+	var music = compiler.compile(false, [input]);
+	// FIXME: get error reports
+	var bytes = mugene.dev.atsushieno.mugene.midiMusicToByteArray(music);
+	// FIXME: normalize file name (strip source extension)
+	fs.writeFile(uri.fsPath + ".mid", Buffer.from(bytes), () => {});
 /*
 	// The server is implemented in C#
 	let mugeneExePath = context.asAbsolutePath(path.join('out', 'tools', 'mugene', 'mugene.exe'));

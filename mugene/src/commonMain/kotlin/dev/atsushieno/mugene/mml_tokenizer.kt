@@ -208,13 +208,13 @@ class MmlLine(val location: MmlLineInfo, var text: String) {
     fun peekChar(): Int {
         if (location.linePosition == text.length)
             return -1
-        return text[location.linePosition].toInt()
+        return text[location.linePosition].code
     }
 
     fun readChar(): Int {
         if (location.linePosition == text.length)
             return -1
-        return text[location.linePosition++].toInt()
+        return text[location.linePosition++].code
     }
 }
 
@@ -515,7 +515,7 @@ abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal v
 
     fun createParsedToken(): MmlToken = MmlToken(currentToken, this.value, currentLocation)
 
-    open fun isWhitespace(ch: Int) = ch == ' '.toInt() || ch == '\t'.toInt()
+    open fun isWhitespace(ch: Int) = ch == ' '.code || ch == '\t'.code
 
     open fun skipWhitespaces() = skipWhitespaces(false)
 
@@ -527,7 +527,7 @@ abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal v
             line.readChar()
     }
 
-    open fun isNumber(c: Int) = '0'.toInt() <= c && c <= '9'.toInt()
+    open fun isNumber(c: Int) = '0'.code <= c && c <= '9'.code
 
     open fun readNumber(acceptFloatingPoint: Boolean): Double {
         val line = line
@@ -543,7 +543,7 @@ abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal v
             var passed = false
             while (true) {
                 ch = line.peekChar().toChar()
-                val isNum = isNumber(ch.toInt())
+                val isNum = isNumber(ch.code)
                 val isUpper = ch in 'A'..'F'
                 val isLower = ch in 'a'..'f'
                 if (!isNum && !isUpper && !isLower) {
@@ -553,9 +553,9 @@ abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal v
                 }
                 passed = true
                 val h =
-                    if (isNum) line.readChar() - '0'.toInt()
-                    else if (isUpper) line.readChar() - 'A'.toInt() + 10
-                    else line.readChar() - 'a'.toInt() + 10
+                    if (isNum) line.readChar() - '0'.code
+                    else if (isUpper) line.readChar() - 'A'.code + 10
+                    else line.readChar() - 'a'.code + 10
                 value = value * 16 + h
             }
             return value
@@ -565,14 +565,14 @@ abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal v
             var floatingPointAt = 0
             while (true) {
                 var ch2 = line.readChar()
-                if (ch2 == '.'.toInt())
+                if (ch2 == '.'.code)
                     floatingPointAt = digits
                 else {
-                    value = value * 10 + (ch2 - '0'.toInt())
+                    value = value * 10 + (ch2 - '0'.code)
                     digits++
                 }
                 ch2 = line.peekChar()
-                if (!(acceptFloatingPoint && ch2 == '.'.toInt()) && !isNumber(ch2))
+                if (!(acceptFloatingPoint && ch2 == '.'.code) && !isNumber(ch2))
                     break
             }
             return if (floatingPointAt > 0) value * 0.1.pow((digits - floatingPointAt).toDouble()) else value
@@ -604,7 +604,7 @@ abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal v
                         else -> {
                             line.location.linePosition--
                             if (cc == '#' || cc in '0'..'9') {
-                                sb.append(readNumber(false).toChar())
+                                sb.append(readNumber(false).toInt().toChar())
                                 line.readChar()
                                 if (cc != ';')
                                     throw lexerError("Unexpected string escape sequence: ';' is expected after number escape sequence")
@@ -825,7 +825,7 @@ abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal v
                 return true
             }
         }
-        if (ch == '#' || isNumber(ch.toInt())) {
+        if (ch == '#' || isNumber(ch.code)) {
             value = readNumber(false)
             currentToken = MmlTokenType.NumberLiteral
             return true
@@ -946,10 +946,9 @@ class MmlMatchLongestLexer(reporter: MmlDiagnosticReporter, resolver: StreamReso
     // examines if current token matches the argument identifier,
     // proceeding the MmlLine.
     private fun matches(name: String): Boolean {
-        var ret = false
         val savedPos = line.location.linePosition
         val savedBufferPos = bufferPos
-        ret = matchesProceed(name)
+        val ret = matchesProceed(name)
         if (!ret) {
             bufferPos = savedBufferPos
             line.location.linePosition = savedPos
@@ -1136,7 +1135,6 @@ class MmlTokenizer(private val reporter: MmlDiagnosticReporter, private val sour
 
         source.lexer.newIdentifierMode = true
         source.lexer.advance()
-        val idx = result.variables.size
         parseVariableList(result.variables, true)
         for (i in 0 until result.variables.size)
             src.parsedNames.add(result.variables[i].name)

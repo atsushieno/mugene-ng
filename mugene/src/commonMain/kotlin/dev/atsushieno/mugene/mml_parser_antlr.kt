@@ -17,9 +17,9 @@ class SimpleEOFToken(source: TokenSource) : Token {
     override val line: Int = 0
     override val startIndex: Int = 0
     override val stopIndex: Int = 0
-    override val text: String? = "" // If we set null, that causes NPE at error reporting.
+    override val text: String = ""
     override val tokenIndex: Int = Token.EOF
-    override val tokenSource: TokenSource? = source
+    override val tokenSource: TokenSource = source
     override val type: Int = Token.EOF
 }
 
@@ -85,12 +85,12 @@ class WrappedTokenFactory<T> : TokenFactory<T> where T : Token {
 
 }
 
-class WrappedTokenSource(val ts: TokenStream) : TokenSource {
+class WrappedTokenSource(private val ts: TokenStream) : TokenSource {
     override val charPositionInLine: Int
         get() = ts.source[ts.position].location.linePosition
     override val line: Int
         get() = ts.source[ts.position].location.lineNumber
-    override val sourceName: String?
+    override val sourceName: String
         get() = ts.source[ts.position].location.file
     override var tokenFactory: TokenFactory<*> = WrappedTokenFactory<Token>()
 
@@ -103,6 +103,7 @@ class WrappedTokenSource(val ts: TokenStream) : TokenSource {
     }
 }
 
+@Suppress("UNCHECKED_CAST")
 class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : MugeneParserBaseVisitor<Any>() {
     private fun getSingleContent(ctx: ParserRuleContext) = visit(ctx.getChild(0)!!)!!
 

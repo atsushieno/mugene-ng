@@ -7,56 +7,23 @@ import org.antlr.v4.kotlinruntime.atn.ATNConfigSet
 import org.antlr.v4.kotlinruntime.dfa.DFA
 
 class MmlSemanticTreeSet {
-    constructor() {
-        baseCount = 192
-        tracks = mutableListOf()
-        macros = mutableListOf()
-        variables = mutableMapOf()
-    }
-
-    var baseCount: Int
-    lateinit var tracks: MutableList<MmlSemanticTrack>
-    lateinit var macros: MutableList<MmlSemanticMacro>
-    lateinit var variables: MutableMap<String, MmlSemanticVariable>
+    var baseCount: Int = 192
+    var tracks: MutableList<MmlSemanticTrack> = mutableListOf()
+    var macros: MutableList<MmlSemanticMacro> = mutableListOf()
+    var variables: MutableMap<String, MmlSemanticVariable> = mutableMapOf()
 }
 
-class MmlSemanticTrack {
-    constructor (number: Double) {
-        this.number = number
-        data = mutableListOf<MmlOperationUse>()
-    }
-
-    var number: Double = 0.0
-
-    lateinit var data: MutableList<MmlOperationUse>
+class MmlSemanticTrack(var number: Double) {
+    var data: MutableList<MmlOperationUse> = mutableListOf()
 }
 
-public class MmlSemanticMacro {
-    constructor (location: MmlLineInfo, name: String, targetTracks: List<Double>) {
-        this.location = location
-        this.name = name
-        this.targetTracks = targetTracks
-        arguments = mutableListOf<MmlSemanticVariable>()
-        data = mutableListOf<MmlOperationUse>()
-    }
-
-    lateinit var location: MmlLineInfo
-    lateinit var name: String
-    lateinit var targetTracks: List<Double>
-    lateinit var arguments: MutableList<MmlSemanticVariable>
-    lateinit var data: MutableList<MmlOperationUse>
+class MmlSemanticMacro(var location: MmlLineInfo, var name: String, var targetTracks: List<Double>) {
+    var arguments: MutableList<MmlSemanticVariable> = mutableListOf()
+    var data: MutableList<MmlOperationUse> = mutableListOf()
 }
 
-class MmlSemanticVariable {
-    constructor (location: MmlLineInfo, name: String, type: MmlDataType) {
-        this.location = location
-        this.name = name
-        this.type = type
-    }
+class MmlSemanticVariable(var location: MmlLineInfo, var name: String, var type: MmlDataType) {
 
-    lateinit var location: MmlLineInfo
-    lateinit var name: String
-    lateinit var type: MmlDataType
     var defaultValue: MmlValueExpr? = null
 
     fun fillDefaultValue() {
@@ -72,21 +39,18 @@ class MmlSemanticVariable {
                 defaultValue = MmlConstantExpr(location, type, null)
             MmlDataType.Any -> {
             }
-            // it happens only for macro arg definition.
-            else ->
-                throw UnsupportedOperationException("Not implemented for type " + type)
         }
     }
 
     override fun toString(): String {
-        if (defaultValue != null)
-            return "$name:$type(=$defaultValue)"
+        return if (defaultValue != null)
+            "$name:$type(=$defaultValue)"
         else
-            return "$name:$type"
+            "$name:$type"
     }
 }
 
-abstract class MmlValueExpr {
+abstract class MmlValueExpr protected constructor(var location: MmlLineInfo?) {
     companion object {
         val skippedArgument = MmlConstantExpr (MmlLineInfo.empty, MmlDataType.String, "DEFAULT ARGUMENT")
 
@@ -100,12 +64,6 @@ abstract class MmlValueExpr {
             return ret
         }
     }
-
-    protected constructor (location: MmlLineInfo?) {
-        this.location = location
-    }
-
-    var location: MmlLineInfo?
 
     lateinit var resolver: MmlValueExprResolver
 }
@@ -142,14 +100,10 @@ class MmlVariableReferenceExpr : MmlValueExpr {
     override fun toString() = "\$${if (scope > 1) "\$" else ""}$name"
 }
 
-class MmlParenthesizedExpr : MmlValueExpr {
-    constructor (content: MmlValueExpr)
-            : super(content.location) {
-        this.content = content
+class MmlParenthesizedExpr(var content: MmlValueExpr) : MmlValueExpr(content.location) {
+    init {
         resolver = MmlParenthesizedExprResolver(this)
     }
-
-    var content: MmlValueExpr
 
     override fun toString() = "($content)"
 }
@@ -212,17 +166,15 @@ class MmlComparisonExpr(val left: MmlValueExpr, val right: MmlValueExpr, type: C
 
     val comparisonType: ComparisonType = type
 
-    override fun toString(): String = "$left $comparisonType $right"
+    override fun toString(): String = "$left ${comparisonType.toExpressionString()} $right"
 
-    fun ComparisonType.toString() {
+    private fun ComparisonType.toExpressionString() =
         when (this) {
             ComparisonType.Lesser -> "<"
             ComparisonType.LesserEqual -> "<="
             ComparisonType.Greater -> ">"
             ComparisonType.GreaterEqual -> ">"
-            else -> throw UnsupportedOperationException()
         }
-    }
 
     init {
         resolver = MmlComparisonExprResolver(this)
@@ -237,18 +189,9 @@ enum class ComparisonType {
 }
 
 // at this phase, we cannot determine if an invoked operation is a macro, or a primitive operation.
-class MmlOperationUse {
-    constructor (name: String, location: MmlLineInfo?) {
-        this.name = name
-        this.location = location
-        this.arguments = mutableListOf()
-    }
+class MmlOperationUse(val name: String, var location: MmlLineInfo?) {
 
-    val name: String
-
-    var location: MmlLineInfo?
-
-    val arguments: MutableList<MmlValueExpr?>
+    val arguments: MutableList<MmlValueExpr?> = mutableListOf()
 
     override fun toString(): String {
         val args = mutableListOf<String>()
@@ -273,6 +216,7 @@ class MmlOperationUse {
             arg!!.resolver.resolve(ctx, type)
         }
     }
+
 }
 
 
@@ -312,7 +256,11 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
             result.tracks.add(buildTrackOperationList(track))
     }
 
-    private fun antlrCompile(reporter: MmlDiagnosticReporter, stream: TokenStream, parseFunc: (MugeneParser) -> ParserRuleContext) : Any {
+    private fun antlrCompile(
+        reporter: MmlDiagnosticReporter,
+        stream: TokenStream,
+        parseFunc: (MugeneParser) -> ParserRuleContext
+    ): Any {
         val tokenStream = CommonTokenStream(WrappedTokenSource(stream))
         val parser = MugeneParser(tokenStream)
         parser.addErrorListener(object : ANTLRErrorListener {
@@ -373,8 +321,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
         })
         val tree = parseFunc(parser)
         val visitor = MugeneParserVisitorImpl(reporter)
-        val ret = visitor.visit(tree)!!
-        return ret
+        return visitor.visit(tree)!!
     }
 
     private fun buildVariableDeclaration(src: MmlVariableDefinition): MmlSemanticVariable {
@@ -414,14 +361,12 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
 
     private fun compileOperationTokens(data: MutableList<MmlOperationUse>, stream: TokenStream) {
         if (stream.source.isNotEmpty()) {
-            var results = antlrCompile(reporter, stream, { parser -> parser.operationUses() })
+            val results = antlrCompile(reporter, stream) { parser -> parser.operationUses() }
             data.addAll(results as List<MmlOperationUse>)
         }
     }
 
     init {
-        if (tokenSet == null)
-            throw IllegalArgumentException("tokenSet")
         result = MmlSemanticTreeSet().apply { baseCount = tokenSet.baseCount }
     }
 }
@@ -471,7 +416,7 @@ class MmlMacroExpander(private val source: MmlSemanticTreeSet, contextReporter: 
 class MmlPrimitiveOperation {
     companion object {
 
-        lateinit var all: List<MmlPrimitiveOperation>
+        val all: List<MmlPrimitiveOperation>
 
         val Print = MmlPrimitiveOperation().apply { name = "__PRINT" }
         val Let = MmlPrimitiveOperation().apply { name = "__LET" };
@@ -535,14 +480,9 @@ enum class MmlDataType {
     Buffer,
 }
 
-/*struct*/ class MmlLength {
-    constructor(num: Int) {
-        dots = 0;
-        isValueByStep = false;
-        number = num;
-    }
+/*struct*/ class MmlLength(num: Int) {
 
-    val number: Int
+    val number: Int = num
     var dots: Int
     var isValueByStep: Boolean
 
@@ -561,6 +501,11 @@ enum class MmlDataType {
     }
 
     override fun toString() = "[${if (isValueByStep) "%" else ""}$number${".".repeat(dots)}]"
+
+    init {
+        dots = 0
+        isValueByStep = false
+    }
 }
 
 class MmlException(message: String = "MML error", innerException: Exception? = null) :

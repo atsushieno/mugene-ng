@@ -1,6 +1,8 @@
 package dev.atsushieno.mugene
 
+import dev.atsushieno.ktmidi.MidiMessage
 import kotlin.math.pow
+import kotlin.native.concurrent.ThreadLocal
 
 // variable resolver structures
 
@@ -425,7 +427,6 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
         var storeCurrentOutput: MutableList<MmlResolvedEvent>? = null
         val storeDummy = mutableListOf<MmlResolvedEvent>()
         var currentStoredOperations: StoredOperations? = null
-        var isStringFormat = false
 
         for (listIndex in start until start + count) {
             val oper = list[listIndex]
@@ -446,7 +447,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                 "__LET" -> {
                     arguments[0].resolver.resolve(rctx, MmlDataType.String)
                     val name = arguments[0].resolver.stringValue
-                    val variable = source.variables.get(name) as MmlSemanticVariable?
+                    val variable = source.variables[name]
                     if (variable == null) {
                         reporter(
                             MmlDiagnosticVerbosity.Error,
@@ -775,14 +776,10 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
 
                     rctx.values = loop.savedValues
 
-                    var baseTicks = 0
-                    var baseOutputEnd = 0
                     var tickOffset = 0
                     val beginAt = loop.beginAt!!
                     val firstBreakAt = loop.firstBreakAt
                     if (firstBreakAt == null) { // w/o break
-                        baseTicks = rctx.timelinePosition - beginAt.tick
-                        baseOutputEnd = loop.events.size
                         rctx.timelinePosition = beginAt.tick
 
                         // This range of commands actually adds extra argument definitions for loop operation, but it won't hurt.
@@ -796,8 +793,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                                 extraTailArgsIfApplied ?: listOf()
                             )
                     } else { // w/ breaks
-                        baseTicks = firstBreakAt.tick - beginAt.tick
-                        baseOutputEnd = firstBreakAt.output
+                        val baseTicks = firstBreakAt.tick - beginAt.tick
 
                         rctx.timelinePosition = beginAt.tick
 
@@ -829,7 +825,6 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                             var elb = loop.endLocations[l]
                             if (elb == null)
                                 elb = loop.endLocations[-1]!!
-                            var breakOffset = lb.tick - beginAt.tick + baseTicks
                             processOperations(
                                 track,
                                 rctx,
@@ -915,7 +910,6 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
     private fun sort(l: MutableList<MmlResolvedEvent>) {
         val msgBlockByTime = mutableMapOf<Int, MutableList<MmlResolvedEvent>>()
         var m = 0
-        var prev = 0
 
         while (m < l.size) {
             val e = l[m]
@@ -924,7 +918,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                 pl = mutableListOf()
                 msgBlockByTime[e.tick] = pl
             }
-            prev = l[m].tick
+            val prev = l[m].tick
             pl.add(l[m])
             m++
             while (m < l.size && l[m].tick == prev) {

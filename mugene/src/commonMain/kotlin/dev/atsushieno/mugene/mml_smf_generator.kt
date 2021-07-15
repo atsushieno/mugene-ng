@@ -17,7 +17,7 @@ class MmlSmfGenerator(private val source: MmlResolvedMusic) {
         fun generate(source: MmlResolvedMusic): MidiMusic {
             val gen = MmlSmfGenerator(source)
             gen.generateSong()
-            return gen.result!!
+            return gen.result
         }
     }
 
@@ -32,7 +32,7 @@ class MmlSmfGenerator(private val source: MmlResolvedMusic) {
         val rtrk = MidiTrack()
         var cur = 0
         for (ev in source.events) {
-            var evt: MidiEvent? = null
+            var evt: MidiEvent?
             if (ev.arguments[0] == 0xFF.toByte())
                 evt = MidiEvent(
                     ev.arguments[0].toUnsigned(),
@@ -90,7 +90,7 @@ class MmlMidi2Generator(private val source: MmlResolvedMusic) {
             else if (ev.operation == "MIDI_NG") {
                 val umpLong = umpMidi2ChannelMessage8_8_32(
                     ev.arguments[1] / 0x10,
-                    ev.arguments[0],
+                    ev.arguments[0].toUnsigned(),
                     ev.arguments[1] % 0x10,
                     ev.arguments[2].toUnsigned(),
                     ev.arguments[3].toUnsigned(),

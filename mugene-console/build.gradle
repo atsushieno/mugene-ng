@@ -17,7 +17,7 @@ test {
 jar {
     manifest {
         attributes(
-                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                'Class-Path': configurations.all.collect { it.getName() }.join(' '),
                 'Main-Class': 'dev.atsushieno.mugene.MainKt'
         )
     }

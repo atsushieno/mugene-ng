@@ -13,7 +13,7 @@ buildscript {
 
 plugins {
     id("com.android.library") version "4.1.3"
-    kotlin("multiplatform") version "1.5.20"
+    kotlin("multiplatform") version "1.5.21"
     id("dev.petuska.npm.publish") version "2.0.3"
     id("maven-publish")
     id("signing")
@@ -37,9 +37,9 @@ kotlin {
             useJUnit()
         }
     }
-    js(LEGACY) {
-        binaries.executable()
+    js(BOTH) {
         nodejs {
+            //binaries.executable()
             testTask {
                 useKarma {
                     useChromeHeadless()
@@ -153,9 +153,9 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
 // you can call the task manually in this case to update the generated sources
 tasks.getByName("compileKotlinJvm").dependsOn("generateKotlinCommonGrammarSource")
 // end of copy(2)
-tasks.getByName("compileKotlinJs").dependsOn("generateKotlinCommonGrammarSource")
-//tasks.getByName("compileKotlinJsIr").dependsOn("generateKotlinCommonGrammarSource")
-//tasks.getByName("compileKotlinJsLegacy").dependsOn("generateKotlinCommonGrammarSource")
+//tasks.getByName("compileKotlinJs").dependsOn("generateKotlinCommonGrammarSource")
+tasks.getByName("compileKotlinJsIr").dependsOn("generateKotlinCommonGrammarSource")
+tasks.getByName("compileKotlinJsLegacy").dependsOn("generateKotlinCommonGrammarSource")
 tasks.getByName("compileKotlinMetadata").dependsOn("generateKotlinCommonGrammarSource")
 afterEvaluate {
     tasks.getByName("compileDebugKotlinAndroid").dependsOn("generateKotlinCommonGrammarSource")

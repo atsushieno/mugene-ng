@@ -7,7 +7,7 @@ import dev.atsushieno.ktmidi.MidiMessage
 import dev.atsushieno.ktmidi.MidiMusic
 import dev.atsushieno.ktmidi.MidiTrack
 import dev.atsushieno.ktmidi.Ump
-import dev.atsushieno.ktmidi.umpfactory.*
+import dev.atsushieno.ktmidi.UmpFactory
 import kotlin.experimental.and
 
 internal fun Byte.toUnsigned() : Int = if (this < 0) 0x100 + this else this.toInt()
@@ -86,9 +86,9 @@ class MmlMidi2Generator(private val source: MmlResolvedMusic) {
             else if (ev.arguments[0] == 0xF0.toByte())
                 wasSysex = true // later
             else if ((ev.arguments[0].toUnsigned() and 0xF0) == 0xF0)
-                evt = Ump(umpSystemMessage(0, ev.arguments[0], ev.arguments[1], ev.arguments[2]))
+                evt = Ump(UmpFactory.systemMessage(0, ev.arguments[0], ev.arguments[1], ev.arguments[2]))
             else if (ev.operation == "MIDI_NG") {
-                val umpLong = umpMidi2ChannelMessage8_8_32(
+                val umpLong = UmpFactory.midi2ChannelMessage8_8_32(
                     ev.arguments[1] / 0x10,
                     ev.arguments[0].toUnsigned(),
                     ev.arguments[1] % 0x10,
@@ -99,20 +99,20 @@ class MmlMidi2Generator(private val source: MmlResolvedMusic) {
                 evt = Ump((umpLong shr 32).toInt(), (umpLong and 0xFFFFFFFF).toInt())
             }
             else
-                evt = Ump(umpMidi1Message(0,
+                evt = Ump(UmpFactory.midi1Message(0,
                     (ev.arguments[0] and 0xF0.toByte()),
                     ev.arguments[0] % 0x10,
                     ev.arguments[1],
                     ev.arguments[2]))
             if (ev.tick != cur)
-                rtrk.messages.addAll(umpJRTimestamps(0, ev.tick.toLong() - cur).map { i -> Ump(i) })
+                rtrk.messages.addAll(UmpFactory.jrTimestamps(0, ev.tick.toLong() - cur).map { i -> Ump(i) })
 
             if (wasMetaSysex8)
                 // those extra 4 bytes are for sysex ManufacturerID, deviceID, subID1, and subID2. They are all dummy values.
-                umpSysex8Process(0, listOf<Byte>(0, 0, 0, 0) + ev.arguments.drop(1), ev.arguments.size + 4 - 1, 0,
+                UmpFactory.sysex8Process(0, listOf<Byte>(0, 0, 0, 0) + ev.arguments.drop(1), ev.arguments.size + 4 - 1, 0,
                     { lv1, lv2, _ -> rtrk.messages.add(Ump((lv1 / 0x100000000).toInt(), (lv1 % 0x100000000).toInt(), (lv2 / 0x100000000).toInt(), (lv2 % 0x100000000).toInt())) }, null)
             else if (wasSysex)
-                umpSysex7Process(0, ev.arguments.drop(1),
+                UmpFactory.sysex7Process(0, ev.arguments.drop(1),
                     { lv, _ -> rtrk.messages.add(Ump((lv / 0x100000000).toInt(), (lv % 0x100000000).toInt())) }, null)
             else
                 rtrk.messages.add(evt)
@@ -121,7 +121,7 @@ class MmlMidi2Generator(private val source: MmlResolvedMusic) {
         }
 
         // end of sequence
-        rtrk.messages.add(Ump(umpSystemMessage(0,0xFF.toByte(), 0x2F, 0)))
+        rtrk.messages.add(Ump(UmpFactory.systemMessage(0,0xFF.toByte(), 0x2F, 0)))
 
         return rtrk
     }

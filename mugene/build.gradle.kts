@@ -13,10 +13,9 @@ buildscript {
 
 plugins {
     id("com.android.library") version "4.1.3"
-    kotlin("multiplatform") version "1.5.20"
+    kotlin("multiplatform") version "1.5.21"
     id("dev.petuska.npm.publish") version "2.0.3"
     id("maven-publish")
-    id("maven")
     id("signing")
 }
 
@@ -71,7 +70,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("dev.atsushieno:ktmidi:$ktmidi_version")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
             }
             dependsOn(commonAntlr)
         }
@@ -92,7 +91,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                implementation("androidx.startup:startup-runtime:1.0.0")
+                implementation("androidx.startup:startup-runtime:1.1.0")
             }
         }
         val androidTest by getting {
@@ -187,17 +186,6 @@ afterEvaluate {
     }
 
     publishing {
-
-        repositories {
-            maven {
-                name = "OSSRH"
-                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-                credentials {
-                    username = System.getenv("OSSRH_USERNAME")
-                    password = System.getenv("OSSRH_PASSWORD")
-                }
-            }
-        }
 
         publications.withType<MavenPublication> {
 

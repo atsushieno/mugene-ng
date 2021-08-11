@@ -22,7 +22,7 @@ plugins {
 group = "dev.atsushieno"
 version = "0.2.12"
 
-val ktmidi_version = "0.3.4"
+val ktmidi_version = "0.3.5"
 
 kotlin {
     android {

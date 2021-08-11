@@ -16,13 +16,14 @@ plugins {
     kotlin("multiplatform") version "1.5.20"
     id("dev.petuska.npm.publish") version "2.0.3"
     id("maven-publish")
+    id("maven")
     id("signing")
 }
 
 group = "dev.atsushieno"
-version = "0.2.13"
+version = "0.2.12"
 
-val ktmidi_version = "0.3.7"
+val ktmidi_version = "0.3.4"
 
 kotlin {
     android {
@@ -70,7 +71,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("dev.atsushieno:ktmidi:$ktmidi_version")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
             }
             dependsOn(commonAntlr)
         }
@@ -91,7 +92,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                implementation("androidx.startup:startup-runtime:1.1.0")
+                implementation("androidx.startup:startup-runtime:1.0.0")
             }
         }
         val androidTest by getting {

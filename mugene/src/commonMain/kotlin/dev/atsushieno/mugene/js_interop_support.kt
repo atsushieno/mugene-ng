@@ -8,17 +8,20 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 @JsExport
-@JsName("midiMusicToByteArray")
-fun midiMusicToByteArray(music: MidiMusic) : ByteArray {
-    val list = mutableListOf<Byte>()
-    SmfWriter(list).writeMusic(music)
-    return list.toByteArray()
-}
+class JsInteropSupport {
+    companion object {
+        @JsName("midiMusicToByteArray")
+        fun midiMusicToByteArray(music: MidiMusic): ByteArray {
+            val list = mutableListOf<Byte>()
+            SmfWriter(list).writeMusic(music)
+            return list.toByteArray()
+        }
 
-@JsExport
-@JsName("midi2MusicToByteArray")
-fun midi2MusicToByteArray(music: Midi2Music) : ByteArray {
-    val list = mutableListOf<Byte>()
-    music.write(list)
-    return list.toByteArray()
+        @JsName("midi2MusicToByteArray")
+        fun midi2MusicToByteArray(music: Midi2Music): ByteArray {
+            val list = mutableListOf<Byte>()
+            music.write(list)
+            return list.toByteArray()
+        }
+    }
 }

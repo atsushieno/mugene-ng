@@ -5,6 +5,7 @@ import dev.atsushieno.ktmidi.MidiMusic
 import dev.atsushieno.ktmidi.SmfWriter
 import dev.atsushieno.ktmidi.write
 
+@JsExport
 @JsName("midiMusicToByteArray")
 fun midiMusicToByteArray(music: MidiMusic) : ByteArray {
     val list = mutableListOf<Byte>()
@@ -12,6 +13,7 @@ fun midiMusicToByteArray(music: MidiMusic) : ByteArray {
     return list.toByteArray()
 }
 
+@JsExport
 @JsName("midi2MusicToByteArray")
 fun midi2MusicToByteArray(music: Midi2Music) : ByteArray {
     val list = mutableListOf<Byte>()

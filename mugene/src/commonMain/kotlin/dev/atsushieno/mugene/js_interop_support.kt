@@ -4,6 +4,8 @@ import dev.atsushieno.ktmidi.Midi2Music
 import dev.atsushieno.ktmidi.MidiMusic
 import dev.atsushieno.ktmidi.SmfWriter
 import dev.atsushieno.ktmidi.write
+import kotlin.js.JsExport
+import kotlin.js.JsName
 
 @JsExport
 @JsName("midiMusicToByteArray")

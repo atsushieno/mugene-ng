@@ -6,6 +6,7 @@ import dev.atsushieno.ktmidi.MidiMusic
 import dev.atsushieno.ktmidi.SmfWriter
 import dev.atsushieno.ktmidi.convertDeltaTimesToJRTimestamps
 import dev.atsushieno.ktmidi.write
+import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.jvm.JvmName
 
@@ -36,6 +37,7 @@ typealias MmlDiagnosticReporter = (verbosity: MmlDiagnosticVerbosity, location: 
 
 internal expect fun createDefaultCompiler(): MmlCompiler
 
+@JsExport
 abstract class MmlCompiler {
     companion object {
         fun create(): MmlCompiler = createDefaultCompiler()
@@ -65,6 +67,7 @@ abstract class MmlCompiler {
             throw MmlException(output, null)
     }
 
+    @JsName("doNotUseCompile_0")
     fun compile(skipDefaultMmlFiles: Boolean, vararg mmlParts: String): MidiMusic {
         val sources = mmlParts.map { mml -> MmlInputSource("<string>", mml) }.toTypedArray()
         return compile(skipDefaultMmlFiles, inputs = sources)
@@ -74,8 +77,10 @@ abstract class MmlCompiler {
     @JvmName("doNotUseCompile")
     fun compile(skipDefaultMmlFiles: Boolean, inputs: Array<MmlInputSource>) = generateMusic(buildSemanticTree(tokenizeInputs(false, skipDefaultMmlFiles, inputs.toList())))
 
+    @JsName("doNotUseCompile_1")
     fun compile(skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) = generateMusic(buildSemanticTree(tokenizeInputs(false, skipDefaultMmlFiles, inputs.toList())))
 
+    @JsName("doNotUseCompile_2")
     fun compile(skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, metaWriter: ((Boolean, MidiMessage, MutableList<Byte>) -> Int)?, output: MutableList<Byte>, disableRunningStatus: Boolean) {
         val music = compile(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
         val writer = SmfWriter(output).apply {
@@ -86,6 +91,7 @@ abstract class MmlCompiler {
         writer.writeMusic(music)
     }
 
+    @JsName("doNotUseCompile2_0")
     fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, vararg mmlParts: String): Midi2Music {
         val sources = mmlParts.map { mml -> MmlInputSource("<string>", mml) }.toTypedArray()
         return compile2(outputDeltaTime, skipDefaultMmlFiles, inputs = sources)
@@ -96,9 +102,11 @@ abstract class MmlCompiler {
     fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, inputs: Array<MmlInputSource>) =
         generateMusic2(outputDeltaTime, buildSemanticTree(tokenizeInputs(true, skipDefaultMmlFiles, inputs.toList())))
 
+    @JsName("doNotUseCompile2_1")
     fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) =
         generateMusic2(outputDeltaTime, buildSemanticTree(tokenizeInputs(true, skipDefaultMmlFiles, inputs.toList())))
 
+    @JsName("doNotUseCompile2_2")
     fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, output: MutableList<Byte>) {
         val music = compile2(outputDeltaTime, skipDefaultMmlFiles, inputs = inputs.toTypedArray())
         music.write(output)

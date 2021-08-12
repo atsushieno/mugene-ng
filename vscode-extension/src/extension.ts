@@ -17,7 +17,7 @@ var mugeneJSPathLegacy = mugeneDirPathLegacy + "/mugene-ng-mugene.js";
 if (fs.existsSync(module.path + "/" + mugeneJSPathLegacy)) {
 	var mugene = require(mugeneJSPathLegacy); // path under dev. environment.
 	mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(module.path + "/" + mugeneDirPathLegacy);
-} else if (fs.existsSync("../../node_modules/@dev.atsushieno/mugene/mugene-ng-mugene.js")) { // legacy from package
+} else if (fs.existsSync(module.path + "/../../node_modules/@dev.atsushieno/mugene/mugene-ng-mugene.js")) { // legacy from package
 	var mugene = require("@dev.atsushieno/mugene/mugene-ng-mugene.js");
 	mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(__dirname + "/../../node_modules/@dev.atsushieno/mugene");
 } else { // IR

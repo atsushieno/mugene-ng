@@ -10,14 +10,26 @@ import { /*workspace,*/ ExtensionContext } from 'vscode';
 //import Module = require('module');
 //import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-languageclient';
 
-var mugeneDirPath = "../../../mugene/build/publications/npm/js";
-var mugeneJSPath = mugeneDirPath + "/mugene-ng-mugene.js";
-if (fs.existsSync(module.path + "/" + mugeneJSPath)) {
-	var mugene = require(mugeneJSPath); // path under dev. environment.
-	mugene.dev.atsushieno.mugene.NodeModuleResourceStreamResolver.Companion.instance.basePath = module.path + "/" + mugeneDirPath;
-} else {
+
+// Load module dynamically, either IR or Legacy, and either dev or package
+var mugeneDirPathLegacy = "../../../mugene/build/publications/npm/js";
+var mugeneJSPathLegacy = mugeneDirPathLegacy + "/mugene-ng-mugene.js";
+if (fs.existsSync(module.path + "/" + mugeneJSPathLegacy)) {
+	var mugene = require(mugeneJSPathLegacy); // path under dev. environment.
+	mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(module.path + "/" + mugeneDirPathLegacy);
+} else if (fs.existsSync("../../node_modules/@dev.atsushieno/mugene/mugene-ng-mugene.js")) { // legacy from package
 	var mugene = require("@dev.atsushieno/mugene/mugene-ng-mugene.js");
-	mugene.dev.atsushieno.mugene.NodeModuleResourceStreamResolver.Companion.instance.basePath = __dirname + "/../../node_modules/@dev.atsushieno/mugene";
+	mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(__dirname + "/../../node_modules/@dev.atsushieno/mugene");
+} else { // IR
+	var mugeneDirPathIR = "../../../build/js/packages/mugene-ng-mugene/kotlin";
+	var mugeneJSPathIR = mugeneDirPathIR + "/mugene-ng-mugene.js";
+	if (fs.existsSync(module.path + "/" + mugeneJSPathIR)) {
+		var mugene = require(mugeneJSPathIR); // path under dev. environment.
+		mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(module.path + "/" + mugeneDirPathIR);
+	} else {
+		var mugene = require("@dev.atsushieno/mugene/kotlin/mugene-ng-mugene.js");
+		mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(__dirname + "/../../node_modules/@dev.atsushieno/mugene");
+	}
 }
 
 const mugene_scheme = "mugene";
@@ -105,7 +117,7 @@ function compileMugeneCommon (isMidi2: Boolean, uri: vscode.Uri, _ : ExtensionCo
 
 	// Collect error reports
 	var reports = new Array<vscode.Diagnostic> ();
-	var compiler = mugene.dev.atsushieno.mugene.MmlCompiler.Companion.create();
+	var compiler = mugene.dev.atsushieno.mugene.createJSCompilerForExport();
 	compiler.continueOnError = true;
 	compiler.report = function(verbosity: any, location: any, message: any) {
 		if (location.file == uri.fsPath)
@@ -117,7 +129,7 @@ function compileMugeneCommon (isMidi2: Boolean, uri: vscode.Uri, _ : ExtensionCo
 	if (isMidi2) {
 		var music = compiler.compile2(true, false, [input]);
 		if (music != null) {
-			var bytes = mugene.dev.atsushieno.mugene.JsInteropSupport.Companion.midi2MusicToByteArray(music);
+			var bytes = mugene.dev.atsushieno.mugene.midi2MusicToByteArray(music);
 	
 			var pathExt = path.extname(uri.fsPath);
 			var midiFilePath = uri.fsPath.substring(0, uri.fsPath.length - pathExt.length) + ".umpx";
@@ -127,7 +139,7 @@ function compileMugeneCommon (isMidi2: Boolean, uri: vscode.Uri, _ : ExtensionCo
 	} else {
 		var music = compiler.compile(false, [input]);
 		if (music != null) {
-			var bytes = mugene.dev.atsushieno.mugene.JsInteropSupport.Companion.midiMusicToByteArray(music);
+			var bytes = mugene.dev.atsushieno.mugene.midiMusicToByteArray(music);
 	
 			var pathExt = path.extname(uri.fsPath);
 			var midiFilePath = uri.fsPath.substring(0, uri.fsPath.length - pathExt.length) + ".mid";

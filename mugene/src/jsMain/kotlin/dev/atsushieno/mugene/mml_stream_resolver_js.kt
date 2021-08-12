@@ -21,7 +21,7 @@ open class LocalFileStreamResolver : StreamResolver() {
     override fun onGetEntity(file: String): String? {
         val abs = resolveFilePath(file)!!
         if (fs.existsSync(abs) as Boolean)
-            return fs.readFileSync(abs, options = "")?.toString()
+            return fs.readFileSync(abs, options = "")?.toString("utf-8") as String?
         return null
     }
 }
@@ -32,6 +32,11 @@ class JsDevResourceStreamResolver : LocalFileStreamResolver() {
     override fun resolveFilePath(file: String): String? {
         return super.resolveFilePath("../../../../mugene/build/processedResources/js/main/$file")
     }
+}
+
+@JsExport
+fun setNodeModuleResourceStreamResolverBasePath(basePath: String) {
+    NodeModuleResourceStreamResolver.instance.basePath = basePath
 }
 
 class NodeModuleResourceStreamResolver(var basePath: String) : LocalFileStreamResolver() {

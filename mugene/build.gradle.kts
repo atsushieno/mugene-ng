@@ -20,7 +20,7 @@ plugins {
 }
 
 group = "dev.atsushieno"
-version = "0.2.13.3"
+version = "0.2.14"
 
 val ktmidi_version = "0.3.5"
 
@@ -37,7 +37,7 @@ kotlin {
             useJUnit()
         }
     }
-    js(IR) {
+    js(LEGACY) {
         binaries.executable()
         nodejs {
             testTask {

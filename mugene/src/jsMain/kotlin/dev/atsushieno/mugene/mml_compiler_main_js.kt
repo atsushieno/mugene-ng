@@ -22,7 +22,11 @@ internal actual fun createDefaultCompiler() : MmlCompiler {
     return MmlCompilerJs().also {
         // FIXME: these are added here only to retain those methods.
         //  There should be some way to leave those functions in the generated .js code.
-        JsInteropSupport.midiMusicToByteArray(MidiMusic())
-        JsInteropSupport.midi2MusicToByteArray(Midi2Music())
+        midiMusicToByteArray(MidiMusic())
+        midi2MusicToByteArray(Midi2Music())
+        assert(NodeModuleResourceStreamResolver.instance.basePath.isNotEmpty())
     }
 }
+
+@JsExport
+fun createJSCompilerForExport() = createDefaultCompiler()

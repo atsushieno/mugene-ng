@@ -87,6 +87,7 @@
 	},
 	"dependencies": {
 		"@dev.atsushieno/mugene": "^0.2.15",
+		"@js-joda/core": "^3.2.0",
 		"rx-lite": "^4.0.8",
 		"vscode-languageclient": "^7.0.0"
 	}

@@ -5,3 +5,4 @@ mugene was originally a C# application project which contained vscode extension 
 To build the extension, run `npm install` and `npm run compile`.
 Note that F5 from vscode does not build the KotlinJS part.
 
+When you want to make changes to mugene-ng itself and verify the changes in this extension code, replace `"@dev.atsushieno.mugene: (...)"` with `"mugene": "../build/js/packages/mugene"` (though I could get this working only with `js(LEGACY)` mode specified in `build.gradle.kts`).

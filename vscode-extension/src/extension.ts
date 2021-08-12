@@ -117,7 +117,7 @@ function compileMugeneCommon (isMidi2: Boolean, uri: vscode.Uri, _ : ExtensionCo
 	if (isMidi2) {
 		var music = compiler.compile2(true, false, [input]);
 		if (music != null) {
-			var bytes = mugene.dev.atsushieno.mugene.midi2MusicToByteArray(music);
+			var bytes = mugene.dev.atsushieno.mugene.JsInteropSupport.Companion.midi2MusicToByteArray(music);
 	
 			var pathExt = path.extname(uri.fsPath);
 			var midiFilePath = uri.fsPath.substring(0, uri.fsPath.length - pathExt.length) + ".umpx";
@@ -127,7 +127,7 @@ function compileMugeneCommon (isMidi2: Boolean, uri: vscode.Uri, _ : ExtensionCo
 	} else {
 		var music = compiler.compile(false, [input]);
 		if (music != null) {
-			var bytes = mugene.dev.atsushieno.mugene.midiMusicToByteArray(music);
+			var bytes = mugene.dev.atsushieno.mugene.JsInteropSupport.Companion.midiMusicToByteArray(music);
 	
 			var pathExt = path.extname(uri.fsPath);
 			var midiFilePath = uri.fsPath.substring(0, uri.fsPath.length - pathExt.length) + ".mid";

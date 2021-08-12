@@ -1,5 +1,9 @@
 package dev.atsushieno.mugene
 
+import com.strumenta.kotlinmultiplatform.assert
+import dev.atsushieno.ktmidi.Midi2Music
+import dev.atsushieno.ktmidi.MidiMusic
+
 private external fun require(module: String): dynamic
 private val fs = if(js("typeof(process) !== 'undefined'") as Boolean) require("fs") else null
 private val Buffer = require("buffer")
@@ -14,4 +18,11 @@ class MmlCompilerJs : MmlCompilerConsole() {
         fs.writeFile(filename, Buffer.from(bytes)) { err -> println(err) }
 }
 
-internal actual fun createDefaultCompiler() : MmlCompiler = MmlCompilerJs()
+internal actual fun createDefaultCompiler() : MmlCompiler {
+    return MmlCompilerJs().also {
+        // FIXME: these are added here only to retain those methods.
+        //  There should be some way to leave those functions in the generated .js code.
+        JsInteropSupport.midiMusicToByteArray(MidiMusic())
+        JsInteropSupport.midi2MusicToByteArray(Midi2Music())
+    }
+}

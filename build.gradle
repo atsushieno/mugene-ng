@@ -4,13 +4,6 @@ allprojects {
         google()
         mavenCentral()
         maven { url "https://jitpack.io" }
-        maven {
-            url "https://maven.pkg.github.com/atsushieno/ktmidi"
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
     }
 }
 
@@ -23,21 +16,6 @@ configurations.matching { it.name != "kotlinCompilerPluginClasspath" }.all {
                 version != null && !version.contains("native-mt")
         ) {
             useVersion("$version-native-mt")
-        }
-    }
-}
-
-subprojects {
-    apply plugin: "maven-publish"
-
-    repositories {
-        maven {
-            name = "OSSRH"
-            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            credentials {
-                username = System.getenv("OSSRH_USERNAME")
-                password = System.getenv("OSSRH_PASSWORD")
-            }
         }
     }
 }

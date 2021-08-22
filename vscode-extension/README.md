@@ -7,7 +7,7 @@ Note that F5 from vscode does not build the KotlinJS part.
 
 When you want to make changes to mugene-ng itself and verify the changes in this extension code, replace `"@dev.atsushieno.mugene: (...)"` with:
 
-- `"mugene": "../build/js/packages/mugene-ng-mugene-js-legacy/"` for js(LEGACY)
-- `"mugene": "../build/js/packages/mugene-ng-mugene-js-ir"` for js(IR)
+- `"mugene": "../mugene/build/publications/npm/js/"` for js(LEGACY)
+- `"mugene": "../build/js/packages/mugene-ng-mugene"` for js(IR)
 
 (Though I could get this working only with `js(LEGACY)` mode specified in `build.gradle.kts`).

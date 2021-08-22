@@ -12,18 +12,20 @@ import { /*workspace,*/ ExtensionContext } from 'vscode';
 
 
 // Load module dynamically, either IR or Legacy, and either dev or package
-var mugeneJSPathLegacy = "../../../build/js/node_modules/mugene-ng-mugene-js-legacy/kotlin/mugene-ng-mugene-js-legacy.js";
+var mugeneDirPathLegacy = "../../../mugene/build/publications/npm/js";
+var mugeneJSPathLegacy = mugeneDirPathLegacy + "/mugene-ng-mugene.js";
 if (fs.existsSync(module.path + "/" + mugeneJSPathLegacy)) {
 	var mugene = require(mugeneJSPathLegacy); // path under dev. environment.
-	mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(module.path + "/" + "../../../mugene/build/processedResources/jsLegacy/main");
+	mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(module.path + "/" + mugeneDirPathLegacy);
 } else if (fs.existsSync(module.path + "/../../node_modules/@dev.atsushieno/mugene/mugene-ng-mugene.js")) { // legacy from package
 	var mugene = require("@dev.atsushieno/mugene/mugene-ng-mugene.js");
 	mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(__dirname + "/../../node_modules/@dev.atsushieno/mugene");
-} else { // IR - not verified!
-	var mugeneJSPathIR = "../../../build/js/node_modules/mugene-ng-mugene-js-ir/kotlin/mugene-ng-mugene-js-ir.js";
+} else { // IR
+	var mugeneDirPathIR = "../../../build/js/packages/mugene-ng-mugene/kotlin";
+	var mugeneJSPathIR = mugeneDirPathIR + "/mugene-ng-mugene.js";
 	if (fs.existsSync(module.path + "/" + mugeneJSPathIR)) {
 		var mugene = require(mugeneJSPathIR); // path under dev. environment.
-		mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(module.path + "/" + "../../../mugene/build/processedResources/jsIr/main");
+		mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(module.path + "/" + mugeneDirPathIR);
 	} else {
 		var mugene = require("@dev.atsushieno/mugene/kotlin/mugene-ng-mugene.js");
 		mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(__dirname + "/../../node_modules/@dev.atsushieno/mugene");

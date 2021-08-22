@@ -20,7 +20,7 @@ plugins {
 }
 
 group = "dev.atsushieno"
-version = "0.2.16"
+version = "0.2.15.90"
 
 val ktmidi_version = "0.3.8"
 
@@ -38,6 +38,7 @@ kotlin {
         }
     }
     js(BOTH) {
+        //binaries.executable()
         nodejs {
             testTask {
                 useKarma {
@@ -47,7 +48,7 @@ kotlin {
             }
             useCommonJs()
         }
-        browser()
+        //browser()
     }
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")

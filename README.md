@@ -15,7 +15,7 @@ The entire language is not documented well, but since it is (so far) port of ats
 At this state, you have to run a couple of Gradle tasks to build whatever you'll likely need:
 
 ```
-./gradlew mugene:generateKotlinCommonGrammarSource build mugene-console:jar pack
+./gradlew mugene:generateKotlinCommonGrammarSource build mugene-console:jar packJsNpmPublication
 ```
 
 This generates some syntax file support code, builds libs and tools, package a single jar for JVM desktop, and generate NPM artifacts that are also used by VSCodium extension (under development).

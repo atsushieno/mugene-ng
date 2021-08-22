@@ -14,7 +14,7 @@ buildscript {
 plugins {
     id("com.android.library") version "4.1.3"
     kotlin("multiplatform") version "1.5.21"
-    id("dev.petuska.npm.publish") version "2.0.3"
+    id("dev.petuska.npm.publish") version "2.0.4"
     id("maven-publish")
     id("signing")
 }
@@ -38,6 +38,8 @@ kotlin {
         }
     }
     js(BOTH) {
+        if (artifactsTaskName == "JsLegacyJar")
+            binaries.executable()
         nodejs {
             testTask {
                 useKarma {

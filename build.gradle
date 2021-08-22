@@ -28,7 +28,6 @@ configurations.matching { it.name != "kotlinCompilerPluginClasspath" }.all {
 }
 
 subprojects {
-    apply plugin: "maven-publish"
 
     repositories {
         maven {

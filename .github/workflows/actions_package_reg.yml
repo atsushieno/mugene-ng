@@ -35,7 +35,7 @@ jobs:
     - name: publish to Maven and Npm
       run: |
         ./gradlew mugene:generateKotlinCommonGrammarSource
-        ./gradlew publish mugene-console:jar
+        ./gradlew build mugene-console:jar publish
       env:
         USERNAME: atsushieno
         GITHUB_TOKEN: ${{ secrets.MAVEN_PAT }}

@@ -87,7 +87,7 @@
 	},
 	"dependencies": {
 		"@js-joda/core": "^3.2.0",
-		"@dev.atsushieno/mugene": "^0.2.16",
+		"mugene": "../build/js/packages/mugene-ng-mugene-js-legacy/",
 		"rx-lite": "^4.0.8",
 		"vscode-languageclient": "^7.0.0"
 	}

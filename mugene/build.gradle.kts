@@ -245,4 +245,4 @@ afterEvaluate {
     signing {}
 }
 
-//apply(from = "${rootDir}/publish-npm.gradle")
+apply(from = "${rootDir}/publish-npm.gradle")

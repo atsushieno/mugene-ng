@@ -46,15 +46,17 @@ A	c4d4e2  c4d4e2 // begain with spaces or tabs: the same track continues.
 | controller | MML |
 |-|-|
 | 01h (modulation) | M |
+| 05h (portamento time) | PORTATIME |
 | 06h (DTE MSB) | DTEM |
 | 07h (volume) | V |
 | 0Ah (pan) | P |
 | 0Bh (expression) | E |
 | 26h (DTE LSB) | DTEL |
 | 40h (hold, dumper pedal) | H |
-| 42h (sostenuto) | SOS |
-| 43h (soft pedal) | SOFT |
-| 44h (legato) | LEGATO |
+| 41h (portamento switch) | PORTA |
+| 42h (sostenuto switch) | SOS |
+| 43h (soft pedal switch) | SOFT |
+| 44h (legato switch) | LEGATO |
 | 45h (hold2) | HX |
 | 58h (reverb send depth) | RSD |
 | 5Dh (chorus send depth) | CSD |

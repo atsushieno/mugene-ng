@@ -184,11 +184,11 @@ Each of these will be output as SMF meta text. (text = `FFh` `01h`, copyright = 
 :format:
 - #define [source] [replacement]
 
-Replace all the [source] strings described here with [replacement]. The replacement is performed for the macro definition line and the track line, after all preprocessor instructions were read from the MML sources.
+Replace all the [source] strings described here with [replacement]. The replacement is performed for the macro definition line and the track line, after all preprocessor operators were read from the MML sources.
 
 Note that the replacement process is applied to the entire line, not just the "body" of these lines. (This is especially true for rhythm tracks.
 
-(This directive was added specifically for the purpose of specifying "rhythm tracks" to which rhythm track instructions should be applied, using the alias DRUMTRACKS, and defining rhythm track macros for only those tracks.)
+(This directive was added specifically for the purpose of specifying "rhythm tracks" to which rhythm track operators should be applied, using the alias DRUMTRACKS, and defining rhythm track macros for only those tracks.)
 
 ### #macro : macro definition
 
@@ -327,5 +327,300 @@ Indicates the end of the loop; in default-macro.mml, `]` is assigned as the oera
 ----
 
 ## Default Macro operations
+
+Now, it's time to move on to the default macro operators, which are for general users. Rephrasing - the operators described here can be customized freely by editing the `default-macro.mml` file.
+
+### CH : Specify output channel
+
+:format:
+- CH [channel]
+
+Sets the specified channel as the target of MIDI operator output for the current track. By default, channel `0` is assigned; valid channels are `0`..`15` in MIDI 1.0, and `0`..`255` in MIDI 2.0.
+
+### DEBUG : debug output
+
+:format:
+- DEBUG [string]
+
+Outputs the argument as a string. This is just an alias for the primitive operator `__PRINT`.
+
+### NOFF : Note off
+
+:format:
+- NOFF [key],[vel]
+
+Turns off notes of the specified scale [key] and velocity [vel]. Both are specified as numbers between 0 and 127. All scale commands use this command; MIDI command `8xh` will be output.
+
+### NON : Note on
+
+:format:
+- NON [key],[vel]
+
+Turns on notes of the specified scale [key] and velocity [vel]. Both are specified as numbers between 0 and 127. All scale commands use this command, which outputs the MIDI command `9xh`.
+
+
+### PAF : Polyphonic Key Pressure (Aftertouch)
+
+:format:
+- PAF [key],[vel]
+
+Outputs an aftertouch with a note of the specified scale [key] and velocity [vel]. MIDI operator `Axh` is output.
+
+### CC : Control Change
+
+:format:
+- CC [opcode],[val]
+
+Outputs a control change with the specified operator address [opcode] and value [val]. MIDI operator `Bxh` is output.
+
+### PROGRAM : Program Change
+
+:format:
+- PROGRAM [val]
+
+Specifies a tone by its tone number, which is a number between 0 and 127. Normally the `@` operator is used.
+
+### CAF : Channel Key Pressure (Aftertouch)
+
+:format:
+- CAF [val]
+
+Outputs the aftertouch of the entire channel at the specified value. 0 to 127. MIDI operator `Dxh` is output.
+
+### PITCH : Pitch Bend
+
+:format:
+- PITCH [val]
+
+Outputs a pitch bend value with the specified value, which can be a number between 0 and 16383. 8192 is considered as the center.
+
+MIDI operator is `Exh`. The PITCH operator specifies a value close to the raw SMF data as it is, which is not likely useful. On the other hand, with the `B` operator, you can specify a more intuitive value using a negative value.
+
+### l : Specify default note length
+
+:format:
+- l [length]
+
+The length specified in the argument will be used as the default value for the note-on and note-off operations when the length is omitted in subsequent occurrences.
+
+### K : Transpose
+
+:format:
+- K[val]
+- K[c..b]+
+- K[c..b]-
+- K[c..b]=
+
+This command transposes the keys of the note operation by the value specified in the argument. Any positive/negative number can be specified. However, the valid value range in the final note operation is 0 to 127.
+
+If a key is specified like `Kc`, `Kd`, ... , then only the value of the specific key will be +1 or -1. The values changed by `K[c..b]+` and `K[c..b]-` can be reset to 0 using the `K[c..b]=` operator (e.g. `Kg=`).
+
+### v : Velocity absolute specification
+
+:format:
+- v [val]
+
+Sets the specified value as a velocity value (absolute). This value is used as the default velocity value for note-on and note-off operators (individual velocities can also be specified for note operators). Valid values are 0 to 127.
+
+### ( ) : Velocity relative specification
+
+:format:
+- ) [val=4]
+- ( [val=4]
+
+Sets the specified value by adding or subtracting it from the current velocity value (relative specification). The resulting value works the same as the `v` operator.
+
+`)` is addition, and `(` is subtraction. If you don't like their direction i.e. you prefer `(` for additive and `)` for subtractive, then you might want to modify `default-macro.mml` to reverse the semantics.
+
+The argument can be omitted, then the value is taken from the default velocity sense, which is `4` by default. This value `4` can be changed using the VELOCITY_SENSE directive.
+
+### VELOCITY_SENSE : Specify Velocity relative default value
+
+:format:
+- VELOCITY_SENSE [val]
+
+Changes the default value (of `4`) in the velocity relative specification operator `(` `)` to an arbitrary number.
+
+### E : Expression absolute specification
+
+:format:
+- E [val]
+
+Sets the specified value as the expression value (absolute specification). This operator outputs `CC #0B`, and therefore applies to all note operators on the target channel. Valid values are 0 to 127.
+
+### E+ E- : Expression relative specification
+
+:format:
+- E+ [val]
+- E- [val]
+
+Sets the specified value by adding or subtracting from the current expression value (relative specification). The semantics of the value is the same as that of the `v` operator. The argument cannot be omitted, though (there is nothing like `EXPRESSION_SENSE`).
+
+### t TEMPO: absolute tempo specification
+
+:format:
+- t [val]
+- TEMPO [val]
+
+Specifies the tempo value in terms of the number of quarter notes in a minute.
+
+Tempo is information that is shared by the entire song across tracks. The value of a variable, on the other hand, is only stored on a track-by-track basis (the order in which MML lines are compiled is not fixed, so it cannot be specified on multiple tracks). In many DAWs, all tempo operators are placed on track 0, "master track", or "tempo track", which is a good idea to follow on MMLs too.
+
+### t+ t- : relative tempo specification
+
+:format:
+- t+ [val]
+- t- [val]
+
+Sets the specified value by adding or subtracting it from the current tempo value (relative specification). The semntics of the value is the same as that of the `t` operator. The argument cannot be omitted.
+
+### M : absolute modulation specification
+
+:format:
+- M [val]
+
+Sets the specified value as a modulation value (absolute specification). This operator outputs `CC #01`. Valid values are 0 to 127.
+
+### M+ M- : relative modulation specification
+
+:format:
+- M+ [val]
+- M- [val]
+
+Sets the specified value by adding or subtracting it from the current modulation value (relative specification). The semantics of the value is the same as that of the `M` operator. The argument cannot be omitted.
+
+### V : absolute volume specification
+
+:format:
+- V [val]
+
+Sets the specified value as the volume value (absolute specification). This operator outputs `CC #07`. Valid values are 0 to 127.
+
+### V+ V- : relative volume specification
+
+:format:
+- V+ [val]
+- V- [val]
+
+Sets the specified value by adding or subtracting it from the current volume value (relative specification). The semantics of the value is the same as that of the `V` command. The argument cannot be omitted.
+
+### P PAN : absolute panpot specification
+
+:format:
+- P [val]
+- PAN [val]
+
+Sets the specified value as the panpot value (absolute specification). This operator outputs `CC #0A`. Valid values are 0 to 127. There is no difference between `P` and `PAN`.
+
+### P+ P- : relative panpot specification
+
+:format:
+- P+ [val]
+- PAN+ [val]
+- P- [val]
+- PAN- [val]
+
+Sets the specified value by adding or subtracting it from the current panpot value (relative specification). The semantics of the value is the same as that of the `P` command; `P+` and `PAN+`, and `P-` and `PAN-` are synonymous.
+
+### H : absolute hold (damper pedal) specification
+
+:format:
+- H [val]
+
+Sets the specified value as the hold (damper pedal) value (absolute specification). This operator outputs `CC #40`. Valid values are 0 to 127.
+
+### @ : Program/Bank Specification
+
+:format:
+- @ [prog],[bankmsb=0],[banklsb=0]
+
+Specifies the program change and bank select together. The values of bank select can be omitted (they will be 0). The valid values are 0 to 127 respectively. For bank select, `CC0` and `CC#20` are used.
+
+### BEND, B : absolute pitch bend 
+
+:format:
+- B [val]
+- BEND [val]
+
+Sets the specified value as a pitch bend value (absolute). This shifts the value range of the `PITCH` operator, which can only be specified as a positive value, to `-8192` to `8191`.
+
+### B+ B- : relative pitch bend
+
+:format:
+- B+ [val]
+- B- [val]
+
+Sets the specified value by adding or subtracting it from the current pitch bend value (relative specification). The semantics of the value is the same as that of the `B` command. The argument cannot be omitted.
+
+### POLTATIME : portamento time specification
+
+:format:
+- POLTATIME [val]
+
+Specifies the rate of change of the portamento pitch. This operator outputs `CC #05`.
+
+### DTE : Data Input (Common Control)
+
+:format:
+- DTE [msb],[lsb]
+
+DTE (Data Entry). This operator outputs `CC #06` and `CC #26`.
+
+### PORTA : portamento switch
+
+:format:
+- PORTA [val]
+
+Sets the portamento switch (on: >= 64, off: <= 63). This operator outputs `CC #41`.
+
+### SOS : Sostenuto switch
+
+:format:
+- SOS [val]
+
+Sets sostenuto switch (on: >= 64, off: <= 63). This operator outputs `CC #42`.
+
+### SOFT : Soft Pedal switch
+
+:format:
+- SOFT [val]
+
+Sets the soft pedal switch  (on: >= 64, off: <= 63). This operator outputs `CC #43`.
+
+### LEGATO : Legato switch
+
+:format:
+- LEGATO [val]
+
+Sets the legato foot switch (on: >= 64, off: <= 63). This operator outputs `CC #54`.
+
+### RSD : Reverb Send Depth
+
+:format:
+- RSD [val]
+- RSD+ [val]
+- RSD- [val]
+
+Outputs `CC #5B`. Many instruments use this to specify the reverb send depth. It can be relative with `+` or `-`.
+
+### CSD : Chorus Send Depth
+
+:format:
+- CSD [val].
+- CSD+ [val]
+- CSD- [val]
+
+Outputs `CC #5D`. Many instruments use this to specify the chorus send depth. It can be relative with `+` or `-`.
+
+### DSD : Delay Send Depth
+
+:format:
+- DSD [val]
+- DSD+ [val]
+- DSD- [val]
+
+Output `CC #5E`. Many instruments use this to specify the delay send depth. It can be relative with `+` or `-`.
+
+----
 
 (TODO)

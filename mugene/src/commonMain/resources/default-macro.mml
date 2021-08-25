@@ -129,6 +129,8 @@
 #macro DTEM val:number { CC #06,$val }
 #macro DTEL val:number { CC #26,$val }
 #macro DTE msb:number,lsb:number { DTEM$msb DTEL$lsb }
+#macro PORTATIME val:number { CC #05,$val }
+#macro PORTA val:number { CC #41,$val } // portamento switch
 #macro SOS val:number { CC#42,$val } // sostenuto
 #macro SOFT val:number { CC#43,$val } // soft pedal
 #macro LEGATO val:number { CC#44,$val }

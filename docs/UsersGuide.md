@@ -214,7 +214,117 @@ Relative file paths are interpreted as relative to the compiler executable, or r
 
 ## Primitive Operations
 
-(TODO)
+Primitive operations would be irrelevant to most of mugene users so this section is almost safe to skip.
+
+Although, this section contains many basic oerations for writing advanced macro oerations such as variable assignment, reference, and conditional branching. In other words, the oerations described here are intended for those who write advanced macro oerations.
+
+### __PRINT : Debug output
+
+:format:
+- __PRINT [identifier]
+
+Outputs a variable that was set with the name [identifier] on the console at MML compile time. This can be used as a diagnostic (debugging) output for MML compilation.
+
+### __LET : Variable Assignment
+
+:format:
+- __LET [identifier], [value]
+
+Set a variable with the name of [identifier] and the value of [value]. The set variable can be referenced by the "reference vairable operator" (`$`).
+
+### __STORE : Add buffer
+
+:format:
+- __STORE [identifier], [string], ...
+
+Adds all string values specified in the second and subsequent arguments to the buffer variable declared with the name [identifier] (or declare a new one if there is none).
+
+(This is a special primitive oeration provided for Vocaloid VSQ file support in the past.)
+
+### __APPLY : macro expansion
+
+:format:
+- __APPLY [macro_string], arguments...
+
+Parses the string specified by [macro_string] as a macro, and recursively expands it on the fly as a macro call, using the second and subsequent arguments as arguments to that macro oeration call. This `macro_string` does not have to be a string constant.
+
+Use this in combination with the "conditional branch operator" (`?`) for flexible conditional branching of operations.
+
+### __MIDI : MIDI output
+
+:format:
+- __MIDI arguments ...
+
+Outputs all arguments as a string of (8-bit) **bytes**. This is basically a number, but note that all of them are only output in the range of one byte.
+
+### __MIDI2 : MIDI 2.0 output
+
+:format:
+- __MIDI2 arguments ...
+
+Outputs all arguments as a string of **32-bit integers**. The difference from `__MIDI` operation is the type.
+
+### __MIDI_META : Output MIDI meta-information
+
+:format:
+- __MIDI_META arguments ...
+
+Outputs MIDI meta events. Outputs `FFh` first, followed by the arguments as byte stream. If it is a string, it will be converted from string to byte array using UTF-8.
+
+### __ON_MIDI_NOTE_OFF : Note off notification
+
+:format:
+- __ON_MIDI_NOTE_OFF
+
+Not for general use - this is an oeration added as a special processing: in `default-macro.mml`, it is called when there is a note-off in a note operation, in order to treat keys with a note of zero-length as a chord construct. This makes it possible to treat e.g. `c0e0g1` as a C-major chord (without this oeration, c0 and e0 would be effectively silent).
+
+I don't see any reason to dare to disable such chord notation, but if you want to, you can edit `default-macro.mml` so that `__ON_MIDI_NOTE_OFF` is not called (or probably easier, `#define __ON_MIDI_NOTE_OFF  // empty`).
+
+### __LOOP_BEGIN : Loop start
+
+:format:
+- __LOOP_BEGIN
+
+Indicates the beginning of a loop. In `default-macro.mml`, `[` is assigned as this oeration.
+
+### __LOOP_BREAK : Loop interruption
+
+:format:
+- __LOOP_BREAK arguments ...
+
+In `default-macro.mml`, `:` and `/` are assigned to this oeration (no difference between those two character, just two common historical operator for loop-break).
+
+The argument specifies at which loop the context block (from this operation until next loop-break or loop-end oeration) will be performed. The argument can be either omitted, or multiple values can be specified. If the argument is omitted, it will be applied if current loop iteration count matches no other loop block within the current loop.
+
+For example:
+
+```
+1    [ A : B :1,3 C :2 D ]5
+```
+
+the content will be `A C A D A C A B A`. `:` before `B` has no specified value, so `B` will be inserted for the 4th loop (which was not indicated by other `:`-split blocks), and `C` will be applied in the 1st. and 3rd. loops.
+
+### __LOOP_END : End of loop
+
+Indicates the end of the loop; in default-macro.mml, `]` is assigned as the oeration and is generally used.
+
+### __SAVE_OPER_BEGIN : Start saving oerations temporarily
+
+(This is an internal oeration for vocaloid support, so it is not explained here.
+
+### __SAVE_OPER_END : End of temporary oeration saving
+
+(This is an internal oeration for vocaloid support, so it is not explained here.)
+
+### __SAVE_OPER_END : End of temporary saving
+
+(This is an internal oeration for vocaloid support, so it is not explained here.)
+
+### __RESTORE_OPER : Expand the temporary save oeration
+
+(This is an internal oeration for vocaloid support, so it is not explained here.)
+
+----
 
 ## Default Macro operations
 

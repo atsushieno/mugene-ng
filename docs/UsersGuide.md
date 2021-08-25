@@ -1,5 +1,3 @@
-(This document is mostly done in Japanese, but there are a few parts that are not yet explained, and only first part is translated to English so far. )
-
 # mugene Users Guide
 
 ## Introduction

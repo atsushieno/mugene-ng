@@ -621,6 +621,189 @@ Outputs `CC #5D`. Many instruments use this to specify the chorus send depth. It
 
 Output `CC #5E`. Many instruments use this to specify the delay send depth. It can be relative with `+` or `-`.
 
-----
+### NRPN : NRRN specification
 
-(TODO)
+:format:
+- NRPN [msb],[lsb]
+
+Outputs an NRPN. (`CC#63`, `CC#62`)
+
+### RPN : Specify RRN
+
+:format:
+- RPN [msb],[lsb]
+
+Outputs an RPN. (`CC#65`, `CC#64`)
+
+### TEXT : Text meta-event specification
+
+:format:
+- TEXT [string]
+
+Outputs a meta text event. (`#FF`, `#01`)
+
+### COPYRIGHT : Copyright notice meta-event specification
+
+:format:
+- COPYRIGHT [string]
+
+Outputs a copyright notice meta event. (`#FF`, `#02`)
+
+### TRACKNAME : Track name meta event specification
+
+:format:
+- TRACKNAME [string]
+
+Outputs a track name meta event. (`#FF`, `#03`)
+
+### INSTRUMENTNAME : Instrument name meta-event specification
+
+:format:
+- INSTRUMENTNAME [string]
+
+Outputs an instrument name meta event. (`#FF`, `#04`)
+
+### LYRIC : lyrics meta event specification
+
+:format:
+- LYRIC [string]
+
+Outputs a lyric meta event. (`#FF`, `#05`)
+
+### MARKER : Marker meta event specification
+
+:format:
+- MARKER [string]
+
+Outputs a marker meta event. (`#FF`, `#06`)
+
+### CUE : Cue meta event specification
+
+:format:
+- CUE [string]
+
+Outputs a cue meta event. (`#FF`, `#07`)
+
+### BEAT : beat specification
+
+:format:
+- BEAT [num],[denom]
+
+Outputs a time signature meta event. Specify the numerator in [num] and the denominator in [denom]. (`#FF`, `#58`)
+
+Note that notation with `/` (like `BEAT 3/4`) will not be recognized (the mugene specification does not specifically recognize such a numerical specification, and a single number cannot distinguish between `3/4` and `6/8`).
+
+### PITCH_BEND_SENSITIVITY : Pitch bend sensitivity specification
+
+:format:
+- PITCH_BEND_SENSITIVITY [val]
+
+Specifies the pitch bend sensitivity (sensitivity). This command outputs `RPN0,0` and `DTE`.
+
+
+### GATE_DENOM : ratio-based gate time denominator
+
+:format:
+- GATE_DENOM [val]
+
+Sets the denominator for the ratio-based gate time specification. If not specified, the value is `8`.
+
+To calculate gate time, standard macros use `GATE_DENOM`, `Q`, and `q`. If there is a note operation with `n (steps)`, the actual gate (note) time for that note will be `n` * `Q` / `GATE_DENOM` - `q`.
+
+The value of `Q` (ratio-based gate time specification) does not follow changes in `GATE_DENOM`, so if you change `GATE_DENOM`, set `Q` as well (otherwise `Q7` ... `GATE_DENOM16` will result in , for example, 7/16 length ratio, instead of 14/16).
+
+### Q : ratio-based gate time
+
+:format:
+- Q [val]
+
+Sets the numerator in the ratio-based gate time specification. It can be greater than `GATE_DENOM`. The default value is `8`.
+
+### q : absolute gate time
+
+:format:
+- q [val]
+
+Sets the absolute gate time value. The value set here is subtracted in steps from the calculated value from the ratio-based gate time.
+
+### o : absolute octave
+
+:format:
+- o [val]
+
+Specifies the octave to be used in the note operation (`c`..`b`). For each operation, o * 12 + the individual key value is passed to the NON and NOFF operations as the key value.
+
+The key value will be 0-127, so the standard value of o will be 0-10.
+
+### > < : octave relative specification
+
+:format:
+- > [val]
+- < [val]
+
+Moves the octave up or down one octave. `>` is up, `<` is down.
+
+### n : Direct numerical pronunciation (note on, note off)
+
+:format:
+- n [key],[step],[gate],[vel=v],[offvel=0]
+
+Emits a pair of Note On and Note Off operations with the specified [key] (number). A note-on for the specified key is emitted and lasts during the note length specified by [gate], and then the note-off is emitted. This operation will also wait until the next operation for the length of the note specified by [step]. The value of [vel] is used for the velocity of the note on, and [offvel] for the velocity of the note off.
+
+The values after [key] can be omitted. If [step] is omitted, the value will be the default note length specified by the `l` operation. If [gate] is omitted, the value is calculated based on the value of [step] and the values specified by the `GATE_DENOM`, `Q`, and `q` operations. If [vel] is omitted, the value will be the default velocity specified by the `v` operation. The default value of [offvel] is `0`.
+
+### c d e f g a b : Pronunciation (note on, note off)
+
+:format:
+- [c d e f g a b][+ - =] [step],[gate],[vel=v],[offvel=0].
+
+This is the most common pair of note-on and note-off operations. It specifies a note of do-re-mi-fa-so-ra-si. The mapping between the keys and operations is as follows (matches the German notation):
+
+- c : Do
+- d : Re
+- e : Mi
+- f : Fa
+- g : So
+- a : La
+- b : Si
+
+These characters can be followed (without spaces) by a `+` to make them sharp, a `-` to make them flat, or an `=` to make them natural. The actual key value is added to the value of the `K` and `Kc`..`Kb` operations. However, the `Kc`..`Kb` values will not be added if Natural (`=`) is specified (which gives special meaning to the `Kc`..`Kb` based key specification).
+
+### r : rest
+
+:format:
+- r [length]
+
+Rest for the specified [length], then do nothing and move on i.e. NO-OP.
+
+### [ ... : / ... ] : Loop
+
+:format:
+- [ ... ] [number]
+
+Loops can be written as aliases for the primitive operations __LOOP_BEGIN, __LOOP_BREAK, and __LOOP_END (corresponding to `[`, `:` or `/`, and `]` respectively). See the description of the primitive operations for details of the loop behavior.
+
+### GM_SYSTEM_ON : GM system on
+
+:format:
+- GM_SYSTEM_ON
+
+Sends "GM System On" common system exclusive message.
+
+### XG_RESET : XG Reset
+
+:format:
+- XG_RESET
+
+Sends "XG reset" common system exclusive message.
+
+
+## Additional macro sets
+
+There are also `nrpn-gs-xg.mml`, `gs-sysex.mml` and `drum-part.mml` additional utility macros for advanced composition using Roland GS modules or YAMAHA XG modules.
+
+## MIDI 2.0 support
+
+When mugene runs with MIDI 2.0 switch enabled, then `default-macro2.mml` is used instead of `default-macro.mml`. To avoid unnecessary MML difference, I leave most of the operators identical - otherwise the value ranges will be quite different e.g. there will be almost no audible notes when velocity assignments are left in MIDI1 values while the actual value range goes 0..65535, which does not make sense.
+
+But channels are indeed expanded to 0..255 so it will make rich composition possible.

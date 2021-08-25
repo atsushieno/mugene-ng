@@ -15,4 +15,4 @@ pluginManagement {
 }
 
 rootProject.name = "mugene-ng"
-include("mugene", "mugene-console")
+include("mugene", "mugene-console", "mugene-console-jvm")

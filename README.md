@@ -15,17 +15,17 @@ The entire language is not documented well, but since it is (so far) port of ats
 At this state, you have to run a couple of Gradle tasks to build whatever you'll likely need:
 
 ```
-./gradlew mugene:generateKotlinCommonGrammarSource build mugene-console:jar packJsNpmPublication
+./gradlew mugene:generateKotlinCommonGrammarSource build mugene-console-jvm:jar packJsNpmPublication
 ```
 
 This generates some syntax file support code, builds libs and tools, package a single jar for JVM desktop, and generate NPM artifacts that are also used by VSCodium extension (under development).
 
 ## Using command-line compiler
 
-Once you are done with `mugene-console;jar` Gradle build task, there will be `mugene-console/build/libs/mugene*.jar` (depends on version name). You can then run it to compile mugene MML files like:
+Once you are done with `mugene-console-jvm;jar` Gradle build task, there will be `mugene-console-jvm/build/libs/mugene*.jar` (depends on version name). You can then run it to compile mugene MML files like:
 
 ```
-java -jar mugene-console/build/libs/mugene-console-0.1.0-SNAPSHOT.jar samples/escape.mugene 
+java -jar mugene-console/build/libs/mugene-console-jvm-(version)-SNAPSHOT.jar samples/escape.mugene 
 ```
 
 ## Limitations

@@ -27,6 +27,56 @@ A	c4d4e2  c4d4e2 // begain with spaces or tabs: the same track continues.
 	] 4 // repeats 4 times
 ```
 
+## MIDI channel messages
+
+| status code | MML | 
+|-|-|
+| 80h, 90h (note on/off) | c d e f g a b n |
+| A0h (poly pressure) | PAF |
+| B0h (control change) | CC |
+| C0h (program change) | @ |
+| D0h (channel pressure) | CAF |
+| E0h (pitch bend) | B |
+| F0h (system exclusive) | __MIDI {#F0, ..., #F7 } |
+| FFh (meta event) | __MIDI_META { ... } |
+
+
+## Control changes
+
+| controller | MML |
+|-|-|
+| 01h (modulation) | M |
+| 06h (DTE MSB) | DTEM |
+| 07h (volume) | V |
+| 0Ah (pan) | P |
+| 0Bh (expression) | E |
+| 26h (DTE LSB) | DTEL |
+| 40h (hold, dumper pedal) | H |
+| 42h (sostenuto) | SOS |
+| 43h (soft pedal) | SOFT |
+| 44h (legato) | LEGATO |
+| 45h (hold2) | HX |
+| 58h (reverb send depth) | RSD |
+| 5Dh (chorus send depth) | CSD |
+| 5Eh (delay send depth... typically) | DSD |
+| 62h (NRPN LSB) | NRPNL |
+| 63h (NRPN MSB) | NRPNM |
+| 64h (RPN LSB) | RPNL |
+| 65h (RPN MSB) | RPNM |
+
+
+## Spectra operators
+
+| base operator | one shot | triangle |
+|-|-|-|
+| P | P_ | Pt |
+| V | V_ | Vt |
+| E | E_ | Et |
+| t | t_ | tt |
+| M | M_ | Mt |
+| B | B_ | Bt |
+
+
 ## General MIDI cheat sheet
 
 ### Program numbers

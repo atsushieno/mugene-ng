@@ -1,12 +1,10 @@
 # Technical choices that I made into mugene
 
-## Why MML?
+## Why MML
 
-MML is an encient way to compose music that was popular in 20th century. In 21st. century we typically use DAWs, but some people (e.g. @atsushieno) still prefer using MML.
+MML is an encient way to compose music that was popular in 20th century. In 21st. century we typically use DAWs, but some people (e.g. @atsushieno) still prefer using MML. It is mostly because text files are handy, but in 21st. century we have other choices like Live Coding languages, so probably I should put more rationale on the language in the following sections.
 
-It is mostly because text files are handy, but in 21st. century we have other choices like Live Coding languages, so probably I should put more rationale on the language.
-
-Also, MML is not a specific syntax with solid definition. Every MML compiler has its own language with own principles (historically it is due to output music binary target). While mugene's target format is very common Standard Midi File, it is not exceptional here.
+Also, MML is not a specific syntax with solid definition. Every MML compiler has its own language with own principles (historically it is due to output music binary target). While mugene's target format is very common Standard Midi File, it is not exceptional here, and I made some design choices over various possibilities that are probably worth documenting.
 
 ## MML syntax characteristics, or "peculiarity"
 
@@ -36,7 +34,7 @@ Any user-level macros can be flexibly defined. In mugene syntax, phrase pattern 
 
 Regarding macro definition flexibility, mugene's tokenization strategy is "match longest". Some MML syntaxes have different strategy e.g. their macros must be "more than one character" "begin with uppercase" etc. mugene has no such limitation.
 
-Historically, preprocessing MML should not be very costful, but in 21st. century it is almost non-issue.
+Historically, preprocessing MML should not be very costful and looking up match-longest with no limitation usually comes with cost. But in 21st. century it is almost non-issue.
 
 ## Chords
 

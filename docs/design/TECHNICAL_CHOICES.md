@@ -24,7 +24,7 @@ On the other hand, those language characteristics impose less programmability on
 
 ## Partially flexible syntax
 
-mugene MML syntax is designed to be flexible enough to customize syntax if you prefer, like exchanging "<" and ">" for relative octave specification (it is like a religious difference from where people grew up, like N88-BASIC, Z-MUSIC, MXDRV, MUAP 98, PMD, FMP, etc.). You can simply `#define` macros for them.
+mugene MML syntax is designed to be flexible enough to customize syntax if you prefer, like exchanging "<" and ">" for relative octave specification (it is like a religious difference from where people grew up, like N88-BASIC, Z-MUSIC, MXDRV, MUAP 98, PMD, FMP, etc.). You can simply use `#macro` (or often `#define`) for them.
 
 It is, however, still not *that* flexible to fully customize the syntax. For example, we use `{` and `}` in macro definition and they cannot be altered. `#` is used to identify hexadecimal numbers from decimal numbers. `[` and `]` are used as loop initiator and terminator and cannot be altered.
 

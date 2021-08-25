@@ -2,13 +2,13 @@
 
 ## What is this?
 
-This is the successor of my [mugene](https://github.com/atsushieno/mugene/) [Music Macro Language](https://en.wikipedia.org/wiki/Music_Macro_Language) compiler to Kotlin (from C#), so that I can go forward and improve the entire ecosystem and toolchains.
+This is the successor of my [mugene](https://github.com/atsushieno/mugene/) [Music Macro Language](https://en.wikipedia.org/wiki/Music_Macro_Language) compiler to Kotlin Multiplatform (from C#), so that I can go forward and improve the entire ecosystem and toolchains. Now it can be used as a JVM library, native library, or a JavaScript library, as well as standalone native compiler or a JVM standalone jar.
 
-The new version in Kotlin has preliminary support for MIDI 2.0 UMP stream format beyond what C# version did. Any new features will be developer in this project.
+The new version in Kotlin has preliminary support for MIDI 2.0 UMP stream format beyond the past C# version did. Any new features will be developed only in this project.
 
-Everything, including the project name, is subject to change at this moment, so if you want to use it you might want to use some revisions off of the `main` branch.
+Everything, including the project name, is subject to change at this moment.
 
-The entire language is not documented well, but since it is (so far) port of atsushieno/mugene, those docs are useful.
+The entire language is partly documented as [docs/UsersGuide.md](./docs/UsersGuide.md).
 
 ## Building
 
@@ -22,13 +22,9 @@ This generates some syntax file support code, builds libs and tools, package a s
 
 ## Using command-line compiler
 
-Once you are done with `mugene-console-jvm;jar` Gradle build task, there will be `mugene-console-jvm/build/libs/mugene*.jar` (depends on version name). You can then run it to compile mugene MML files like:
+Once you are done with `build` Gradle build task, there will be `mugene-console/build/bin/native/debugExecutable/mugene-console.kexe` (or `.exe` on Windows). You can then run it to compile mugene MML files like: `(the/path/to/)mugene-console.kexe samples/escape.mugene`. For the complete list of command line arguments, just run this executable without arguments.
 
-```
-java -jar mugene-console/build/libs/mugene-console-jvm-(version)-SNAPSHOT.jar samples/escape.mugene 
-```
-
-## Limitations
+## mugene-ng limitations
 
 When porting from C#, I disabled `__STORE_FORMAT` primitive operation (because it had C# `String.Format()` as its premise), which effectively killed Vocaloid2 VSQ support and around the feature. Vocaloid2 is too ancient anyways, so there wouldn't be significant drawback.
 
@@ -36,7 +32,6 @@ When porting from C#, I disabled `__STORE_FORMAT` primitive operation (because i
 
 mugene-ng is distributed under the MIT License.
 
-mugene-ng depends on [my fork](https://github.com/atsushieno/antlr-kotlin/tree/main) of [Strumenta/antlr-kotliin](https://github.com/Strumenta/antlr-kotlin) which is distributed under the Apache 2.0 License.
+mugene-ng depends on [my fork](https://github.com/atsushieno/antlr-kotlin/tree/main) of [Strumenta/antlr-kotliin](https://github.com/Strumenta/antlr-kotlin) which is distributed under the Apache 2.0 License. (It will go back to the original version once my contributed change is released in their new version.)
 
 mugene-ng depends on [atsushieno/ktmidi](https://github.com/atsushieno/ktmidi) which is distributed under the MIT License.
-

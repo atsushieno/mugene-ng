@@ -156,4 +156,14 @@ class MmlCompilerTest {
         val music2 = Midi2Music().apply { read (midi2Bytes.toList()) }
         assertEquals(72, music2.getTotalTicks(), "midi2 total ticks")
     }
+
+    @Test
+    fun escapedNameCharExtension() {
+        val mml = """
+#macro M\1 { c }
+#macro M\0 { c }
+#macro M\$ { c }
+#macro M\# { c }"""
+        MmlTestUtility.testCompile("midi1", mml)
+    }
 }

@@ -405,7 +405,7 @@ class MmlInputSourceReader(private val reporter: MmlDiagnosticReporter, private 
         if (result.lexer.isWhitespace(line.peekChar()))
             result.lexer.skipWhitespaces(true)
         else {
-            if (result.lexer.isIdentifier(line.peekChar(), true)) {
+            if (result.lexer.isIdentifier(line, true)) {
                 section = result.lexer.readNewIdentifier()
                 result.lexer.skipWhitespaces(false)
             }
@@ -656,14 +656,15 @@ abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal v
         }.toList()
     }
 
-    open fun isIdentifier(c: Int, isStartChar: Boolean): Boolean {
+    open fun isIdentifier(line: MmlLine, isStartChar: Boolean, isEscapedContinue: Boolean = false): Boolean {
+        val c = line.peekChar()
         if (c < 0)
             return false
         if (isWhitespace(c))
             return false
 
         if (isNumber(c))
-            return false
+            return isEscapedContinue
 
         when (c.toChar()) {
             '\r',
@@ -674,21 +675,26 @@ abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal v
             '-', // subtraction
             '^', // length-addition
             '#' -> // hex number prefix / preprocessor directive at line head
-                return !isStartChar // could be part of identifier
+                return !isStartChar || isEscapedContinue // could be part of identifier
             ':', // variable argument-type separator / loop break
             '/', // division / loop break
             '%', // modulo / length by step
             '(', // parenthesized expr / velocity down
             ')' -> // parenthesized expr / velocity up
-                return isStartChar // valid only as head character
+                return isStartChar || isEscapedContinue // valid only as head character
+            '\\' -> { // escape sequence marker
+                if (isEscapedContinue)
+                    return true
+                line.readChar()
+                return isIdentifier(line, false, true)
+            }
             '*', // multiplication
             '$', // variable reference
             ',', // identifier separator
             '"', // string quotation
             '{', // macro body start
-            '}', // macro body end
-            '\\' -> // escape sequence marker
-                return false
+            '}' -> // macro body end
+                return isEscapedContinue
         }
 
         // everything else is regarded as a valid identifier
@@ -697,9 +703,10 @@ abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal v
 
     fun readNewIdentifier(): String {
         val start = line.location.linePosition
-        if (!isIdentifier(line.readChar(), true))
+        if (!isIdentifier(line, true))
             throw lexerError("Identifier character is expected")
-        while (isIdentifier(line.peekChar(), false))
+        line.readChar()
+        while (isIdentifier(line, false))
             line.readChar()
         return line.text.substring(start, line.location.linePosition)
     }
@@ -926,21 +933,20 @@ class MmlMatchLongestLexer(reporter: MmlDiagnosticReporter, resolver: StreamReso
         // In such case, read up until the input comes to non-identifier.
         // If it is not a valid identifier input, then return null.
         if (bufferPos == 0) {
-            if (!isIdentifier(line.peekChar(), true))
+            if (!isIdentifier(line, true))
                 return null // not an identifier
             buffer[bufferPos++] = line.readChar().toChar()
         }
 
         while (true) {
-            val ch = line.peekChar()
-            if (!isIdentifier(ch, false))
+            if (!isIdentifier(line, false))
                 break
             if (buffer.size == bufferPos) {
                 val newbuf = Array(buffer.size * 2) { _ -> 0.toChar() }
                 buffer.copyInto(newbuf, 0, buffer.size)
                 buffer = newbuf
             }
-            buffer[bufferPos++] = ch.toChar()
+            buffer[bufferPos++] = line.peekChar().toChar()
             line.readChar()
         }
         return buffer.toCharArray().concatToString(0, 0 + bufferPos)

@@ -82,6 +82,7 @@ The grammatical restrictions of identifier names are as follows:
 - Characters that cannot be used at the beginning: `-` `+` `^` `?`
 - Characters that can only be used at the beginning: `/` `:` `(` `)`
 
+An exception to this rule is that `\` can be used as an escape character to accept those characters above, as well as '\' itself. Note that whitespaces are still not allowed.
 
 ### Number, Length, Variable Types
 

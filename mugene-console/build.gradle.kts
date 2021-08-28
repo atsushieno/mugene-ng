@@ -36,6 +36,27 @@ kotlin {
     }
 }
 
+// LAMESPEC: native resources are not copied, including those from dependencies.
+//  https://youtrack.jetbrains.com/issue/KT-29311
+tasks {
+    val copyDebugResource by registering(Copy::class) {
+        configurations.forEach {
+            from("../mugene/build/processedResources/native/main")
+            into("build/bin/native/debugExecutable/")
+        }
+    }
+    val copyReleaseResource by registering(Copy::class) {
+        configurations.forEach {
+            from("../mugene/build/processedResources/native/main")
+            into("build/bin/native/releaseExecutable/")
+        }
+    }
+    build {
+        dependsOn(copyDebugResource)
+        dependsOn(copyReleaseResource)
+    }
+}
+
 tasks.withType<Wrapper> {
   gradleVersion = "7.1.1"
   distributionType = Wrapper.DistributionType.BIN

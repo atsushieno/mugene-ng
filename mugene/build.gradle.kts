@@ -52,20 +52,22 @@ kotlin {
     }
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")
+    val isMacOSX64 = hostOs == "Mac OS X"
+    val isLinuxX64 = hostOs == "Linux"
     val nativeTarget = when {
-        hostOs == "Mac OS X" -> macosX64("native") {
+        isMacOSX64 -> macosX64("apple") {
             binaries {
                 staticLib {}
                 sharedLib {}
             }
         }
-        hostOs == "Linux" -> linuxX64("native") {
+        isLinuxX64 -> linuxX64("linuxX64") {
             binaries {
                 staticLib {}
                 sharedLib {}
             }
         }
-        isMingwX64 -> mingwX64("native") {
+        isMingwX64 -> mingwX64("mingwX64") {
             binaries {
                 staticLib {}
                 sharedLib {}
@@ -95,10 +97,7 @@ kotlin {
                 implementation(kotlin("test-annotations-common"))
             }
         }
-        val jvmMain by getting {
-            dependencies {
-            }
-        }
+        val jvmMain by getting
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
@@ -115,20 +114,28 @@ kotlin {
                 implementation("junit:junit:4.13.2")
             }
         }
-        val jsMain by getting {
-            dependencies {
-            }
-        }
+        val jsMain by getting
         val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))
             }
         }
-        val nativeMain by getting {
-            dependencies {
+        val nativeMain by creating
+        if (isLinuxX64) {
+            val linuxX64Main by getting {
+                dependsOn(nativeMain)
             }
         }
-        val nativeTest by getting
+        if (isMingwX64) {
+            val mingwX64Main by getting {
+                dependsOn(nativeMain)
+            }
+        }
+        if (isMacOSX64) {
+            val appleMain by getting {
+                dependsOn(nativeMain)
+            }
+        }
     }
 }
 

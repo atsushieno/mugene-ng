@@ -39,15 +39,19 @@ kotlin {
 // LAMESPEC: native resources are not copied, including those from dependencies.
 //  https://youtrack.jetbrains.com/issue/KT-29311
 tasks {
+    val sources = arrayOf("../mugene/build/processedResources/native/main",
+        "../mugene/build/processedResources/apple/main",
+        "../mugene/build/processedResources/mingwX64/main",
+        "../mugene/build/processedResources/linuxX64/main")
     val copyDebugResource by registering(Copy::class) {
         configurations.forEach {
-            from("../mugene/build/processedResources/native/main")
+            from(sources)
             into("build/bin/native/debugExecutable/")
         }
     }
     val copyReleaseResource by registering(Copy::class) {
         configurations.forEach {
-            from("../mugene/build/processedResources/native/main")
+            from(sources)
             into("build/bin/native/releaseExecutable/")
         }
     }

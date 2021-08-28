@@ -8,7 +8,7 @@ import platform.posix.fopen
 import platform.posix.fwrite
 
 class MmlCompilerNative : MmlCompilerConsole() {
-    override var resolver : StreamResolver = MergeStreamResolver(NativeDevResourceStreamResolver(), LocalFileStreamResolver())
+    override var resolver : StreamResolver = MergeStreamResolver(NativeDevResourceStreamResolver(), LocalFileStreamResolver(), ExecutablePathStreamResolver())
 
     override fun decodeStringUsingEncoding(s: String, charset: String): ByteArray =
         TODO("Not Implemented")

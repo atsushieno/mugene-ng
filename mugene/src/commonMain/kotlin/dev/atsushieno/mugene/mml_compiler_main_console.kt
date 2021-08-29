@@ -14,7 +14,6 @@ abstract class MmlCompilerConsole : MmlCompiler() {
         var metaWriter: ((Boolean, MidiMessage, MutableList<Byte>) -> Int)? = null
     }
 
-    abstract fun decodeStringUsingEncoding(s: String, charset: String = "utf-8"): ByteArray
     abstract fun writeToFile(filename: String, bytes: ByteArray)
 
     fun compile(args: List<String>) {

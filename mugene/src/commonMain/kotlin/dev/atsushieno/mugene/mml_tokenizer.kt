@@ -248,10 +248,10 @@ class MmlTokenizerSource(reporter: MmlDiagnosticReporter, resolver: StreamResolv
     }
 }
 
-class MmlInputSourceReader(private val reporter: MmlDiagnosticReporter, private val resolver: StreamResolver) {
+class MmlInputSourceReader(private val compiler: MmlCompiler, private val resolver: StreamResolver) {
     companion object {
-        fun parse(reporter: MmlDiagnosticReporter, resolver: StreamResolver, inputs: List<MmlInputSource>): MmlTokenizerSource {
-            val r = MmlInputSourceReader(reporter, resolver)
+        fun parse(compiler: MmlCompiler, resolver: StreamResolver, inputs: List<MmlInputSource>): MmlTokenizerSource {
+            val r = MmlInputSourceReader(compiler, resolver)
             r.process(inputs)
             return r.result
         }
@@ -281,7 +281,7 @@ class MmlInputSourceReader(private val reporter: MmlDiagnosticReporter, private 
     private var inCommentMode = false
 
     fun process(inputs: List<MmlInputSource>) {
-        result = MmlTokenizerSource(reporter, resolver)
+        result = MmlTokenizerSource(compiler.report, resolver)
         doProcess(inputs.toMutableList())
     }
 
@@ -415,7 +415,7 @@ class MmlInputSourceReader(private val reporter: MmlDiagnosticReporter, private 
             }
         }
         if (range == null) {
-            reporter(
+            compiler.report(
                 MmlDiagnosticVerbosity.Error,
                 line.location,
                 "Current line indicates no track number, and there was no indicated tracks previously.")

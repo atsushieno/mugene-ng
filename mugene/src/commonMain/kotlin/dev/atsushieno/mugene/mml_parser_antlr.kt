@@ -104,7 +104,7 @@ class WrappedTokenSource(private val ts: TokenStream) : TokenSource {
 }
 
 @Suppress("UNCHECKED_CAST")
-class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : MugeneParserBaseVisitor<Any>() {
+class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserBaseVisitor<Any>() {
     private fun getSingleContent(ctx: ParserRuleContext) = visit(ctx.getChild(0)!!)!!
 
     override fun visitTerminal(node: TerminalNode): Any? {
@@ -267,7 +267,7 @@ class MugeneParserVisitorImpl(private val reporter: MmlDiagnosticReporter) : Mug
     override fun visitStepConstant(ctx: MugeneParser.StepConstantContext): Any {
         val mul = if (ctx.Minus() != null) -1 else 1
         val n = visit(ctx.NumberLiteral() !!) as MmlToken
-        val l = MmlLength (mul * (MmlValueExprResolver.getTypedValue (reporter, n.value, MmlDataType.Number, n.location) as Double).toInt()).apply {
+        val l = MmlLength (mul * (MmlValueExprResolver.getTypedValue (compiler, n.value, MmlDataType.Number, n.location) as Double).toInt()).apply {
             isValueByStep = true
         }
         return MmlConstantExpr (n.location, MmlDataType.Length, l)

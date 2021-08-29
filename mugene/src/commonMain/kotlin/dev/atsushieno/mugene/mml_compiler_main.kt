@@ -43,6 +43,8 @@ abstract class MmlCompiler {
         fun create(): MmlCompiler = createDefaultCompiler()
     }
 
+    abstract fun decodeStringUsingEncoding(s: String, charset: String = "utf-8"): ByteArray
+
     var verbose = false
 
     abstract var resolver: StreamResolver
@@ -122,7 +124,7 @@ abstract class MmlCompiler {
                 inputs
 
         // input sources -> tokenizer sources
-        val tokenizerSources = MmlInputSourceReader.parse(report, resolver, actualInputs.toMutableList())
+        val tokenizerSources = MmlInputSourceReader.parse(this, resolver, actualInputs.toMutableList())
 
         // tokenizer sources -> token streams
         return MmlTokenizer.tokenize(report, tokenizerSources)
@@ -131,23 +133,23 @@ abstract class MmlCompiler {
     // used by language server and compiler.
     private fun buildSemanticTree(tokens: MmlTokenSet): MmlSemanticTreeSet {
         // token streams -> semantic trees
-        return MmlSemanticTreeBuilder.compile(tokens, report)
+        return MmlSemanticTreeBuilder.compile(tokens, this)
     }
 
     private fun generateMusic(tree: MmlSemanticTreeSet): MidiMusic {
         // semantic trees -> simplified streams
-        MmlMacroExpander.expand(tree, report)
+        MmlMacroExpander.expand(tree, this)
         // simplified streams -> raw events
-        val resolved = MmlEventStreamGenerator.generate(tree, report)
+        val resolved = MmlEventStreamGenerator.generate(tree, this)
         // raw events -> SMF
         return MmlSmfGenerator.generate(resolved)
     }
 
     private fun generateMusic2(outputDeltaTime: Boolean, tree: MmlSemanticTreeSet): Midi2Music {
         // semantic trees -> simplified streams
-        MmlMacroExpander.expand(tree, report)
+        MmlMacroExpander.expand(tree, this)
         // simplified streams -> raw events
-        val resolved = MmlEventStreamGenerator.generate(tree, report)
+        val resolved = MmlEventStreamGenerator.generate(tree, this)
         // raw events -> UMP music format
         val umpmf = MmlMidi2Generator.generate(resolved)
         if (outputDeltaTime)

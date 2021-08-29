@@ -21,10 +21,10 @@ abstract class MmlValueExprResolver(val expr: MmlValueExpr) {
             value: Any?,
             type: MmlDataType,
             location: MmlLineInfo?
-        ): Any? = getTypedValue(ctx.reporter, value, type, location)
+        ): Any? = getTypedValue(ctx.compiler, value, type, location)
 
         fun getTypedValue(
-            reporter: MmlDiagnosticReporter,
+            compiler: MmlCompiler,
             value: Any?,
             type: MmlDataType,
             location: MmlLineInfo?
@@ -44,7 +44,7 @@ abstract class MmlValueExprResolver(val expr: MmlValueExpr) {
                     if (value == null)
                         return 0.toDouble()
                     else
-                        reporter(
+                        compiler.report(
                             MmlDiagnosticVerbosity.Error,
                             location,
                             "Cannot convert from value `$value` of number to $type)")
@@ -61,14 +61,14 @@ abstract class MmlValueExprResolver(val expr: MmlValueExpr) {
                     else if (value is Byte)
                         denom = value.toUnsigned()
                     else
-                        reporter(
+                        compiler.report(
                             MmlDiagnosticVerbosity.Error,
                             location,
                             "Cannot convert from length to $type)")
                     return MmlLength(denom)
                 }
                 else -> {
-                    reporter(
+                    compiler.report(
                         MmlDiagnosticVerbosity.Error,
                         location,
                         "Invalid value $value for the expected data type $type)")
@@ -126,7 +126,7 @@ class MmlVariableReferenceExprResolver(expr: MmlVariableReferenceExpr) :
         val expr = this.expr as MmlVariableReferenceExpr
         if (expr.scope == 3) {
             if (ctx.globalContext == null)
-                ctx.reporter(
+                ctx.compiler.report(
                     MmlDiagnosticVerbosity.Error,
                     null,
                     "Global variable '${expr.name}' cannot be resolved at this compilation phase")
@@ -149,7 +149,7 @@ class MmlVariableReferenceExprResolver(expr: MmlVariableReferenceExpr) :
 
         val variable = ctx.sourceTree.variables[expr.name]
         if (variable == null)
-            ctx.reporter(
+            ctx.compiler.report(
                 MmlDiagnosticVerbosity.Error,
                 expr.location,
                 "Cannot resolve variable '${expr.name}'")
@@ -347,10 +347,8 @@ data class LoopLocation(val source: Int, val output: Int, val tick: Int)
 class MmlResolveContext(
     val sourceTree: MmlSemanticTreeSet,
     val globalContext: MmlResolveContext?,
-    contextReporter: MmlDiagnosticReporter?
+    val compiler: MmlCompiler
 ) {
-    val reporter: MmlDiagnosticReporter = contextReporter ?: globalContext!!.reporter
-
     var timelinePosition: Int = 0
     var macroArguments = mutableMapOf<Any?, Any>()
     var values = mutableMapOf<MmlSemanticVariable, Any>()
@@ -370,26 +368,28 @@ class MmlResolveContext(
     }
 }
 
-class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private val reporter: MmlDiagnosticReporter) {
+class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private val compiler: MmlCompiler) {
     companion object {
-        fun generate(source: MmlSemanticTreeSet, contextReporter: MmlDiagnosticReporter): MmlResolvedMusic {
-            val gen = MmlEventStreamGenerator(source, contextReporter)
+        fun generate(source: MmlSemanticTreeSet, compiler: MmlCompiler): MmlResolvedMusic {
+            val gen = MmlEventStreamGenerator(source, compiler)
             gen.generate()
             return gen.result
         }
     }
+
+    private val reporter = compiler.report
 
     private lateinit var globalContext: MmlResolveContext
     val result: MmlResolvedMusic = MmlResolvedMusic().apply { baseCount = source.baseCount }
     private var currentOutput = mutableListOf<MmlResolvedEvent>()
 
     private fun generate() {
-        globalContext = MmlResolveContext(source, null, reporter)
+        globalContext = MmlResolveContext(source, null, compiler)
 
         for (track in source.tracks) {
             val rtrk = MmlResolvedTrack(track.number, source)
             result.tracks.add(rtrk)
-            val tctx = MmlResolveContext(source, globalContext, reporter)
+            val tctx = MmlResolveContext(source, globalContext, compiler)
             val list = track.data
             currentOutput = rtrk.events
             processOperations(rtrk, tctx, list, 0, list.size, listOf())
@@ -558,8 +558,13 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                 "__MIDI" -> {
                     oper.validateArguments(rctx, arguments.size)
                     val mop = MmlResolvedEvent("MIDI", rctx.timelinePosition)
-                    for (arg in arguments)
-                        mop.arguments.add(arg.resolver.byteValue)
+                    for (arg in arguments) {
+                        if (arg.resolver.resolvedValue is String)
+                            // It becomes 0-terminated string, so chop last 0 here.
+                            mop.arguments.addAll(compiler.decodeStringUsingEncoding(arg.resolver.stringValue).dropLast(1).toList())
+                        else
+                            mop.arguments.add(arg.resolver.byteValue)
+                    }
                     currentOutput.add(mop)
                     if (recordNextAsChord)
                         chord.add(mop)

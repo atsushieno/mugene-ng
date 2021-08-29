@@ -203,7 +203,7 @@ class MmlOperationUse(val name: String, var location: MmlLineInfo?) {
     fun validateArguments(ctx: MmlResolveContext, minParams: Int, vararg types: MmlDataType) {
         if (arguments.size != types.size) {
             if (arguments.size < minParams || minParams < 0) {
-                ctx.reporter(
+                ctx.compiler.report(
                     MmlDiagnosticVerbosity.Error,
                     location,
                     "Insufficient argument(s)")
@@ -222,16 +222,15 @@ class MmlOperationUse(val name: String, var location: MmlLineInfo?) {
 
 // semantic tree builder
 
-class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiagnosticReporter) {
+class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, val compiler: MmlCompiler) {
     companion object {
-        fun compile(tokenSet: MmlTokenSet, contextReporter: MmlDiagnosticReporter): MmlSemanticTreeSet {
-            val b = MmlSemanticTreeBuilder(tokenSet, contextReporter)
+        fun compile(tokenSet: MmlTokenSet, compiler: MmlCompiler): MmlSemanticTreeSet {
+            val b = MmlSemanticTreeBuilder(tokenSet, compiler)
             b.compile()
             return b.result
         }
     }
 
-    private val reporter: MmlDiagnosticReporter = contextReporter
     val result: MmlSemanticTreeSet
 
     private fun compile() {
@@ -320,7 +319,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
 
         })
         val tree = parseFunc(parser)
-        val visitor = MugeneParserVisitorImpl(reporter)
+        val visitor = MugeneParserVisitorImpl(compiler)
         return visitor.visit(tree)!!
     }
 
@@ -332,7 +331,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
 
         // This is the rewritten code for Kotlin...
         val stream = TokenStream(src.defaultValueTokens, src.location)
-        val typed = antlrCompile(reporter, stream, { parser -> parser.expression() })
+        val typed = antlrCompile(compiler.report, stream) { parser -> parser.expression() }
         ret.defaultValue = typed as MmlValueExpr
         // ...end of that.
 
@@ -361,7 +360,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, contextReporter: MmlDiag
 
     private fun compileOperationTokens(data: MutableList<MmlOperationUse>, stream: TokenStream) {
         if (stream.source.isNotEmpty()) {
-            val results = antlrCompile(reporter, stream) { parser -> parser.operationUses() }
+            val results = antlrCompile(compiler.report, stream) { parser -> parser.operationUses() }
             data.addAll(results as List<MmlOperationUse>)
         }
     }
@@ -380,18 +379,17 @@ class TokenStream(val source: List<MmlToken>, val definitionLocation: MmlLineInf
 
 // semantic tree expander
 
-class MmlMacroExpander(private val source: MmlSemanticTreeSet, contextReporter: MmlDiagnosticReporter) {
+class MmlMacroExpander(private val source: MmlSemanticTreeSet, private val compiler: MmlCompiler) {
     companion object {
-        fun expand(source: MmlSemanticTreeSet, contextReporter: MmlDiagnosticReporter) {
-            MmlMacroExpander(source, contextReporter).expand()
+        fun expand(source: MmlSemanticTreeSet, compiler: MmlCompiler) {
+            MmlMacroExpander(source, compiler).expand()
         }
     }
 
-    private val reporter: MmlDiagnosticReporter = contextReporter
     private val expansionStack = mutableListOf<MmlSemanticMacro>()
 
     private fun expand() {
-        val ctx = MmlResolveContext(source, null, reporter)
+        val ctx = MmlResolveContext(source, null, compiler)
 
         // resolve variables without any context.
         for (variable in source.variables.values) {

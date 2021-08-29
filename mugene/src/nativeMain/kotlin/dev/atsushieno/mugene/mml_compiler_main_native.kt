@@ -11,7 +11,8 @@ class MmlCompilerNative : MmlCompilerConsole() {
     override var resolver : StreamResolver = MergeStreamResolver(NativeDevResourceStreamResolver(), LocalFileStreamResolver(), ExecutablePathStreamResolver())
 
     override fun decodeStringUsingEncoding(s: String, charset: String): ByteArray =
-        TODO("Not Implemented")
+        // FIXME: respect charset
+        s.encodeToByteArray()
 
     override fun writeToFile(filename: String, bytes: ByteArray) {
         val fp = fopen(filename, "w+") ?: throw IllegalArgumentException("File '$filename' is not writable")

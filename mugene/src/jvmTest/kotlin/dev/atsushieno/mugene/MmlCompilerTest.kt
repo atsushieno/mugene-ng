@@ -189,4 +189,26 @@ class MmlCompilerTest {
         val trackTail = arrayOf(0xF7.toByte(), 0, 0xFF.toByte(), 0x2F, 0)
         assertArrayEquals(trackHead + sysexData + trackTail, bytes.toTypedArray(), "SMF track")
     }
+
+    @Test
+    fun compileStringInMidiPrimitive2() {
+        val mml = """
+#macro X { __MIDI #F0, #7D, "augene-ng", 11, "-1472549978", #F7 }
+1   X
+"""
+        val music = MidiMusic().apply { read(MmlTestUtility.testCompile("midi1", mml).toList()) }
+        assertEquals(1, music.tracks.size, "tracks.size")
+        val msg = music.tracks[0].messages.first()
+        assertEquals(0xF0, msg.event.statusByte.toUnsigned(), "status")
+        val sysexData = arrayOf(0x7D, 'a'.code, 'u'.code, 'g'.code, 'e'.code, 'n'.code, 'e'.code, '-'.code, 'n'.code, 'g'.code,
+                                0x0B, 0x2D, 0x31, 0x34, 0x37, 0x32, 0x35, 0x34, 0x39, 0x39, 0x37, 0x38)
+            .map { v -> v.toByte() }.toTypedArray()
+        val actualData = msg.event.extraData!!.drop(msg.event.extraDataOffset).take(msg.event.extraDataLength).toTypedArray()
+        assertArrayEquals(sysexData, actualData, "sysex data")
+        val bytes = mutableListOf<Byte>()
+        SmfWriter(bytes).writeTrack(music.tracks[0])
+        val trackHead = arrayOf('M'.code, 'T'.code, 'r'.code, 'k'.code, 0, 0, 0, 29, 0, 0xF0).map { v -> v.toByte() }.toTypedArray()
+        val trackTail = arrayOf(0xF7.toByte(), 0, 0xFF.toByte(), 0x2F, 0)
+        assertArrayEquals(trackHead + sysexData + trackTail, bytes.toTypedArray(), "SMF track")
+    }
 }

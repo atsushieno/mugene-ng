@@ -561,7 +561,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                     for (arg in arguments) {
                         if (arg.resolver.resolvedValue is String)
                             // It becomes 0-terminated string, so chop last 0 here.
-                            mop.arguments.addAll(compiler.decodeStringUsingEncoding(arg.resolver.stringValue).dropLast(1).toList())
+                            mop.arguments.addAll(compiler.decodeStringUsingEncoding(arg.resolver.stringValue).toList())
                         else
                             mop.arguments.add(arg.resolver.byteValue)
                     }

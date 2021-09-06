@@ -211,4 +211,21 @@ class MmlCompilerTest {
         val trackTail = arrayOf(0xF7.toByte(), 0, 0xFF.toByte(), 0x2F, 0)
         assertArrayEquals(trackHead + sysexData + trackTail, bytes.toTypedArray(), "SMF track")
     }
+
+    @Test
+    fun verifyCompiledBinaries() {
+        val mml = """
+1   CH1 @1 o5 l4 v100 cdefgab>c
+"""
+        val music = MidiMusic().apply { read(MmlTestUtility.testCompile("midi1", mml).toList()) }
+        assertEquals(1, music.tracks.size, "tracks.size")
+        val messages = music.tracks[0].messages
+        assertEquals(0xB0, messages[0].event.statusByte.toUnsigned(), "msg0")
+        assertEquals(0xB0, messages[1].event.statusByte.toUnsigned(), "msg1")
+        assertEquals(0xC0, messages[2].event.statusByte.toUnsigned(), "msg2")
+        assertEquals(0x90, messages[3].event.statusByte.toUnsigned(), "msg3")
+        assertEquals(0x80, messages[4].event.statusByte.toUnsigned(), "msg4")
+        assertEquals(0x90, messages[5].event.statusByte.toUnsigned(), "msg5")
+        assertEquals(0x80, messages[6].event.statusByte.toUnsigned(), "msg6")
+    }
 }

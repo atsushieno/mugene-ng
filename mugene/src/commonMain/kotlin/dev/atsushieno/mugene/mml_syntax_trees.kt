@@ -303,7 +303,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, val compiler: MmlCompile
                 prediction: Int,
                 configs: ATNConfigSet
             ) {
-                reporter(MmlDiagnosticVerbosity.Warning, MmlLineInfo.empty, "reportContextSensitivity")
+                //reporter(MmlDiagnosticVerbosity.Warning, MmlLineInfo.empty, "reportContextSensitivity")
             }
 
             override fun syntaxError(

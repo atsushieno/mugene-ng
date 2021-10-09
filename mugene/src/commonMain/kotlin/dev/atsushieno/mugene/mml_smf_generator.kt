@@ -108,12 +108,10 @@ class MmlMidi2Generator(private val source: MmlResolvedMusic) {
                 rtrk.messages.addAll(UmpFactory.jrTimestamps(0, ev.tick.toLong() - cur).map { i -> Ump(i) })
 
             if (wasMetaSysex8)
-                // those extra 4 bytes are for sysex ManufacturerID, deviceID, subID1, and subID2. They are all dummy values.
-                UmpFactory.sysex8Process(0, listOf<Byte>(0, 0, 0, 0) + ev.arguments.drop(1), ev.arguments.size + 4 - 1, 0,
-                    { lv1, lv2, _ -> rtrk.messages.add(Ump((lv1 / 0x100000000).toInt(), (lv1 % 0x100000000).toInt(), (lv2 / 0x100000000).toInt(), (lv2 % 0x100000000).toInt())) }, null)
+                // those extra 4 bytes are for sysex ManufacturerID, deviceID, subID1, and subID2. They are all dummy values. Then 3 0xFF bytes.
+                rtrk.messages.addAll(UmpFactory.sysex8(0, listOf(0, 0, 0, 0, 0xFF, 0xFF, 0xFF).map { it.toByte() } + ev.arguments.drop(1)))
             else if (wasSysex)
-                UmpFactory.sysex7Process(0, ev.arguments.drop(1),
-                    { lv, _ -> rtrk.messages.add(Ump((lv / 0x100000000).toInt(), (lv % 0x100000000).toInt())) }, null)
+                rtrk.messages.addAll(UmpFactory.sysex7(0, ev.arguments.drop(1)))
             else
                 rtrk.messages.add(evt)
 

@@ -797,6 +797,47 @@ Sends "GM System On" common system exclusive message.
 Sends "XG reset" common system exclusive message.
 
 
+## Spectra operations
+
+There are handful of operations that repeatedly send events per short step cycles. They result in linear changes on the target parameter. We call them "spectra" (or "spectra operations")
+
+Currently `P` (pan), `V` (volume), `E` (expression), `t` (tempo), `M` (modulation), and `B` (pitchbend) are supported.
+
+There are two kinds of spectra:
+
+- One-shot: it goes up or down to the start value to the end value, only one time.
+- Triangle: it goes up or down to the start value to the end value, then it goes flipped, and repeats that multiple times (specified).
+
+Note that they are not triggered by *each* note operations. There is no such binding. If you want note operations to always trigger them, define a new macro that wraps note operation prepended by the spectra (you would have to hack some macro variables to align the spectra length with the note length).
+
+Last but not least, those spectra operations are defined in generic way so that it is possible to define custom spectra operation to any parameter that can work in similar way to those already-supported parameters. Look for `SPECTRA_ONESHOT` and `SPECTRA_TRIANGLE` in `default-macro.mml` (or `default-macro2.mml`).
+
+### P_, V_, E_, t_, M_, B_ : One-shot Spectra
+
+:format:
+- P_ [sv:number], [ev:number], [sd:length], [len:length], [deltaLen:length = %4]
+- V_ [sv:number], [ev:number], [sd:length], [len:length], [deltaLen:length = %4]
+- E_ [sv:number], [ev:number], [sd:length], [len:length], [deltaLen:length = %4]
+- t_ [sv:number], [ev:number], [sd:length], [len:length], [deltaLen:length = %4]
+- M_ [sv:number], [ev:number], [sd:length], [len:length], [deltaLen:length = %4]
+- B_ [sv:number], [ev:number], [sd:length], [len:length], [deltaLen:length = %4]
+
+Triggers one-shot spectra explained above. It waits for `sd` (star delay) length then starts the linear value changes with `sv` (start value), towards `ev` (end value), with the whole `len` length of duration. The value change happens on every `deltaLen` optional length (4 ticks by default). The delta value for each step depends on `deltaLen` (`deltaValue = (ev - sv) / (len / deltaLen)`).
+
+
+### Pt, Vt, Et, tt, Mt, Bt : Triangle Spectra
+
+:format:
+- Pt [sv:number], [ev:number], [sd:length], [ed:length], [ts:number], [es:number = %4], [delta:number], [rt:number]
+- Vt [sv:number], [ev:number], [sd:length], [ed:length], [ts:number], [es:number = %4], [delta:number], [rt:number]
+- Et [sv:number], [ev:number], [sd:length], [ed:length], [ts:number], [es:number = %4], [delta:number], [rt:number]
+- tt [sv:number], [ev:number], [sd:length], [ed:length], [ts:number], [es:number = %4], [delta:number], [rt:number]
+- Mt [sv:number], [ev:number], [sd:length], [ed:length], [ts:number], [es:number = %4], [delta:number], [rt:number]
+- Bt [sv:number], [ev:number], [sd:length], [ed:length], [ts:number], [es:number = %4], [delta:number], [rt:number]
+
+Triggers triangle spectra explained above. At first it works the same as one-shot specta, except that instead of `len` and `deltaLen` we specify `ts` (total steps), `es` (each steps), and `delta` value explicitly. And once it reaches `ev` then it flips the value change direction (to either positive or negative) and do the same loop. And once it reached back to `sv`, then it waits `ed` (end delay) until the next loop starts. The number of loops is specified as `rt`.
+
+
 ## Additional macro sets
 
 There are also `nrpn-gs-xg.mml`, `gs-sysex.mml` and `drum-part.mml` additional utility macros for advanced composition using Roland GS modules or YAMAHA XG modules.

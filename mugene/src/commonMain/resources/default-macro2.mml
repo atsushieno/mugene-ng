@@ -101,12 +101,12 @@
 	__MIDI_NG {#D0, $__channel, 0, 0, \
 	$__tmp / #1000000, {$__tmp / #10000} % #100, {$__tmp / #100} % #100, $__tmp % #100 } }
 #macro PITCH val:number { \
-	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #1000000, 1 } } \
+	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #40000, 1 } } \
 	__MIDI_NG {#E0, $__channel, 0, 0, \
 	$__tmp / #1000000, {$__tmp / #10000} % #100, {$__tmp / #100} % #100, $__tmp % #100 } }
-#macro PN_PITCH val:number { \
-	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #1000000, 1 } } \
-	__MIDI_NG {#60, $__channel, 0, 0, \
+#macro PN_PITCH note:number, val:number { \
+	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #40000, 1 } } \
+	__MIDI_NG {#60, $__channel, $note, 0, \
 	$__tmp / #1000000, {$__tmp / #10000} % #100, {$__tmp / #100} % #100, $__tmp % #100 } }
 
 // Variable storage
@@ -179,6 +179,16 @@
 #macro B val:number { BEND$val }
 #macro B+ val:number { BEND $__bend + $val }
 #macro B- val:number { BEND $__bend - $val }
+#variable __bend_pn:number = 0
+#variable __pitchbend_bare_value_pn:number = 0
+#macro BEND_PN note:number, val:number { \
+	__LET_PN{"__bend_pn", $note, $val} \
+	__LET_PN{"__pitchbend_bare_value_pn", $note, $__pitchbend_cent_mode ? $val / 100 * 8192 / $__pitchbend_cent_mode, $val } \
+	__PER_NOTE $note PN_PITCH $note, $__pitchbend_bare_value_pn + 8192 __PER_NOTE_RESET \
+	}
+#macro Bn note:number, val:number { BEND_PN $note, $val }
+#macro Bn+ note:number, val:number { __PER_NOTE $note BEND_PN $note, $__bend_pn + $val __PER_NOTE_RESET }
+#macro Bn- note:number, val:number { __PER_NOTE $note BEND_PN $note, $__bend_pn - $val __PER_NOTE_RESET }
 #macro DTEM val:number { CC #06,$val }
 #macro DTEL val:number { CC #26,$val }
 #macro DTE msb:number,lsb:number { DTEM$msb DTEL$lsb }

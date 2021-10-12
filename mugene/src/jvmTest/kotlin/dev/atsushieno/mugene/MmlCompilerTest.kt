@@ -228,4 +228,15 @@ class MmlCompilerTest {
         assertEquals(0x90, messages[5].event.statusByte.toUnsigned(), "msg5")
         assertEquals(0x80, messages[6].event.statusByte.toUnsigned(), "msg6")
     }
+
+    @Test
+    fun midi2PerNotePitchbend() {
+        val mml = """
+1   Bn64,0 n64,4
+"""
+        val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
+        val music = Midi2Music().apply { read(umpx) }
+        assertEquals(0x40604000, music.tracks[0].messages[0].int1, "int1")
+        assertEquals(0x81000000.toUInt(), music.tracks[0].messages[0].int2.toUInt(), "int2")
+    }
 }

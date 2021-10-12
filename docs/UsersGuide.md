@@ -231,6 +231,31 @@ Outputs a variable that was set with the name [identifier] on the console at MML
 
 Set a variable with the name of [identifier] and the value of [value]. The set variable can be referenced by the "reference vairable operator" (`$`).
 
+### __LET_PN : Variable Assignment per note
+
+:format:
+- __LET_PN [identifier], [note], [value]
+
+Set a variable with the name of [identifier] and the value of [value] only for the argument [note]. Referencing the variable is still without the note number, but `__PER_NOTE` operation has to be called beforehand, otherwise the compiler has no idea which note to reference.
+
+Variable definitions are shared with `__LET`, but value stores are different between channel scope store and note scope store.
+
+### __PER_NOTE : target note for per-note variable
+
+:format:
+- __PER_NOTE [note]
+
+In combination with `__LET_PN` operation, specify which note to resolve for per-note variable. It is used to keep the enhanced syntax as closest to existing syntax as possible (otherwise variable resolution will have to take note number too).
+
+### __PER_NOTE_RESET : reset target note
+
+:format:
+- __PER_NOTE_RESET
+
+In combination with `__PER_NOTE` operation, it resets context note number.
+
+It is likely unnecessary, but by cleaning up context note number it would avoid possible buggy per-note variable resolution.
+
 ### __STORE : Add buffer
 
 :format:
@@ -847,3 +872,15 @@ There are also `nrpn-gs-xg.mml`, `gs-sysex.mml` and `drum-part.mml` additional u
 When mugene runs with MIDI 2.0 switch enabled, then `default-macro2.mml` is used instead of `default-macro.mml`. To avoid unnecessary MML difference, I leave most of the operators identical - otherwise the value ranges will be quite different e.g. there will be almost no audible notes when velocity assignments are left in MIDI1 values while the actual value range goes 0..65535, which does not make sense.
 
 But channels are indeed expanded to 0..255 so it will make rich composition possible.
+
+### BEND_PN, Bn, Bn+, Bn-: Per-note Pitchbend
+
+MIDI 2.0 only.
+
+:format:
+- BEND_PN [note], [value]
+- Bn [note], [value]
+- Bn+ [note], [value]
+- Bn- [note], [value]
+
+Generates per-note pitchbend MIDI 2.0 messages. `Bn+` and `Bn-` indicate relative values from current memoized value. The way how it works is in general the same as `B` (channel pitchbend) operation.

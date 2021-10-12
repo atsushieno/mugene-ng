@@ -418,6 +418,9 @@ class MmlPrimitiveOperation {
 
         val Print = MmlPrimitiveOperation().apply { name = "__PRINT" }
         val Let = MmlPrimitiveOperation().apply { name = "__LET" };
+        val LetPN = MmlPrimitiveOperation().apply { name = "__LET_PN" };
+        val PerNote = MmlPrimitiveOperation().apply { name = "__PER_NOTE" };
+        val PerNoteReset = MmlPrimitiveOperation().apply { name = "__PER_NOTE_RESET" };
         val Store = MmlPrimitiveOperation().apply { name = "__STORE" };
         val StoreFormat = MmlPrimitiveOperation().apply { name = "__STORE_FORMAT" };
         val Format = MmlPrimitiveOperation().apply { name = "__FORMAT" };
@@ -445,6 +448,9 @@ class MmlPrimitiveOperation {
             all = listOf(
                 Print,
                 Let,
+                LetPN,
+                PerNote,
+                PerNoteReset,
                 Store,
                 StoreFormat,
                 Format,

@@ -10,7 +10,7 @@ import dev.atsushieno.ktmidi.Ump
 import dev.atsushieno.ktmidi.UmpFactory
 import kotlin.experimental.and
 
-internal fun Byte.toUnsigned() : Int = if (this < 0) 0x100 + this else this.toInt()
+internal fun Byte.toUnsigned() : Int = if (this < 0) this.toUByte().toInt() else this.toInt()
 
 class MmlSmfGenerator(private val source: MmlResolvedMusic) {
     companion object {
@@ -88,15 +88,17 @@ class MmlMidi2Generator(private val source: MmlResolvedMusic) {
             else if ((ev.arguments[0].toUnsigned() and 0xF0) == 0xF0)
                 evt = Ump(UmpFactory.systemMessage(0, ev.arguments[0], ev.arguments[1], ev.arguments[2]))
             else if (ev.operation == "MIDI_NG") {
+                val rest32 = ev.arguments[4].toUnsigned() * 0x1000000 + ev.arguments[5].toUnsigned() * 0x10000 +
+                        ev.arguments[6].toUnsigned() * 0x100 + ev.arguments[7].toUnsigned()
                 val umpLong = UmpFactory.midi2ChannelMessage8_8_32(
-                    ev.arguments[1] / 0x10,
+                    ev.arguments[1].toUnsigned() / 0x10,
                     ev.arguments[0].toUnsigned(),
-                    ev.arguments[1] % 0x10,
+                    ev.arguments[1].toUnsigned() % 0x10,
                     ev.arguments[2].toUnsigned(),
                     ev.arguments[3].toUnsigned(),
-                    ev.arguments[4] * 0x1000000 + ev.arguments[5] * 0x10000 + ev.arguments[6] * 0x100 + ev.arguments[7].toLong()
+                    rest32.toUInt().toLong()
                 )
-                evt = Ump((umpLong shr 32).toInt(), (umpLong and 0xFFFFFFFF).toInt())
+                evt = Ump(umpLong)
             }
             else
                 evt = Ump(UmpFactory.midi1Message(0,

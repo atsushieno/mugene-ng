@@ -352,19 +352,31 @@ class MmlResolveContext(
     var timelinePosition: Int = 0
     var macroArguments = mutableMapOf<Any?, Any>()
     var values = mutableMapOf<MmlSemanticVariable, Any>()
+    var valuesPerNote = mutableMapOf<MmlSemanticVariable, MutableList<Any?>>()
+    var perNoteContext = -1
     val loops = mutableListOf<Loop>()
 
     val currentLoop: Loop?
         get() = loops.lastOrNull()
 
     fun ensureDefaultResolvedVariable(variable: MmlSemanticVariable): Any? {
-        var value = values[variable]
-        if (value == null) {
-            variable.defaultValue!!.resolver.resolve(this, variable.type)
-            value = variable.defaultValue!!.resolver.resolvedValue!!
-            values[variable] = value
+        if (perNoteContext >= 0 && valuesPerNote.containsKey(variable)) {
+            var value = valuesPerNote[variable]!![perNoteContext]
+            if (value == null) {
+                variable.defaultValue!!.resolver.resolve(this, variable.type)
+                value = variable.defaultValue!!.resolver.resolvedValue!!
+                valuesPerNote[variable]!![perNoteContext] = value
+            }
+            return value
+        } else {
+            var value = values[variable]
+            if (value == null) {
+                variable.defaultValue!!.resolver.resolve(this, variable.type)
+                value = variable.defaultValue!!.resolver.resolvedValue!!
+                values[variable] = value
+            }
+            return value
         }
-        return value
     }
 }
 
@@ -404,6 +416,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
     class StoredOperations {
         var operations = mutableListOf<MmlOperationUse>()
         var values = mutableMapOf<MmlSemanticVariable, Any>()
+        var valuesPerNote = mutableMapOf<MmlSemanticVariable, MutableList<Any?>>()
         var macroArguments = mutableMapOf<Any?, Any>()
     }
 
@@ -459,6 +472,39 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                         if (name == "__timeline_position")
                             rctx.timelinePosition = arguments[1].resolver.intValue
                     }
+                }
+                "__LET_PN" -> {
+                    arguments[0].resolver.resolve(rctx, MmlDataType.String)
+                    val name = arguments[0].resolver.stringValue
+                    arguments[1].resolver.resolve(rctx, MmlDataType.Number)
+                    val note = arguments[1].resolver.intValue
+                    val variable = source.variables[name]
+                    if (variable == null) {
+                        reporter(
+                            MmlDiagnosticVerbosity.Error,
+                            oper.location,
+                            "Target variable not found: $name")
+                    } else {
+                        arguments[1].resolver.resolve(rctx, variable.type)
+                        if (rctx.valuesPerNote[variable] == null)
+                            rctx.valuesPerNote[variable] = MutableList(128) { null }
+                        rctx.valuesPerNote[variable]!![note] = arguments[1].resolver.resolvedValue!!
+                    }
+                }
+                "__PER_NOTE" -> {
+                    arguments[0].resolver.resolve(rctx, MmlDataType.Number)
+                    val note = arguments[0].resolver.intValue
+                    if (note < 0 || note > 127) {
+                        reporter(
+                            MmlDiagnosticVerbosity.Error,
+                            oper.location,
+                            "Per-Note context must be between 0 and 127")
+                    }
+                    else
+                        rctx.perNoteContext = note
+                }
+                "__PER_NOTE_RESET" -> {
+                    rctx.perNoteContext = -1
                 }
                 "__STORE" -> {
                     arguments[0].resolver.resolve(rctx, MmlDataType.String)
@@ -623,6 +669,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                     currentOutput = storeDummy
                     currentStoredOperations = StoredOperations()
                     currentStoredOperations.values = rctx.values.toList().toMap().toMutableMap()
+                    currentStoredOperations.valuesPerNote = rctx.valuesPerNote.map { p -> Pair(p.key, p.value.toMutableList()) }.toMap().toMutableMap()
                     currentStoredOperations.macroArguments =
                         rctx.macroArguments.toList().toMap().toMutableMap()
                 }

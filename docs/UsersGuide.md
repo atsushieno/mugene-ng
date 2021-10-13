@@ -418,7 +418,7 @@ Outputs the aftertouch of the entire channel at the specified value. 0 to 127. M
 
 Outputs a pitch bend value with the specified value, which can be a number between 0 and 16383. 8192 is considered as the center.
 
-MIDI operator is `Exh`. The PITCH operator specifies a value close to the raw SMF data as it is, which is not likely useful. On the other hand, with the `B` operator, you can specify a more intuitive value using a negative value.
+MIDI operator is `Exh`. The PITCH operator specifies a value close to the raw SMF data as it is, which is not likely useful. On the other hand, with the `B=` operator, you can specify a more intuitive value using a negative value.
 
 ### l : Specify default note length
 
@@ -560,13 +560,16 @@ Sets the specified value as the hold (damper pedal) value (absolute specificatio
 
 Specifies the program change and bank select together. The values of bank select can be omitted (they will be 0). The valid values are 0 to 127 respectively. For bank select, `CC0` and `CC#20` are used.
 
-### BEND, B : absolute pitch bend 
+### BEND, B, B= : absolute pitch bend 
 
 :format:
-- B [val]
-- BEND [val]
+- B [val: -8192-8191]
+- BEND [val: -8192-8191]
+- B= [val: -8192-8191]
 
 Sets the specified value as a pitch bend value (absolute). This shifts the value range of the `PITCH` operator, which can only be specified as a positive value, to `-8192` to `8191`.
+
+**IMPORTANT**: We don't recommend `B` for any newer MML since 0.2.19 because it brings ambiguity between `B` with negative value and `B-` with positive value (because of "longest match" parser strategy, `B-` takes precedence). In the next major upgrade, `B` **will disappear** from the default macros.
 
 ### B+ B- : relative pitch bend
 
@@ -574,7 +577,7 @@ Sets the specified value as a pitch bend value (absolute). This shifts the value
 - B+ [val]
 - B- [val]
 
-Sets the specified value by adding or subtracting it from the current pitch bend value (relative specification). The semantics of the value is the same as that of the `B` command. The argument cannot be omitted.
+Sets the specified value by adding or subtracting it from the current pitch bend value (relative specification). The semantics of the value is the same as that of the `B=` command. The argument cannot be omitted.
 
 ### POLTATIME : portamento time specification
 
@@ -826,7 +829,7 @@ Sends "XG reset" common system exclusive message.
 
 There are handful of operations that repeatedly send events per short step cycles. They result in linear changes on the target parameter. We call them "spectra" (or "spectra operations")
 
-Currently `P` (pan), `V` (volume), `E` (expression), `t` (tempo), `M` (modulation), and `B` (pitchbend) are supported.
+Currently `P` (pan), `V` (volume), `E` (expression), `t` (tempo), `M` (modulation), and `B=` (pitchbend) are supported.
 
 There are two kinds of spectra:
 
@@ -835,7 +838,7 @@ There are two kinds of spectra:
 
 Note that they are not triggered by *each* note operations. There is no such binding. If you want note operations to always trigger them, define a new macro that wraps note operation prepended by the spectra (you would have to hack some macro variables to align the spectra length with the note length).
 
-Last but not least, those spectra operations are defined in generic way so that it is possible to define custom spectra operation to any parameter that can work in similar way to those already-supported parameters. Look for `SPECTRA_ONESHOT` and `SPECTRA_TRIANGLE` in `default-macro.mml` (or `default-macro2.mml`).
+Last but not least, those spectra operations are defined in generic way so that it is possible to define custom spectra operation to any parameter that can work in similar way to those already-supported parameters. Look for `SPECTRA_ONESHOT` and `SPECTRA_TRIANGLE` in `default-macro.mml` (or `default-macro2.mml`). Although note that they work only if the target takes only 1 argument. (For more complicated macros, you will have to code your own `SPECTRA_ONESHOT` and `SPECTRA_TRIANGLE` equivalents.)
 
 ### P_, V_, E_, t_, M_, B_ : One-shot Spectra
 
@@ -873,14 +876,33 @@ When mugene runs with MIDI 2.0 switch enabled, then `default-macro2.mml` is used
 
 But channels are indeed expanded to 0..255 so it will make rich composition possible.
 
-### BEND_PN, Bn, Bn+, Bn-: Per-note Pitchbend
+### BEND_PN, Bn, Bn+, Bn-: Explicit Per-note Pitchbend
 
 MIDI 2.0 only.
 
 :format:
 - BEND_PN [note], [value]
-- Bn [note], [value]
+- Bn= [note], [value]
 - Bn+ [note], [value]
 - Bn- [note], [value]
 
-Generates per-note pitchbend MIDI 2.0 messages. `Bn+` and `Bn-` indicate relative values from current memoized value. The way how it works is in general the same as `B` (channel pitchbend) operation.
+Generates per-note pitchbend MIDI 2.0 messages. `Bn=` indicates absolute value, and `Bn+` and `Bn-` indicate relative values from current memoized value. The way how it works is in general the same as `B=` (channel pitchbend) operation.
+
+### Bc, Bc+, Bc-: Implicit Per-note Pitchbend
+
+MIDI 2.0 only.
+
+:format:
+- Bc= [value]
+- Bc+ [value]
+- Bc- [value]
+- Bc_ [sv:number], [ev:number], [sd:length], [len:length], [deltaLen:length = %4]
+- Bt_ [sv:number], [ev:number], [sd:length], [ed:length], [ts:number], [es:number = %4], [delta:number], [rt:number]
+
+Generates per-note pitchbend MIDI 2.0 messages, for the latest note operation (`c`..`b`, or `n`). The value argument works exactly same as that of `Bn` operation family.
+
+The biggest impact of this operation is that it can be used as spectra because it only takes just one argument. For example:
+
+```
+1   BEND_CENT_MODE24 n64,0,1 Bc_0,1200,8,2 n60,0,1 Bc_0,-1200,8,2 r1
+```

@@ -124,6 +124,7 @@
 	PITCH $__pitchbend_bare_value + 8192 \
 	}
 #macro B val:number { BEND$val }
+#macro B= val:number { BEND$val }
 #macro B+ val:number { BEND $__bend + $val }
 #macro B- val:number { BEND $__bend - $val }
 #macro DTEM val:number { CC #06,$val }

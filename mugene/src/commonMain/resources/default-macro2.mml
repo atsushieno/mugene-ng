@@ -46,6 +46,7 @@
 #variable __gate_abs:number
 #variable __current_note_step:number = 0 // temporary (work) variable
 #variable __current_note_gate:number = 0 // temporary (work) variable
+#variable __latest_note:number
 
 // Primitive MIDI operations
 // NON (8n), NOFF (9n), PAF (An), CC (Bn), PROGRAM (Cn), CAF (Dn), PITCH (En), EX (F0,F7), META (FF)
@@ -167,28 +168,54 @@
 #macro PAN- val:number { P- $val }
 #macro H val:number { CC#40,$val } // dumper pedal
 #macro @ prg:number,bmsb:number=0,blsb:number=0 { CC0,$bmsb CC#20,$blsb PROGRAM$prg }
+
 #variable __bend:number = 0
 #variable __pitchbend_cent_mode:number = 0
 #variable __pitchbend_bare_value:number = 0
 #macro BEND_CENT_MODE val:number { __LET{"__pitchbend_cent_mode", $val} }
-#macro BEND val:number { \
+#macro __CALCULATE_BEND_INTERMEDIATES val:number { \
 	__LET{"__bend", $val} \
 	__LET{"__pitchbend_bare_value", $__pitchbend_cent_mode ? $val / 100 * 8192 / $__pitchbend_cent_mode, $val } \
+}
+#macro BEND val:number { \
+	__CALCULATE_BEND_INTERMEDIATES $val \
 	PITCH $__pitchbend_bare_value + 8192 \
 	}
 #macro B val:number { BEND$val }
-#macro B+ val:number { BEND $__bend + $val }
-#macro B- val:number { BEND $__bend - $val }
+#macro B= val:number { BEND$val }
+#macro B+ val:number { \
+	__CALCULATE_BEND_INTERMEDIATES $val \
+	BEND $__bend + $__pitchbend_bare_value \
+}
+#macro B- val:number { \
+	__CALCULATE_BEND_INTERMEDIATES $val \
+	BEND $__bend - $__pitchbend_bare_value \
+}
+
 #variable __bend_pn:number = 0
 #variable __pitchbend_bare_value_pn:number = 0
+#macro __CALCULATE_BEND_INTERMEDIATES_PN val:number { \
+	__LET{"__bend_pn", $val} \
+	__LET{"__pitchbend_bare_value_pn", $__pitchbend_cent_mode ? $val / 100 * 8192 / $__pitchbend_cent_mode, $val } \
+}
 #macro BEND_PN note:number, val:number { \
-	__LET_PN{"__bend_pn", $note, $val} \
-	__LET_PN{"__pitchbend_bare_value_pn", $note, $__pitchbend_cent_mode ? $val / 100 * 8192 / $__pitchbend_cent_mode, $val } \
-	__PER_NOTE $note PN_PITCH $note, $__pitchbend_bare_value_pn + 8192 __PER_NOTE_RESET \
+	__PER_NOTE $note __CALCULATE_BEND_INTERMEDIATES_PN $val \
+	PN_PITCH $note, $__pitchbend_bare_value_pn + 8192 \
+	__PER_NOTE_RESET \
 	}
-#macro Bn note:number, val:number { BEND_PN $note, $val }
-#macro Bn+ note:number, val:number { __PER_NOTE $note BEND_PN $note, $__bend_pn + $val __PER_NOTE_RESET }
-#macro Bn- note:number, val:number { __PER_NOTE $note BEND_PN $note, $__bend_pn - $val __PER_NOTE_RESET }
+#macro Bn= note:number, val:number { BEND_PN $note, $val }
+#macro Bn+ note:number, val:number { \
+	__PER_NOTE $note __CALCULATE_BEND_INTERMEDIATES_PN $val \
+	BEND_PN $note, $__bend_pn + $__pitchbend_bare_value_pn \
+	__PER_NOTE_RESET }
+#macro Bn- note:number, val:number { \
+	__PER_NOTE $note __CALCULATE_BEND_INTERMEDIATES_PN $val \
+	BEND_PN $note, $__bend_pn - $__pitchbend_bare_value_pn \
+	__PER_NOTE_RESET }
+#macro Bc= val:number { Bn= $__latest_note, $val }
+#macro Bc+ val:number { Bn+ $__latest_note, $val }
+#macro Bc- val:number { Bn- $__latest_note, $val }
+
 #macro DTEM val:number { CC #06,$val }
 #macro DTEL val:number { CC #26,$val }
 #macro DTE msb:number,lsb:number { DTEM$msb DTEL$lsb }
@@ -247,6 +274,7 @@
 	__LET{"__current_note_step", $gate + %1 ? $gate, $step}  \
 	__LET{"__current_note_gate", $__current_note_step * $__gate_rel * {1 / $__gate_rel_denom} - $__gate_abs} \
 	__LET{"__current_note_gate", $__current_note_gate \< 0 ? 0, $__current_note_gate } \
+	__LET{"__latest_note", $key} \
 	NOP$timing \
 	NON$key, $vel \
 	NOP$__current_note_gate \
@@ -345,7 +373,8 @@
 #macro E_ SPECTRA_ONESHOT_ARG_DEF { SPECTRA_ONESHOT "E", "E+", SPECTRA_ONESHOT_ARG_USE }
 #macro t_ SPECTRA_ONESHOT_ARG_DEF { SPECTRA_ONESHOT "t", "t+", SPECTRA_ONESHOT_ARG_USE }
 #macro M_ SPECTRA_ONESHOT_ARG_DEF { SPECTRA_ONESHOT "M", "M+", SPECTRA_ONESHOT_ARG_USE }
-#macro B_ SPECTRA_ONESHOT_ARG_DEF { SPECTRA_ONESHOT "B", "B+", SPECTRA_ONESHOT_ARG_USE }
+#macro B_ SPECTRA_ONESHOT_ARG_DEF { SPECTRA_ONESHOT "B=", "B+", SPECTRA_ONESHOT_ARG_USE }
+#macro Bc_ SPECTRA_ONESHOT_ARG_DEF { SPECTRA_ONESHOT "Bc=", "Bc+", SPECTRA_ONESHOT_ARG_USE }
 
 #define SPECTRA_TRIANGLE_ARG_DEF sv:number, ev:number, sd:number, ed:number, ts:number, es:number = %4, delta:number, rt:number
 #define SPECTRA_TRIANGLE_ARG_USE $sv, $ev, $sd, $ed, $ts, $es, $delta, $rt
@@ -373,4 +402,5 @@
 #macro Et SPECTRA_TRIANGLE_ARG_DEF { SPECTRA_TRIANGLE "E", "E+", "E-", SPECTRA_TRIANGLE_ARG_USE }
 #macro tt SPECTRA_TRIANGLE_ARG_DEF { SPECTRA_TRIANGLE "t", "t+", "t-", SPECTRA_TRIANGLE_ARG_USE }
 #macro Mt SPECTRA_TRIANGLE_ARG_DEF { SPECTRA_TRIANGLE "M", "M+", "M-", SPECTRA_TRIANGLE_ARG_USE }
-#macro Bt SPECTRA_TRIANGLE_ARG_DEF { SPECTRA_TRIANGLE "BEND", "B+", "B-", SPECTRA_TRIANGLE_ARG_USE }
+#macro Bt SPECTRA_TRIANGLE_ARG_DEF { SPECTRA_TRIANGLE "B=", "B+", "B-", SPECTRA_TRIANGLE_ARG_USE }
+#macro Bct SPECTRA_TRIANGLE_ARG_DEF { SPECTRA_TRIANGLE "Bc=", "Bc+", "Bc-", SPECTRA_TRIANGLE_ARG_USE }

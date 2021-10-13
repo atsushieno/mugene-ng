@@ -8,6 +8,7 @@ import dev.atsushieno.ktmidi.SmfWriter
 import dev.atsushieno.ktmidi.read
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class MmlCompilerTest {
     @Test
@@ -232,11 +233,38 @@ class MmlCompilerTest {
     @Test
     fun midi2PerNotePitchbend() {
         val mml = """
-1   Bn64,0 n64,4
+1   Bn=64,0 n64,4
 """
         val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
         val music = Midi2Music().apply { read(umpx) }
         assertEquals(0x40604000, music.tracks[0].messages[0].int1, "int1")
-        assertEquals(0x81000000.toUInt(), music.tracks[0].messages[0].int2.toUInt(), "int2")
+        assertEquals(0x80000000.toUInt(), music.tracks[0].messages[0].int2.toUInt(), "int2")
+    }
+
+    @Test
+    fun midi2PerNotePitchbendCurrent() {
+        val mml = """
+1   BEND_CENT_MODE24 n64,0,4 Bc=0 r8 Bc=100 r8 Bc=-100
+"""
+        val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
+        val music = Midi2Music().apply { read(umpx) }
+        val ml = music.tracks[0].messages
+        assertEquals(0x40604000, ml[1].int1, "1.int1")
+        assertEquals(0x80000000.toUInt(), ml[1].int2.toUInt(), "1.int2")
+        assertEquals(0x40604000, ml[3].int1, "3.int1")
+        assertEquals(0x85555555.toUInt(), ml[3].int2.toUInt(), "3.int2")
+        assertEquals(0x40604000, ml[6].int1, "6.int1")
+        assertEquals(0x7AAAAAAA.toUInt(), ml[6].int2.toUInt(), "6.int2")
+    }
+
+    @Test
+    fun midi2PerNotePitchbendCurrentSpectra() {
+        val mml = """
+1   BEND_CENT_MODE24 o5 c0,1 Bc_0,1200,8,2 f0,1 Bc_0,-1200,8,2 r1
+"""
+        val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
+        val music = Midi2Music().apply { read(umpx) }
+        assertTrue(music.tracks[0].messages.filter { it.int1 == 0x40603C00 }.size > 10, "PN.o5c")
+        assertTrue(music.tracks[0].messages.filter { it.int1 == 0x40604100 }.size > 10, "PN.o5f")
     }
 }

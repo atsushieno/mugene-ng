@@ -180,6 +180,9 @@ class MmlAddExprResolver(expr: MmlAddExpr) : MmlArithmeticExprResolver(expr) {
             resolvedValue = MmlLength(
                 (expr.left.resolver.getDoubleValue(ctx) + expr.right.resolver.getDoubleValue(ctx)).toInt()
             ).apply { isValueByStep = true }
+        else if (expr.left.resolver.resolvedValue is String || expr.right.resolver.resolvedValue is String)
+            resolvedValue =
+                expr.left.resolver.stringValue + expr.right.resolver.stringValue
         else
             resolvedValue =
                 expr.left.resolver.getDoubleValue(ctx) + expr.right.resolver.getDoubleValue(ctx)

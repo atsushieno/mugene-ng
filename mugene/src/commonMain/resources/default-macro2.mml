@@ -67,6 +67,8 @@
 	__LET { "__tmp", $vel * { VALUE_COMPAT_MODE ? #1000000, 1 } } \
 	__MIDI_NG {#A0, $__channel, $key, 0, \
 	$__tmp / #1000000, {$__tmp / #10000} % #100, {$__tmp / #100} % #100, $__tmp % #100 } }
+#macro CC_OLD index:number, val:number { \
+	__MIDI {#B0, $__channel, $index, $val }
 #macro CC index:number, val:number { \
 	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #1000000, 1 } } \
 	__MIDI_NG {#B0, $__channel, $index, 0, \
@@ -207,36 +209,44 @@
 #macro Bc+ val:number { Bn+ $__latest_note, $val }
 #macro Bc- val:number { Bn- $__latest_note, $val }
 
-#macro DTEM val:number { CC #06,$val }
-#macro DTEL val:number { CC #26,$val }
-#macro DTE msb:number,lsb:number { DTEM$msb DTEL$lsb }
 #macro PORTATIME val:number { CC #05,$val }
 #macro PORTA val:number { CC #41,$val } // portamento switch
 #macro SOS val:number { CC#42,$val } // sostenuto
 #macro SOFT val:number { CC#43,$val } // soft pedal
 #macro LEGATO val:number { CC#44,$val }
 #macro HX val:number { CC#45,$val } // Hold 2 (release parameter based)
+
+#variable __cutoff:number
+#macro COFF= val:number { __LET{"__cutoff", $val} CC#4A,$val }
+#macro COFF+ val:number { COFF= $__cutoff + $val }
+#macro COFF- val:number { COFF= $__cutoff - $val }
 #variable __reverb_send_depth:number
 #macro RSD val:number { __LET{"__reverb_send_depth", $val} CC#5B,$val }
 #macro RSD= val:number { __LET{"__reverb_send_depth", $val} CC#5B,$val }
-#macro RSD+ val:number { RSD $__reverb_send_depth + $val }
-#macro RSD- val:number { RSD $__reverb_send_depth - $val }
+#macro RSD+ val:number { RSD= $__reverb_send_depth + $val }
+#macro RSD- val:number { RSD= $__reverb_send_depth - $val }
 #variable __chorus_send_depth:number
 #macro CSD val:number { __LET{"__chorus_send_depth", $val} CC#5D,$val }
 #macro CSD= val:number { __LET{"__chorus_send_depth", $val} CC#5D,$val }
-#macro CSD+ val:number { CSD $__chorus_send_depth + $val }
-#macro CSD- val:number { CSD $__chorus_send_depth - $val }
+#macro CSD+ val:number { CSD= $__chorus_send_depth + $val }
+#macro CSD- val:number { CSD= $__chorus_send_depth - $val }
 #variable __delay_send_depth:number
 #macro DSD val:number { __LET{"__delay_send_depth", $val} CC#5E,$val } // 5E is not always DSD though...
 #macro DSD= val:number { __LET{"__delay_send_depth", $val} CC#5E,$val } // 5E is not always DSD though...
-#macro DSD+ val:number { DSD $__delay_send_depth + $val }
-#macro DSD- val:number { DSD $__delay_send_depth - $val }
-#macro NRPNM val:number { CC #63,$val }
-#macro NRPNL val:number { CC #62,$val }
+#macro DSD+ val:number { DSD= $__delay_send_depth + $val }
+#macro DSD- val:number { DSD= $__delay_send_depth - $val }
+
+// RPN, NRPN, and DTE are not supported in MIDI 2.0 channel messages, so use CC_OLD.
+#macro NRPNM val:number { CC_OLD #63,$val }
+#macro NRPNL val:number { CC_OLD #62,$val }
 #macro NRPN msb:number,lsb:number { NRPNM$msb NRPNL$lsb }
-#macro RPNM val:number { CC #65,$val }
-#macro RPNL val:number { CC #64,$val }
+#macro RPNM val:number { CC_OLD #65,$val }
+#macro RPNL val:number { CC_OLD #64,$val }
 #macro RPN msb:number,lsb:number { RPNM$msb RPNL$lsb }
+#macro DTEM val:number { CC_OLD #06,$val }
+#macro DTEL val:number { CC_OLD #26,$val }
+#macro DTE msb:number,lsb:number { DTEM$msb DTEL$lsb }
+
 #macro TEXT val:string { __MIDI_META{1, $val} }
 #macro COPYRIGHT val:string { __MIDI_META{2, $val} }
 #macro TRACKNAME val:string { __MIDI_META{3, $val} }

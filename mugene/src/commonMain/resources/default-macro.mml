@@ -134,15 +134,17 @@
 #macro B= val:number { BEND$val }
 #macro B+ val:number { BEND $__bend + $val }
 #macro B- val:number { BEND $__bend - $val }
-#macro DTEM val:number { CC #06,$val }
-#macro DTEL val:number { CC #26,$val }
-#macro DTE msb:number,lsb:number { DTEM$msb DTEL$lsb }
 #macro PORTATIME val:number { CC #05,$val }
 #macro PORTA val:number { CC #41,$val } // portamento switch
 #macro SOS val:number { CC#42,$val } // sostenuto
 #macro SOFT val:number { CC#43,$val } // soft pedal
 #macro LEGATO val:number { CC#44,$val }
 #macro HX val:number { CC#45,$val } // Hold 2 (release parameter based)
+
+#variable __cutoff:number
+#macro COFF= val:number { __LET{"__cutoff", $val} CC#4A,$val }
+#macro COFF+ val:number { COFF= $__cutoff + $val }
+#macro COFF- val:number { COFF= $__cutoff - $val }
 #variable __reverb_send_depth:number
 #macro RSD val:number { __LET{"__reverb_send_depth", $val} CC#5B,$val }
 #macro RSD= val:number { __LET{"__reverb_send_depth", $val} CC#5B,$val }
@@ -158,12 +160,21 @@
 #macro DSD= val:number { __LET{"__delay_send_depth", $val} CC#5E,$val } // 5E is not always DSD though...
 #macro DSD+ val:number { DSD $__delay_send_depth + $val }
 #macro DSD- val:number { DSD $__delay_send_depth - $val }
+
 #macro NRPNM val:number { CC #63,$val }
 #macro NRPNL val:number { CC #62,$val }
 #macro NRPN msb:number,lsb:number { NRPNM$msb NRPNL$lsb }
 #macro RPNM val:number { CC #65,$val }
 #macro RPNL val:number { CC #64,$val }
 #macro RPN msb:number,lsb:number { RPNM$msb RPNL$lsb }
+#macro DTEM val:number { CC #06,$val }
+#macro DTEL val:number { CC #26,$val }
+#macro DTE msb:number,lsb:number { DTEM$msb DTEL$lsb }
+#macro RPNX msb:number, lsb:number, val:number { \
+	RPNM $msb RPNL $lsb $DTE val / #4000, { $val / #4000 } / % #80 }
+#macro NRPNX msb:number, lsb:number, val:number { \
+	NRPNM $msb NRPNL $lsb $DTE val / #4000, { $val / #4000 } / % #80 }
+
 #macro TEXT val:string { __MIDI_META{1, $val} }
 #macro COPYRIGHT val:string { __MIDI_META{2, $val} }
 #macro TRACKNAME val:string { __MIDI_META{3, $val} }

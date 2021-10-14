@@ -17,7 +17,7 @@
 #variable __length:length = 4
 #variable __tmp:number = 0
 #define VALUE_COMPAT_MODE 1
-#macro CH val:number { __LET {"__channel", $val} }
+#macro CH val:number { __LET {"__channel", $val} } // 0-255
 #macro DEBUG val { __PRINT {$val} }
 #variable __dummy_msg:string
 #macro ASSERT_STEP val:number,label:string { \
@@ -179,24 +179,15 @@
 #variable __pitchbend_cent_mode:number = 0
 #variable __pitchbend_bare_value:number = 0
 #macro BEND_CENT_MODE val:number { __LET{"__pitchbend_cent_mode", $val} }
-#macro __CALCULATE_BEND_INTERMEDIATES val:number { \
+#macro BEND val:number { \
 	__LET{"__bend", $val} \
 	__LET{"__pitchbend_bare_value", $__pitchbend_cent_mode ? $val / 100 * 8192 / $__pitchbend_cent_mode, $val } \
-}
-#macro BEND val:number { \
-	__CALCULATE_BEND_INTERMEDIATES $val \
 	PITCH $__pitchbend_bare_value + 8192 \
 	}
 #macro B val:number { BEND$val }
 #macro B= val:number { BEND$val }
-#macro B+ val:number { \
-	__CALCULATE_BEND_INTERMEDIATES $val \
-	BEND $__bend + $__pitchbend_bare_value \
-}
-#macro B- val:number { \
-	__CALCULATE_BEND_INTERMEDIATES $val \
-	BEND $__bend - $__pitchbend_bare_value \
-}
+#macro B+ val:number { BEND $__bend + $val }
+#macro B- val:number { BEND $__bend - $val }
 
 #variable __bend_pn:number = 0
 #variable __pitchbend_bare_value_pn:number = 0
@@ -377,7 +368,7 @@
 #macro t_ SPECTRA_ONESHOT_ARG_DEF { SPECTRA_ONESHOT "t=", "t+", SPECTRA_ONESHOT_ARG_USE }
 #macro M_ SPECTRA_ONESHOT_ARG_DEF { SPECTRA_ONESHOT "M=", "M+", SPECTRA_ONESHOT_ARG_USE }
 #macro B_ SPECTRA_ONESHOT_ARG_DEF { SPECTRA_ONESHOT "B=", "B+", SPECTRA_ONESHOT_ARG_USE }
-#macro Bc_ SPECTRA_ONESHOT_ARG_DEF { SPECTRA_ONESHOT "Bc=", "Bc+", SPECTRA_ONESHOT_ARG_USE }
+#macro Bc_ SPECTRA_ONESHOT_ARG_DEF { __PER_NOTE $__latest_note SPECTRA_ONESHOT "Bc=", "Bc+", SPECTRA_ONESHOT_ARG_USE }
 
 #define SPECTRA_TRIANGLE_ARG_DEF sv:number, ev:number, sd:number, ed:number, ts:number, es:number = %4, delta:number, rt:number
 #define SPECTRA_TRIANGLE_ARG_USE $sv, $ev, $sd, $ed, $ts, $es, $delta, $rt
@@ -406,4 +397,4 @@
 #macro tt SPECTRA_TRIANGLE_ARG_DEF { SPECTRA_TRIANGLE "t=", "t+", "t-", SPECTRA_TRIANGLE_ARG_USE }
 #macro Mt SPECTRA_TRIANGLE_ARG_DEF { SPECTRA_TRIANGLE "M=", "M+", "M-", SPECTRA_TRIANGLE_ARG_USE }
 #macro Bt SPECTRA_TRIANGLE_ARG_DEF { SPECTRA_TRIANGLE "B=", "B+", "B-", SPECTRA_TRIANGLE_ARG_USE }
-#macro Bct SPECTRA_TRIANGLE_ARG_DEF { SPECTRA_TRIANGLE "Bc=", "Bc+", "Bc-", SPECTRA_TRIANGLE_ARG_USE }
+#macro Bct SPECTRA_TRIANGLE_ARG_DEF { __PER_NOTE $__latest_note SPECTRA_TRIANGLE "Bc=", "Bc+", "Bc-", SPECTRA_TRIANGLE_ARG_USE }

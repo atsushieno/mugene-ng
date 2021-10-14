@@ -897,7 +897,7 @@ MIDI 2.0 only.
 - Bc+ [value]
 - Bc- [value]
 - Bc_ [sv:number], [ev:number], [sd:length], [len:length], [deltaLen:length = %4]
-- Bt_ [sv:number], [ev:number], [sd:length], [ed:length], [ts:number], [es:number = %4], [delta:number], [rt:number]
+- Bct [sv:number], [ev:number], [sd:length], [ed:length], [ts:number], [es:number = %4], [delta:number], [rt:number]
 
 Generates per-note pitchbend MIDI 2.0 messages, for the latest note operation (`c`..`b`, or `n`). The value argument works exactly same as that of `Bn` operation family.
 

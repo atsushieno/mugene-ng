@@ -115,10 +115,12 @@
 #macro P+ val:number { P $__pan + $val }
 #macro P- val:number { P $__pan - $val }
 #macro PAN val:number { P $val }
+#macro PAN= val:number { P $val }
 #macro PAN+ val:number { P+ $val }
 #macro PAN- val:number { P- $val }
 #macro H val:number { CC#40,$val } // dumper pedal
 #macro @ prg:number,bmsb:number=0,blsb:number=0 { CC0,$bmsb CC#20,$blsb PROGRAM$prg }
+
 #variable __bend:number = 0
 #variable __pitchbend_cent_mode:number = 0
 #variable __pitchbend_bare_value:number = 0

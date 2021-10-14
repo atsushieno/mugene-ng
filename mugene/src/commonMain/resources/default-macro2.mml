@@ -68,7 +68,7 @@
 	__MIDI_NG {#A0, $__channel, $key, 0, \
 	$__tmp / #1000000, {$__tmp / #10000} % #100, {$__tmp / #100} % #100, $__tmp % #100 } }
 #macro CC_OLD index:number, val:number { \
-	__MIDI {#B0, $__channel, $index, $val }
+	__MIDI {#B0, $__channel, $index, $val } }
 #macro CC index:number, val:number { \
 	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #1000000, 1 } } \
 	__MIDI_NG {#B0, $__channel, $index, 0, \

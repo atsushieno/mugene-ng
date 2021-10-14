@@ -267,4 +267,22 @@ class MmlCompilerTest {
         assertTrue(music.tracks[0].messages.filter { it.int1 == 0x40603C00 }.size > 10, "PN.o5c")
         assertTrue(music.tracks[0].messages.filter { it.int1 == 0x40604100 }.size > 10, "PN.o5f")
     }
+
+    @Test
+    fun midi2PerNotePitchbendCurrentRel() {
+        val mml = """
+1   o5 c0,1 Bc=0 r4 Bc=-8192 r4 Bc+4096 r4 Bc-3072
+"""
+        val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
+        val music = Midi2Music().apply { read(umpx) }
+        val ml = music.tracks[0].messages
+        assertEquals(0x40603C00, ml[1].int1, "1.int1")
+        assertEquals(0x80000000.toInt(), ml[1].int2, "1.int2")
+        assertEquals(0x40603C00, ml[3].int1, "3.int1")
+        assertEquals(0x00000000, ml[3].int2, "3.int2")
+        assertEquals(0x40603C00, ml[5].int1, "5.int1")
+        assertEquals(0x40000000, ml[5].int2, "5.int2")
+        assertEquals(0x40603C00, ml[7].int1, "7.int1")
+        assertEquals(0x10000000, ml[7].int2, "7.int2")
+    }
 }

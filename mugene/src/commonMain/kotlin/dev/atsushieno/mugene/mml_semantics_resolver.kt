@@ -479,8 +479,6 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                 "__LET_PN" -> {
                     arguments[0].resolver.resolve(rctx, MmlDataType.String)
                     val name = arguments[0].resolver.stringValue
-                    arguments[1].resolver.resolve(rctx, MmlDataType.Number)
-                    val note = arguments[1].resolver.intValue
                     val variable = source.variables[name]
                     if (variable == null) {
                         reporter(
@@ -491,7 +489,7 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                         arguments[1].resolver.resolve(rctx, variable.type)
                         if (rctx.valuesPerNote[variable] == null)
                             rctx.valuesPerNote[variable] = MutableList(128) { null }
-                        rctx.valuesPerNote[variable]!![note] = arguments[1].resolver.resolvedValue!!
+                        rctx.valuesPerNote[variable]!![rctx.perNoteContext] = arguments[1].resolver.resolvedValue!!
                     }
                 }
                 "__PER_NOTE" -> {

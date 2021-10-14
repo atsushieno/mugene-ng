@@ -200,24 +200,18 @@
 
 #variable __bend_pn:number = 0
 #variable __pitchbend_bare_value_pn:number = 0
-#macro __CALCULATE_BEND_INTERMEDIATES_PN val:number { \
-	__LET{"__bend_pn", $val} \
-	__LET{"__pitchbend_bare_value_pn", $__pitchbend_cent_mode ? $val / 100 * 8192 / $__pitchbend_cent_mode, $val } \
-}
 #macro BEND_PN note:number, val:number { \
-	__PER_NOTE $note __CALCULATE_BEND_INTERMEDIATES_PN $val \
+	__PER_NOTE $note \
+	__LET_PN{"__bend_pn", $val} \
+	__LET_PN{"__pitchbend_bare_value_pn", $__pitchbend_cent_mode ? $val / 100 * 8192 / $__pitchbend_cent_mode, $val } \
 	PN_PITCH $note, $__pitchbend_bare_value_pn + 8192 \
 	__PER_NOTE_RESET \
 	}
 #macro Bn= note:number, val:number { BEND_PN $note, $val }
 #macro Bn+ note:number, val:number { \
-	__PER_NOTE $note __CALCULATE_BEND_INTERMEDIATES_PN $val \
-	BEND_PN $note, $__bend_pn + $__pitchbend_bare_value_pn \
-	__PER_NOTE_RESET }
+	__PER_NOTE $note BEND_PN $note, $__bend_pn + $val __PER_NOTE_RESET }
 #macro Bn- note:number, val:number { \
-	__PER_NOTE $note __CALCULATE_BEND_INTERMEDIATES_PN $val \
-	BEND_PN $note, $__bend_pn - $__pitchbend_bare_value_pn \
-	__PER_NOTE_RESET }
+	__PER_NOTE $note BEND_PN $note, $__bend_pn - $val __PER_NOTE_RESET }
 #macro Bc= val:number { Bn= $__latest_note, $val }
 #macro Bc+ val:number { Bn+ $__latest_note, $val }
 #macro Bc- val:number { Bn- $__latest_note, $val }

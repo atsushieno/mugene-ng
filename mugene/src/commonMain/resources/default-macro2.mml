@@ -16,7 +16,11 @@
 #variable __dummy_step:number
 #variable __length:length = 4
 #variable __tmp:number = 0
+
+// MIDI-2.0 specific, to indicate every value is still within MIDI 1.0 range.
+// It can be overriden to set to make everything MIDI 2.0 native range.
 #define VALUE_COMPAT_MODE 1
+
 #macro CH val:number { __LET {"__channel", $val} } // 0-255
 #macro DEBUG val { __PRINT {$val} }
 #variable __dummy_msg:string
@@ -272,15 +276,15 @@
 #macro < { __LET{"__octave", $__octave - 1} }
 
 // NoteOn/Off events
-#define KEYARGDEF step:length=$__length, gate:length=%-1, vel:number=$__velocity, timing:number=$__timing, offvel:number=0
-#define KEYARGAPPLY $step, $gate, $vel, $timing, $offvel
+#define KEYARGDEF step:length=$__length, gate:length=%-1, vel:number=$__velocity, timing:number=$__timing, offvel:number=0, atttype:number, attval:number
+#define KEYARGAPPLY $step, $gate, $vel, $timing, $offvel, $atttype, $attval
 #macro n key:number, KEYARGDEF   { \
 	__LET{"__current_note_step", $gate + %1 ? $gate, $step}  \
 	__LET{"__current_note_gate", $__current_note_step * $__gate_rel * {1 / $__gate_rel_denom} - $__gate_abs} \
 	__LET{"__current_note_gate", $__current_note_gate \< 0 ? 0, $__current_note_gate } \
 	__LET{"__latest_note", $key} \
 	NOP$timing \
-	NON$key, $vel \
+	NON$key, $vel, $atttype, $attval \
 	NOP$__current_note_gate \
 	__ON_MIDI_NOTE_OFF{$__current_note_gate, $key, $vel} \
 	NOFF$key, $offvel \

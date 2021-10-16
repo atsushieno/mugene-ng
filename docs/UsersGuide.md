@@ -378,9 +378,11 @@ Turns off notes of the specified scale [key] and velocity [vel]. Both are specif
 ### NON : Note on
 
 :format:
-- NON [key],[vel]
+- NON [key],[vel],[atttype],[attval]
 
 Turns on notes of the specified scale [key] and velocity [vel]. Both are specified as numbers between 0 and 127. All scale commands use this command, which outputs the MIDI command `9xh`.
+
+`atttype` and `attval` are **MIDI 2.0 only** arguments that are to directly specify note attribute type and note attribute value.
 
 
 ### PAF : Polyphonic Key Pressure (Aftertouch)
@@ -773,16 +775,18 @@ Moves the octave up or down one octave. `>` is up, `<` is down.
 ### n : Direct numerical pronunciation (note on, note off)
 
 :format:
-- n [key],[step],[gate],[vel=v],[offvel=0]
+- n [key],[step],[gate],[vel=v],[offvel=0],[atttype=0],[attval=0]
 
 Emits a pair of Note On and Note Off operations with the specified [key] (number). A note-on for the specified key is emitted and lasts during the note length specified by [gate], and then the note-off is emitted. This operation will also wait until the next operation for the length of the note specified by [step]. The value of [vel] is used for the velocity of the note on, and [offvel] for the velocity of the note off.
 
 The values after [key] can be omitted. If [step] is omitted, the value will be the default note length specified by the `l` operation. If [gate] is omitted, the value is calculated based on the value of [step] and the values specified by the `GATE_DENOM`, `Q`, and `q` operations. If [vel] is omitted, the value will be the default velocity specified by the `v` operation. The default value of [offvel] is `0`.
 
+`attype` and `attval` are **MIDI 2.0 only** arguments that are to directly specify UMP note attribute type and note attribute value (such as pitch 7.9).
+
 ### c d e f g a b : Pronunciation (note on, note off)
 
 :format:
-- [c d e f g a b][+ - =] [step],[gate],[vel=v],[offvel=0].
+- [c d e f g a b][+ - =] [step],[gate],[vel=v],[offvel=0],[atttype=0],[attval=0]
 
 This is the most common pair of note-on and note-off operations. It specifies a note of do-re-mi-fa-so-ra-si. The mapping between the keys and operations is as follows (matches the German notation):
 
@@ -795,6 +799,8 @@ This is the most common pair of note-on and note-off operations. It specifies a 
 - b : Si
 
 These characters can be followed (without spaces) by a `+` to make them sharp, a `-` to make them flat, or an `=` to make them natural. The actual key value is added to the value of the `K` and `Kc`..`Kb` operations. However, the `Kc`..`Kb` values will not be added if Natural (`=`) is specified (which gives special meaning to the `Kc`..`Kb` based key specification).
+
+`attype` and `attval` are **MIDI 2.0 only** arguments that are to directly specify UMP note attribute type and note attribute value (such as pitch 7.9).
 
 ### r : rest
 
@@ -875,6 +881,10 @@ There are also `nrpn-gs-xg.mml`, `gs-sysex.mml` and `drum-part.mml` additional u
 When mugene runs with MIDI 2.0 switch enabled, then `default-macro2.mml` is used instead of `default-macro.mml`. To avoid unnecessary MML difference, I leave most of the operators identical - otherwise the value ranges will be quite different e.g. there will be almost no audible notes when velocity assignments are left in MIDI1 values while the actual value range goes 0..65535, which does not make sense.
 
 But channels are indeed expanded to 0..255 so it will make rich composition possible.
+
+### parameter ranges
+
+MIDI 2.0 supports higher resolution in various parameters. Lots of values are 32-bit wise (CC, pitchbend, CAF, PAF...) and some values have 16-bit ranges (note velocity). Since we are most unlikely used to specify those high resolution values, not in MIDI 1.0 ranges, we specify `VALUE_COMPAT_MODE 1` in `default-macro2.mml`. It can be overriden to set to be native MIDI 2.0 ranges in user MML.
 
 ### BEND_PN, Bn, Bn+, Bn-: Explicit Per-note Pitchbend
 

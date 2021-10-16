@@ -28,7 +28,7 @@
 	__LET {"__dummy_step", $__timeline_position - $val } \
 	__LET { "__dummy_msg", \
 		"WARNING: step assertion failed. Label: " + $label + \
-		"expected position: " + $val + ", actual: " + $__dummy_step + "." } \
+		"expected position: " + $val + ", actual: " + $__timeline_position + "." } \
 	DEBUG $__dummy_step ? $__dummy_msg, "" \
 	}
 

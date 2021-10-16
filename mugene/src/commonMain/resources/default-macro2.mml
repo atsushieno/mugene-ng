@@ -22,14 +22,18 @@
 #define VALUE_COMPAT_MODE 1
 
 #macro CH val:number { __LET {"__channel", $val} } // 0-255
+
 #macro DEBUG val { __PRINT {$val} }
 #variable __dummy_msg:string
+#variable __dummy_cmd:string
+#macro NOP_STR str:string {}
 #macro ASSERT_STEP val:number,label:string { \
 	__LET {"__dummy_step", $__timeline_position - $val } \
 	__LET { "__dummy_msg", \
 		"WARNING: step assertion failed. Label: " + $label + \
-		"expected position: " + $val + ", actual: " + $__timeline_position + "." } \
-	DEBUG $__dummy_step ? $__dummy_msg, "" \
+		" - Expected position: " + $val + ", actual: " + $__timeline_position + "." } \
+	__LET { "__dummy_cmd", $__dummy_step ? "DEBUG", "NOP_STR" } \
+	__APPLY { $__dummy_cmd, $__dummy_msg } \
 	}
 
 // primitive variables used in primitive macro operations

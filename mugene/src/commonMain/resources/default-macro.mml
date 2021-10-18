@@ -208,7 +208,7 @@
 #define KEYARGAPPLY $step, $gate, $vel, $timing, $offvel
 #macro n key:number, KEYARGDEF   { \
 	__LET{"__current_note_step", $gate + %1 ? $gate, $step}  \
-	__LET{"__current_note_gate", $__current_note_step * $__gate_rel * {1 / $__gate_rel_denom} - $__gate_abs} \
+	__LET{"__current_note_gate", $step ? $__current_note_step * $__gate_rel * {1 / $__gate_rel_denom} - $__gate_abs, $__current_note_step} \
 	__LET{"__current_note_gate", $__current_note_gate \< 0 ? 0, $__current_note_gate } \
 	NOP$timing \
 	NON$key, $vel \

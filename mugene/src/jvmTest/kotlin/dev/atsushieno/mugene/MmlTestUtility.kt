@@ -5,18 +5,22 @@ import kotlin.test.assertTrue
 
 class MmlTestUtility {
     companion object {
-        fun testCompile (testLabel: String, mml: String, skipDefault: Boolean = false) : ByteArray {
+        fun testCompile (testLabel: String, mml: String, skipDefault: Boolean = false, reporter: MmlDiagnosticReporter? = null) : ByteArray {
             val sources = mutableListOf<MmlInputSource> ()
             sources.add ( MmlInputSource ("fakefilename.mml", mml))
             val outs = mutableListOf<Byte> ()
-            MmlCompiler.create().compile(skipDefault, sources, null, outs, false)
+            MmlCompiler.create()
+                .apply { if (reporter != null) this.report = reporter }
+                .compile(skipDefault, sources, null, outs, false)
             return outs.toByteArray()
         }
-        fun testCompile2 (testLabel: String, mml: String, skipDefault: Boolean = false, outputDeltaTime: Boolean = false) : ByteArray {
+        fun testCompile2 (testLabel: String, mml: String, skipDefault: Boolean = false, outputDeltaTime: Boolean = false, reporter: MmlDiagnosticReporter? = null) : ByteArray {
             val sources = mutableListOf<MmlInputSource> ()
             sources.add ( MmlInputSource ("fakefilename.mml", mml))
             val outs = mutableListOf<Byte> ()
-            MmlCompiler.create().compile2(outputDeltaTime, skipDefault, sources, outs)
+            MmlCompiler.create()
+                .apply { if (reporter != null) this.report = reporter }
+                .compile2(outputDeltaTime, skipDefault, sources, outs)
             return outs.toByteArray()
         }
     }

@@ -5,9 +5,13 @@ import dev.atsushieno.ktmidi.Midi2Music
 import dev.atsushieno.ktmidi.MidiChannelStatus
 import dev.atsushieno.ktmidi.MidiMusic
 import dev.atsushieno.ktmidi.SmfWriter
+import dev.atsushieno.ktmidi.eventType
 import dev.atsushieno.ktmidi.read
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class MmlCompilerTest {
@@ -308,7 +312,7 @@ class MmlCompilerTest {
     fun gateTime() {
         val mml = """
 1   c4 q4 c4 Q4 c4 q0 c4 l12 c Q8 c
-""".trimIndent()
+"""
         val smf = MmlTestUtility.testCompile("mml1", mml).toList()
         val music = MidiMusic().apply { read(smf) }
         val ml = music.tracks[0].messages
@@ -324,5 +328,55 @@ class MmlCompilerTest {
         assertEquals(8, ml[9].deltaTime, "deltaTime5")
         assertEquals(MidiChannelStatus.NOTE_OFF, ml[11].event.eventType.toUnsigned(), "eventType6")
         assertEquals(16, ml[11].deltaTime, "deltaTime6")
+    }
+
+    @Test
+    fun chordAndGateTime() {
+        // context: https://github.com/atsushieno/mugene-ng/issues/21
+        val mml = """
+1   q1 c0e4c4
+"""
+        val smf = MmlTestUtility.testCompile("mml1", mml).toList()
+        val music = MidiMusic().apply { read(smf) }
+        val ml = music.tracks[0].messages
+        assertEquals(MidiChannelStatus.NOTE_ON, ml[0].event.eventType.toUnsigned(), "smf: note-on should appear")
+
+        val umpx = MmlTestUtility.testCompile2("mml1", mml).toList()
+        val music2 = Midi2Music().apply { read(umpx) }
+        val ml2 = music2.tracks[0].messages
+        assertEquals(MidiChannelStatus.NOTE_ON, ml2[0].eventType, "umpx: note-on should appear")
+    }
+
+    // FIXME: enable this once issue #15 gets fixed
+    //@Test
+    fun noteOffThenOnPrioritization() {
+        // context: https://github.com/atsushieno/mugene-ng/issues/15
+        val mml = """
+1   l8 ceg r-4. egb
+"""
+        val reports = mutableListOf<String>()
+        val smf = MmlTestUtility.testCompile("mml1", mml, reporter = {  _, _, message -> reports.add(message) }).toList()
+        assertEquals(0, reports.size, "reported: " + reports.firstOrNull())
+        val music = MidiMusic().apply { read(smf) }
+        var current = 0
+        val notes = mutableMapOf<Byte,Int>()
+        var count = 0
+        music.tracks[0].messages.forEach {
+            count++
+            current += it.deltaTime
+            when (it.event.eventType.toUnsigned()) {
+                MidiChannelStatus.NOTE_OFF -> {
+                    val existing = notes[it.event.msb]
+                    assertNotNull(existing)
+                    assertTrue(current != existing, "note on and off at the same time == zero length: " + it.event.msb)
+                    notes.remove(it.event.msb)
+                }
+                MidiChannelStatus.NOTE_ON -> {
+                    assertTrue(notes[it.event.msb] == null, "There is already an existing note on: " + it.event.msb)
+                    notes[it.event.msb] = current
+                }
+            }
+        }
+        assertEquals(13, count, "event count")
     }
 }

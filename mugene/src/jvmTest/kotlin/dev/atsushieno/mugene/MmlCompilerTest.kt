@@ -303,4 +303,26 @@ class MmlCompilerTest {
         assertEquals(0x40E00000, ml[7].int1, "7.int1")
         assertEquals(0x10000000, ml[7].int2, "7.int2")
     }
+
+    @Test
+    fun gateTime() {
+        val mml = """
+1   c4 q4 c4 Q4 c4 q0 c4 l12 c Q8 c
+""".trimIndent()
+        val smf = MmlTestUtility.testCompile("mml1", mml).toList()
+        val music = MidiMusic().apply { read(smf) }
+        val ml = music.tracks[0].messages
+        assertEquals(MidiChannelStatus.NOTE_OFF, ml[1].event.eventType.toUnsigned(), "eventType1")
+        assertEquals(48, ml[1].deltaTime, "deltaTime1")
+        assertEquals(MidiChannelStatus.NOTE_OFF, ml[3].event.eventType.toUnsigned(), "eventType2")
+        assertEquals(44, ml[3].deltaTime, "deltaTime2")
+        assertEquals(MidiChannelStatus.NOTE_OFF, ml[5].event.eventType.toUnsigned(), "eventType3")
+        assertEquals(20, ml[5].deltaTime, "deltaTime3")
+        assertEquals(MidiChannelStatus.NOTE_OFF, ml[7].event.eventType.toUnsigned(), "eventType4")
+        assertEquals(24, ml[7].deltaTime, "deltaTime4")
+        assertEquals(MidiChannelStatus.NOTE_OFF, ml[9].event.eventType.toUnsigned(), "eventType5")
+        assertEquals(8, ml[9].deltaTime, "deltaTime5")
+        assertEquals(MidiChannelStatus.NOTE_OFF, ml[11].event.eventType.toUnsigned(), "eventType6")
+        assertEquals(16, ml[11].deltaTime, "deltaTime6")
+    }
 }

@@ -93,7 +93,17 @@
 
 #variable __tempo:number
 #variable __tempo_tmp:number
-#macro TEMPO val:number { __LET{"__tempo", $val} __LET{"__tempo_tmp", 1000000 * {60 / $val}} __MIDI_META {#51, $__tempo_tmp / #10000, {$__tempo_tmp % #10000} / #100, $__tempo_tmp % #100} }
+#variable __tempo_f:number
+#variable __tempo_s:number
+#variable __tempo_t:number
+#macro TEMPO val:number { \
+	__LET{"__tempo", $val} \
+	__LET{"__tempo_tmp", 1000000 * {60 / $val} } \
+	__LET{"__tempo_f", $__tempo_tmp / #10000} \
+	__LET{"__tempo_s", {$__tempo_tmp / #100} % #100} \
+	__LET{"__tempo_t", $__tempo_tmp % #100 } \
+	__MIDI_META {#51, $__tempo_f, $__tempo_s, $__tempo_t } \
+	}
 #macro t val:number { TEMPO $val }
 #macro t= val:number { TEMPO $val }
 #macro t+ val:number { t $__tempo + $val }

@@ -153,7 +153,17 @@
 
 #variable __tempo:number
 #variable __tempo_tmp:number
-#macro TEMPO val:number { __LET{"__tempo", $val} __LET{"__tempo_tmp", 1000000 * {60 / $val}} __MIDI_META {#51, $__tempo_tmp / #10000, {$__tempo_tmp % #10000} / #100, $__tempo_tmp % #100} }
+#variable __tempo_f:number
+#variable __tempo_s:number
+#variable __tempo_t:number
+#macro TEMPO val:number { \
+	__LET{"__tempo", $val} \
+	__LET{"__tempo_tmp", 1000000 * {60 / $val} } \
+	__LET{"__tempo_f", $__tempo_tmp / #10000} \
+	__LET{"__tempo_s", {$__tempo_tmp / #100} % #100} \
+	__LET{"__tempo_t", $__tempo_tmp % #100 } \
+	__MIDI_META {#51, $__tempo_f, $__tempo_s, $__tempo_t } \
+	}
 #macro t val:number { TEMPO $val }
 #macro t= val:number { TEMPO $val }
 #macro t+ val:number { t $__tempo + $val }
@@ -280,7 +290,7 @@
 #macro < { __LET{"__octave", $__octave - 1} }
 
 // NoteOn/Off events
-#define KEYARGDEF step:length=$__length, gate:length=%-1, vel:number=$__velocity, timing:number=$__timing, offvel:number=0, atttype:number, attval:number
+#define KEYARGDEF step:length=$__length, gate:length=%-1, vel:number=$__velocity, timing:number=$__timing, offvel:number=0, atttype:number=0, attval:number=0
 #define KEYARGAPPLY $step, $gate, $vel, $timing, $offvel, $atttype, $attval
 #macro n key:number, KEYARGDEF   { \
 	__LET{"__current_note_step", $gate + %1 ? $gate, $step}  \

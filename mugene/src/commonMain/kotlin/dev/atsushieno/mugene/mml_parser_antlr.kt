@@ -121,20 +121,13 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
     }
 
     override fun visitOperationUses(ctx: MugeneParser.OperationUsesContext): Any {
-        return if (ctx.findOperationUses() == null) {
-                val content = getSingleContent(ctx)
-                if (content is MmlOperationUse)
-                    mutableListOf<MmlOperationUse>().apply {
-                        add(content)
-                    }
-                else
-                    content as MutableList<*> // MutableList<MmlOperationUse>, but generics are gone.
+        val ret = mutableListOf<MmlOperationUse>()
+        ctx.findOperationUse().forEach {
+            val content = visitOperationUse(it)
+            if (content is MmlOperationUse)
+                ret.add(content)
         }
-        else {
-            val l = visit(ctx.findOperationUses()!!)!! as MutableList<MmlOperationUse>
-            l.add(visit(ctx.findOperationUse()!!)!! as MmlOperationUse)
-            l
-        }
+        return ret
     }
 
     override fun visitOperationUse(ctx: MugeneParser.OperationUseContext): Any {

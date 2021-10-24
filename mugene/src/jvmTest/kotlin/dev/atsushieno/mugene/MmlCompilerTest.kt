@@ -7,6 +7,8 @@ import dev.atsushieno.ktmidi.MidiMusic
 import dev.atsushieno.ktmidi.SmfWriter
 import dev.atsushieno.ktmidi.eventType
 import dev.atsushieno.ktmidi.read
+import java.nio.file.Files
+import java.nio.file.Path
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -378,5 +380,11 @@ class MmlCompilerTest {
             }
         }
         assertEquals(13, count, "event count")
+    }
+
+    @Test
+    fun compileLargeMml() {
+        val music = createDefaultCompiler().compile2(true, false,
+            Files.readString(Path.of("../samples/mars.mugene")))
     }
 }

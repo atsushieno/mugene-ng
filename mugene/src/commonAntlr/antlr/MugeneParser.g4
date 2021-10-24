@@ -8,8 +8,7 @@ expressionOrOperationUses :
 	;
 
 operationUses :
-	operationUse
-	| operationUses operationUse
+	operationUse+
 	;
 
 operationUse :

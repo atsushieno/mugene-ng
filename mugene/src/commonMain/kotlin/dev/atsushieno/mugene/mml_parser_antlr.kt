@@ -284,7 +284,9 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
         }
     }
 
-    private fun Token.toMmlLineInfo() = MmlLineInfo(tokenSource!!.sourceName ?: "", line, charPositionInLine)
+    // FIXME: we don't use filename as MmlLineInfo constructor argument anymore and it cannot work either.
+    //  Fortunately it is used only for hacky constant for DOT which would not be in actual use, hopefully.
+    private fun Token.toMmlLineInfo() = MmlLineInfo(/*tokenSource!!.sourceName ?: ""*/MmlLineInfo.emptyInputSource, line, charPositionInLine)
 
     override fun visitDots(ctx: MugeneParser.DotsContext): Any {
         return if (ctx.findDots() == null) 1 else getSingleContent(ctx) as Int + 1

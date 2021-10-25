@@ -1,6 +1,7 @@
 #meta title "Gustav Holst - The Planets: I. Mars, the Bringer of War."
 #define DRUMTRACKS 0.00001
 #macro REWIND len:length { r $len }
+#include "default-ext.mml"
 
 // FIXME: remove this `q1` once we fixed this issue
 //  https://github.com/atsushieno/mugene-ng/issues/15

@@ -35,23 +35,26 @@ open class LocalFileStreamResolver : StreamResolver() {
         return stat(file, st) == 0
     }
 
-    override fun resolveFilePath(file: String): String? {
+    override fun resolveFilePath(file: String, baseSourcePath: String?): String? {
+        val abs = if (baseSourcePath != null && exists(baseSourcePath)) {
+            val bAbs = getRealpath(baseSourcePath)
+            // FIXME: any solid solution for resolving relative paths?
+            bAbs.substring(0, bAbs.lastIndexOf('/') + 1) + file
+        } else file
         if (!includes.any()) {
-            if (!exists(file))
+            if (!exists(abs))
                 return null
-            val realPath = getRealpath(file)
+            val realPath = getRealpath(abs)
             return if (exists(realPath)) realPath else null
         }
-        if (exists(file) && getRealpath(file) == file)
-            return file
-        return getRealpath(includes.last() + '/' + file)
+        if (exists(abs) && getRealpath(abs) == abs)
+            return abs
+        return getRealpath(includes.last() + '/' + abs)
     }
 
-    override fun onGetEntity(file: String): String? {
-        val filePath = resolveFilePath(file) ?: return null
-
+    override fun onGetEntity(resolvedPath: String): String? {
         val returnBuffer = StringBuilder()
-        val fp = fopen(filePath, "r") ?: throw IllegalArgumentException("Cannot open '$filePath'")
+        val fp = fopen(resolvedPath, "r") ?: throw IllegalArgumentException("Cannot open '$resolvedPath'")
 
         try {
             memScoped {
@@ -73,18 +76,18 @@ open class LocalFileStreamResolver : StreamResolver() {
 
 // I assume this only works for dev. environment for unit testing. We need more paths to resolve...
 class NativeDevResourceStreamResolver : LocalFileStreamResolver() {
-    override fun resolveFilePath(file: String): String? {
-        return super.resolveFilePath("build/processedResources/native/main/$file")
+    override fun resolveFilePath(file: String, baseSourcePath: String?): String? {
+        return super.resolveFilePath(file, baseSourcePath) ?: super.resolveFilePath(file, "build/processedResources/native/main/")
     }
 }
 
 class ExecutablePathStreamResolver : LocalFileStreamResolver() {
 
-    override fun resolveFilePath(file: String): String? {
+    override fun resolveFilePath(file: String, baseSourcePath: String?): String? {
         val exePath = getSelfExecutablePath()
         val dir = exePath.substring(0, exePath.lastIndexOfAny(charArrayOf('/', '\\')))
-        val filePath = getRealpath("$dir/$file")
-        return if (exists(filePath)) filePath else null
+        val filePath = super.resolveFilePath(file, dir)
+        return if (filePath != null && exists(filePath)) filePath else null
     }
 }
 

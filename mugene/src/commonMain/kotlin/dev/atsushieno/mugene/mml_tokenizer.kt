@@ -6,25 +6,25 @@ import kotlin.math.pow
 
 abstract class StreamResolver {
 
-    fun getEntity(file: String): String {
-        if (file.isEmpty())
+    fun getEntity(resolvedFilePath: String): String {
+        if (resolvedFilePath.isEmpty())
             throw IllegalArgumentException("Empty filename is passed")
-        return onGetEntity(file) ?: throw IllegalArgumentException("MML stream \"$file\" could not be resolved.")
+        return onGetEntity(resolvedFilePath) ?: throw IllegalArgumentException("MML stream \"$resolvedFilePath\" could not be resolved.")
     }
 
-    internal open fun onGetEntity(file: String): String? {
+    internal open fun onGetEntity(resolvedPath: String): String? {
         throw UnsupportedOperationException("You have to implement it. It is virtual only because of backward compatibility.")
     }
 
     protected val includes = mutableListOf<String>()
 
-    abstract fun resolveFilePath(file: String): String?
+    abstract fun resolveFilePath(file: String, baseSourcePath: String?): String?
 
-    open fun pushInclude(file: String) {
-        val abs = resolveFilePath(file)
-        if (abs != null && includes.contains(abs))
-            throw IllegalArgumentException("File \"$abs\" is already being processed. Recursive inclusion is prohibited.")
-        includes.add(abs ?: "")
+    open fun pushInclude(resolvedFilePath: String?) {
+        //val abs = resolveFilePath(resolvedFilePath)
+        if (resolvedFilePath != null && includes.contains(resolvedFilePath))
+            throw IllegalArgumentException("File \"$resolvedFilePath\" is already being processed. Recursive inclusion is prohibited.")
+        includes.add(resolvedFilePath ?: "")
     }
 
     open fun popInclude() {
@@ -35,9 +35,9 @@ abstract class StreamResolver {
 class MergeStreamResolver(vararg resolvers: StreamResolver) : StreamResolver() {
     private val resolvers: MutableList<StreamResolver> = resolvers.toMutableList()
 
-    override fun resolveFilePath(file: String): String? {
+    override fun resolveFilePath(file: String, baseSourcePath: String?): String? {
         for (r in resolvers) {
-            val ret = r.resolveFilePath(file)
+            val ret = r.resolveFilePath(file, baseSourcePath)
             if (ret != null)
                 return ret
         }
@@ -53,9 +53,9 @@ class MergeStreamResolver(vararg resolvers: StreamResolver) : StreamResolver() {
         return null
     }
 
-    override fun pushInclude(file: String) {
+    override fun pushInclude(resolvedFilePath: String?) {
         for (r in resolvers)
-            r.pushInclude(file)
+            r.pushInclude(resolvedFilePath)
     }
 
     override fun popInclude() {
@@ -177,26 +177,29 @@ class MmlTrack(val number: Double) {
 // file sources to be parsed into MmlSourceLineSet, for each track
 // and macro.
 @JsExport
-data class MmlInputSource(val file: String, val text: String)
+data class MmlInputSource(val file: String, val text: String, val resolvedAsDefaultMacro: Boolean = false)
 
 @JsExport
-class MmlLineInfo(var file: String, line: Int, column: Int) {
+class MmlLineInfo(var source: MmlInputSource, line: Int, column: Int) {
     companion object {
-        val empty = MmlLineInfo("__internal__", 0, 0)
+        internal val emptyInputSource = MmlInputSource("___internal___", "")
+        val empty = MmlLineInfo(emptyInputSource, 0, 0)
     }
 
+    val file: String
+        get() = source.file
     var lineNumber: Int = line
     var linePosition: Int = column
 
-    fun clone() = MmlLineInfo(file, lineNumber, linePosition)
+    fun clone() = MmlLineInfo(source, lineNumber, linePosition)
 
     override fun toString() = "Location: $file (${lineNumber}, ${linePosition})"
 }
 
 class MmlLine(val location: MmlLineInfo, var text: String) {
     companion object {
-        fun create(file: String, lineNumber: Int, linePosition: Int, text: String) =
-            MmlLine(MmlLineInfo(file, lineNumber, linePosition), text)
+        fun create(source: MmlInputSource, lineNumber: Int, linePosition: Int, text: String) =
+            MmlLine(MmlLineInfo(source, lineNumber, linePosition), text)
     }
 
     fun tryMatch(target: String): Boolean {
@@ -311,9 +314,9 @@ class MmlInputSourceReader(private val compiler: MmlCompiler, private val resolv
                     continue
                 }
                 ls = if (s[0] == '#')
-                    processPragmaLine(MmlLine.create(input.file, line, 0, s))
+                    processPragmaLine(MmlLine.create(input, line, 0, s))
                 else
-                    processTrackLine(MmlLine.create(input.file, line, 0, s))
+                    processTrackLine(MmlLine.create(input, line, 0, s))
             }
             if (wasContinued)
                 throw mmlError(
@@ -365,7 +368,10 @@ class MmlInputSourceReader(private val compiler: MmlCompiler, private val resolv
     }
 
     private fun processIncludeLine(line: MmlLine): MmlSourceLineSet? {
-        val file = line.text.substring(line.location.linePosition).trim()
+        var file = line.text.substring(line.location.linePosition).trim()
+        if (line.location.source.resolvedAsDefaultMacro)
+            file = resolver.resolveFilePath(file, line.location.source.file)
+                ?: throw MmlException("Specified include file $file could not be opened.")
         this.doProcess(
             mutableListOf(
                 MmlInputSource(file, resolver.getEntity(file))
@@ -436,7 +442,7 @@ class MmlInputSourceReader(private val compiler: MmlCompiler, private val resolv
     }
 
     private fun mmlError(input: MmlInputSource, line: Int, column: Int, msg: String): MmlException {
-        return MmlException(msg, MmlLineInfo(input.file, line, column))
+        return MmlException(msg, MmlLineInfo(input, line, column))
     }
 }
 
@@ -453,7 +459,7 @@ abstract class MmlSourceLineSet {
             throw IllegalStateException("Unexpected addition to previous line while there was no registered line.")
         val prev = lines.last()
         val line = MmlLine.create(
-            prev.location.file,
+            prev.location.source,
             prev.location.lineNumber + 1,
             0,
             text

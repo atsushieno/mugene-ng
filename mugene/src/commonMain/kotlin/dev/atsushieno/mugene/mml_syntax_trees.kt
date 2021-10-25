@@ -314,7 +314,7 @@ class MmlSemanticTreeBuilder(val tokenSet: MmlTokenSet, val compiler: MmlCompile
                 msg: String,
                 e: RecognitionException?
             ) {
-                reporter(MmlDiagnosticVerbosity.Error, MmlLineInfo("(unknown)", line, charPositionInLine), msg)
+                reporter(MmlDiagnosticVerbosity.Error, MmlLineInfo(MmlLineInfo.emptyInputSource, line, charPositionInLine), msg)
             }
 
         })

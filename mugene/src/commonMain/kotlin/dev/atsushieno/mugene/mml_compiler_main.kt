@@ -118,7 +118,7 @@ abstract class MmlCompiler {
         val defaults = if (isMidi2) Util.defaultIncludes2 else Util.defaultIncludes
         var actualInputs =
             if (!skipDefaultMmlFiles)
-                defaults.map { f -> MmlInputSource(f, resolver.getEntity(f)) } + inputs
+                defaults.map { f -> MmlInputSource(f, resolver.getEntity(f), true) } + inputs
             else
                 inputs
 

@@ -349,8 +349,7 @@ class MmlCompilerTest {
         assertEquals(MidiChannelStatus.NOTE_ON, ml2[0].eventType, "umpx: note-on should appear")
     }
 
-    // FIXME: enable this once issue #15 gets fixed
-    //@Test
+    @Test
     fun noteOffThenOnPrioritization() {
         // context: https://github.com/atsushieno/mugene-ng/issues/15
         val mml = """

@@ -981,8 +981,15 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
         }
 
         l.clear()
-        for (k in msgBlockByTime.keys.sorted())
-            l.addAll(msgBlockByTime[k]!!)
+        for (k in msgBlockByTime.keys.sorted()) {
+            // We put note-off messages before note-on messages here.
+            // For details, see https://github.com/atsushieno/mugene-ng/issues/15
+            val lbt = msgBlockByTime[k]!!
+            l.addAll(lbt.filter { it.operation == "MIDI" && it.arguments[0].toUnsigned() == 0x80 ||
+                    it.operation == "MIDI_NG" && it.arguments[0].toUnsigned() == 0x80})
+            l.addAll(lbt.filter { (it.operation != "MIDI" || it.arguments[0].toUnsigned() != 0x80) &&
+                    (it.operation != "MIDI_NG" || it.arguments[0].toUnsigned() != 0x80)})
+        }
     }
 }
 

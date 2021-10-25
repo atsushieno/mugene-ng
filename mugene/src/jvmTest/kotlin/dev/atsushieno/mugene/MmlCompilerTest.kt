@@ -11,6 +11,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
@@ -385,5 +386,11 @@ class MmlCompilerTest {
     fun compileLargeMml() {
         val music = createDefaultCompiler().compile2(true, false,
             Files.readString(Path.of("../samples/mars.mugene")))
+    }
+
+    @Test
+    fun reportUnclosedLoop() {
+        // https://github.com/atsushieno/mugene-ng/issues/22
+        assertFails("should report unclosed loop") { MmlTestUtility.testCompile("mml", "1  [ceg") }
     }
 }

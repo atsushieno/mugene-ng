@@ -893,6 +893,12 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                     processMacroCall(track, rctx, oper, extraTailArgsIfApplied ?: listOf())
             }
         }
+
+        if (rctx.loops.any())
+            reporter(
+                MmlDiagnosticVerbosity.Error,
+                list[rctx.loops.last().beginAt!!.source].location,
+                "There is an unclosed loop")
     }
 
     private val expansionStack = mutableListOf<MmlSemanticMacro>()

@@ -150,7 +150,7 @@ class MmlCompilerTest {
 1	CH4 @47 V100 P79 l16 v100
     E_64,127,0,4.,24
     [g24]12
-    [c8c,,60c8c,,60c8c8 ]1
+    [c8cc8cc8c8 ]1
     """
         MmlTestUtility.testCompile2("midi2", mml)
         MmlTestUtility.testCompile("midi1", mml)
@@ -165,6 +165,16 @@ class MmlCompilerTest {
         val midi2Bytes = MmlTestUtility.testCompile2("midi2", mml, outputDeltaTime = true)
         val music2 = Midi2Music().apply { read (midi2Bytes.toList()) }
         assertEquals(72, music2.getTotalTicks(), "midi2 total ticks")
+    }
+
+    // FIXME: uncomment this once we fixed https://github.com/atsushieno/mugene-ng/issues/25
+    //@Test
+    fun tokenizerNoteSkippingLengthInsideLoop() { // it somehow skipped " ]1" parts
+        val mml = """
+1	[c8c,,60 ]1
+    """
+        MmlTestUtility.testCompile2("midi2", mml)
+        MmlTestUtility.testCompile("midi1", mml)
     }
 
     @Test

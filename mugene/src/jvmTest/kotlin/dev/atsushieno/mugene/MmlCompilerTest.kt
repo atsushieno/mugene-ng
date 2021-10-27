@@ -177,6 +177,14 @@ class MmlCompilerTest {
         MmlTestUtility.testCompile("midi1", mml)
     }
 
+    // FIXME: uncomment this once we fixed https://github.com/atsushieno/mugene-ng/issues/27
+    //@Test
+    fun tokenizerShouldReportError() {
+        val mml = "1 @58 o3 80  o5c"
+        assertFails("should report syntax error at orphan number token") { MmlTestUtility.testCompile2("midi2", mml) }
+        assertFails("should report syntax error at orphan number token") { MmlTestUtility.testCompile("midi1", mml) }
+    }
+
     @Test
     fun escapedNameCharExtension() {
         val mml = """

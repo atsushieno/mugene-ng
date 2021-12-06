@@ -1,0 +1,22 @@
+allprojects {
+    repositories {
+        mavenLocal()
+        google()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+    }
+}
+
+// This is a workaround for https://youtrack.jetbrains.com/issue/KT-44884
+configurations.matching { it.name != "kotlinCompilerPluginClasspath" }.all {
+    resolutionStrategy.eachDependency {
+        version = requested.version
+        if (requested.group == "org.jetbrains.kotlinx" &&
+                requested.name.startsWith("kotlinx-coroutines") &&
+                version != null && !version.contains("native-mt")
+        ) {
+            useVersion("$version-native-mt")
+        }
+    }
+}
+

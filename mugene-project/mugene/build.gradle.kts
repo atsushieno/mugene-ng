@@ -13,14 +13,14 @@ buildscript {
 
 plugins {
     id("com.android.library") version "4.1.3"
-    kotlin("multiplatform") version "1.5.21"
+    kotlin("multiplatform") version "1.5.31"
     id("dev.petuska.npm.publish") version "2.0.3"
     id("maven-publish")
     id("signing")
 }
 
 group = "dev.atsushieno"
-version = "0.2.24"
+version = "0.2.25"
 
 val ktmidi_version = "0.3.15"
 
@@ -87,7 +87,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("dev.atsushieno:ktmidi:$ktmidi_version")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
             }
             dependsOn(commonAntlr)
         }
@@ -175,14 +175,16 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
 // you can call the task manually in this case to update the generated sources
 tasks.getByName("compileKotlinJvm").dependsOn("generateKotlinCommonGrammarSource")
 // end of copy(2)
-tasks.getByName("compileKotlinJs").dependsOn("generateKotlinCommonGrammarSource")
-//tasks.getByName("compileKotlinJsIr").dependsOn("generateKotlinCommonGrammarSource")
-//tasks.getByName("compileKotlinJsLegacy").dependsOn("generateKotlinCommonGrammarSource")
+/*
+//tasks.getByName("compileKotlinJs").dependsOn("generateKotlinCommonGrammarSource")
+tasks.getByName("compileKotlinJsIr").dependsOn("generateKotlinCommonGrammarSource")
+tasks.getByName("compileKotlinJsLegacy").dependsOn("generateKotlinCommonGrammarSource")
 tasks.getByName("compileKotlinMetadata").dependsOn("generateKotlinCommonGrammarSource")
 afterEvaluate {
     tasks.getByName("compileDebugKotlinAndroid").dependsOn("generateKotlinCommonGrammarSource")
     tasks.getByName("compileReleaseKotlinAndroid").dependsOn("generateKotlinCommonGrammarSource")
 }
+*/
 
 android {
     compileSdkVersion(30)

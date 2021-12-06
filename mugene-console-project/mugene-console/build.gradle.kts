@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.5.21"
+    kotlin("multiplatform") version "1.5.31"
 }
 
 repositories {
@@ -30,7 +30,7 @@ kotlin {
     sourceSets {
         val nativeMain by getting {
             dependencies {
-                implementation(project(":mugene"))
+                implementation("dev.atsushieno:mugene:+")
             }
         }
     }
@@ -62,6 +62,6 @@ tasks {
 }
 
 tasks.withType<Wrapper> {
-  gradleVersion = "7.1.1"
+  gradleVersion = "7.3"
   distributionType = Wrapper.DistributionType.BIN
 }

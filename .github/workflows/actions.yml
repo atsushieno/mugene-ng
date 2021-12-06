@@ -25,21 +25,24 @@ jobs:
         echo y | sudo apt-get install doxygen cmake ninja-build libasound2-dev
     - name: stupid NDK setup workaround for GitHub Actions
       run: sudo mkdir -p /usr/local/lib/android/sdk/ndk && sudo chmod 777 /usr/local/lib/android/sdk/ndk
-    - name: build
+    - name: build mugene-project
       run: |
-        ./gradlew :mugene:generateKotlinCommonGrammarSource
-        ./gradlew build mugene-console-jvm:jar
+        cd mugene-project && ./gradlew :mugene:generateKotlinCommonGrammarSource build publishToMavenLocal
       env:
         USERNAME: atsushieno
-        GITHUB_TOKEN: ${{ secrets.MAVEN_PAT }}
+    - name: build mugene-console-project
+      run: |
+        cd mugene-console-project && ./gradlew build mugene-console-jvm:jar
+      env:
+        USERNAME: atsushieno
     - name: upload artifact
       if: success()
       uses: actions/upload-artifact@v2
       with:
         name: mugene-ng-artifacts
         path: |
-          mugene/build/libs/*.jar
-          mugene/build/outputs/aar/*.aar
-          mugene-console/build/bin/
-          mugene-console-jvm/build/libs/*.jar
+          mugene-project/mugene/build/libs/*.jar
+          mugene-project/mugene/build/outputs/aar/*.aar
+          mugene-console-project/mugene-console/build/bin/
+          mugene-console-project/mugene-console-jvm/build/libs/*.jar
 

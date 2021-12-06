@@ -15,14 +15,17 @@ The entire language is partly documented as [docs/UsersGuide.md](./docs/UsersGui
 At this state, you have to run a couple of Gradle tasks to build whatever you'll likely need:
 
 ```
-./gradlew mugene:generateKotlinCommonGrammarSource build mugene-console-jvm:jar packJsNpmPublication
+cd mugene-project
+./gradlew mugene:generateKotlinCommonGrammarSource build packJsNpmPublication publishToMavenLocal
+cd ../mugene-console-project
+./gradlew build mugene-console-jvm:jar
 ```
 
 This generates some syntax file support code, builds libs and tools, package a single jar for JVM desktop, and generate NPM artifacts that are also used by VSCodium extension (under development).
 
 ## Using command-line compiler
 
-Once you are done with `build` Gradle build task, there will be `mugene-console/build/bin/native/debugExecutable/mugene-console.kexe` (or `.exe` on Windows). You can then run it to compile mugene MML files like: `(the/path/to/)mugene-console.kexe samples/escape.mugene`. For the complete list of command line arguments, just run this executable without arguments.
+Once you are done with `build` Gradle build task, there will be `mugene-console-project/mugene-console/build/bin/native/debugExecutable/mugene-console.kexe` (or `.exe` on Windows). You can then run it to compile mugene MML files like: `(the/path/to/)mugene-console.kexe samples/escape.mugene`. For the complete list of command line arguments, just run this executable without arguments.
 
 ## mugene-ng limitations
 

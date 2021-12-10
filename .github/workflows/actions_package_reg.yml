@@ -25,24 +25,20 @@ jobs:
         echo y | sudo apt-get install doxygen cmake ninja-build libasound2-dev
     - name: stupid NDK setup workaround for GitHub Actions
       run: sudo mkdir -p /usr/local/lib/android/sdk/ndk && sudo chmod 777 /usr/local/lib/android/sdk/ndk
+    - name: publish mugene-project to mavenLocal
+      run: |
+        cd mugene-project && ./gradlew :mugene:generateKotlinCommonGrammarSource publishToMavenLocal
+    - name: build mugene-console-project
+      run: |
+        cd mugene-console-project && ./gradlew build mugene-console-jvm:jar
+    - name: rewrite build.gradle to require signing
+      run: sed -i "s/signing {}/signing { sign(publishing.publications) }/" mugene-project/mugene/build.gradle.kts
     - name: setup gpg necessities
       run: sudo bash -c "echo '$GPG_KEY_CONTENTS' | base64 -d > '$SIGNING_SECRET_KEY_RING_FILE'"
       env:
         GPG_KEY_CONTENTS: ${{ secrets.GPG_KEY_CONTENTS }}
         SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SIGNING_SECRET_KEY_RING_FILE }}
-    - name: rewrite build.gradle to require signing
-      run: sed -i "s/signing {}/signing { sign(publishing.publications) }/" mugene-project/mugene/build.gradle.kts
-    - name: build mugene-project
-      run: |
-        cd mugene-project && ./gradlew :mugene:generateKotlinCommonGrammarSource publishToMavenLocal
-      env:
-        USERNAME: atsushieno
-    - name: build mugene-console-project
-      run: |
-        cd mugene-console-project && ./gradlew build mugene-console-jvm:jar
-      env:
-        USERNAME: atsushieno
-    - name: publish mugene-project
+    - name: build and publish mugene-project
       run: |
         cd mugene-project && ./gradlew build publish
       env:

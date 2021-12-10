@@ -7,30 +7,35 @@ import * as vscode from 'vscode';
 import * as rx from 'rx-lite';
 
 import { /*workspace,*/ ExtensionContext } from 'vscode';
+import { IllegalStateException } from '@js-joda/core';
 //import Module = require('module');
 //import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-languageclient';
 
 
 // Load module dynamically, either IR or Legacy, and either dev or package
-var mugeneDirPathLegacy = "../../../mugene/build/publications/npm/js";
-var mugeneJSPathLegacy = mugeneDirPathLegacy + "/mugene-ng-mugene.js";
-if (fs.existsSync(module.path + "/" + mugeneJSPathLegacy)) {
-	var mugene = require(mugeneJSPathLegacy); // path under dev. environment.
-	mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(module.path + "/" + mugeneDirPathLegacy);
-} else if (fs.existsSync(module.path + "/../../node_modules/@dev.atsushieno/mugene/mugene-ng-mugene.js")) { // legacy from package
-	var mugene = require("@dev.atsushieno/mugene/mugene-ng-mugene.js");
-	mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(__dirname + "/../../node_modules/@dev.atsushieno/mugene");
-} else { // IR
-	var mugeneDirPathIR = "../../../build/js/packages/mugene-ng-mugene/kotlin";
-	var mugeneJSPathIR = mugeneDirPathIR + "/mugene-ng-mugene.js";
-	if (fs.existsSync(module.path + "/" + mugeneJSPathIR)) {
-		var mugene = require(mugeneJSPathIR); // path under dev. environment.
-		mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(module.path + "/" + mugeneDirPathIR);
-	} else {
-		var mugene = require("@dev.atsushieno/mugene/kotlin/mugene-ng-mugene.js");
+var mugeneDirPathLegacy = "../../../build/js/packages/mugene-mugene-js-legacy/kotlin";
+var mugeneJSPathLegacy = mugeneDirPathLegacy + "/mugene-mugene-js-legacy.js";
+var resPathLegacy = "../../../mugene/build/processedResources/jsLegacy/main";
+var mugeneDirPathIRBoth = "../../../mugene/build/publications/npm/js";
+var mugeneDirPathIROnly = "../../../build/js/packages/mugene-mugene/kotlin";
+var mugeneJSPathIRBoth = mugeneDirPathIRBoth + "/mugene-mugene.js";
+var mugeneJSPathIROnly = mugeneDirPathIROnly + "/mugene-mugene.js";
+var resPathIRBoth = mugeneDirPathIRBoth;
+var resPathIROnly = mugeneDirPathIROnly;
+	if (fs.existsSync(module.path + "/" + mugeneJSPathIRBoth)) { // BOTH-IR dev
+		var mugene = require(mugeneJSPathIRBoth);
+		mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(module.path + "/" + resPathIRBoth);
+	} else if (fs.existsSync(module.path + "/" + mugeneJSPathIROnly)) { // IR-only dev
+		var mugene = require(mugeneJSPathIROnly);
+		mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(module.path + "/" + resPathIROnly);
+	} else if (fs.existsSync(module.path + "/" + mugeneJSPathLegacy)) { // Legacy dev
+		var mugene = require(mugeneJSPathLegacy);
+		mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(module.path + "/" + resPathLegacy);
+	} else if (fs.existsSync(module.path + "/../../node_modules/@dev.atsushieno/mugene/mugene-ng-mugene.js")) {
+		var mugene = require("@dev.atsushieno/mugene/kotlin/mugene-mugene.js");
 		mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(__dirname + "/../../node_modules/@dev.atsushieno/mugene");
-	}
-}
+	} else
+		throw new IllegalStateException("mugene JS implementation not found.")
 
 const mugene_scheme = "mugene";
 

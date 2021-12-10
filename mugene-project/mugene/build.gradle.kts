@@ -13,8 +13,8 @@ buildscript {
 
 plugins {
     id("com.android.library") version "4.1.3"
-    kotlin("multiplatform") version "1.5.31"
-    id("dev.petuska.npm.publish") version "2.0.3"
+    kotlin("multiplatform") version "1.6.0"
+    id("dev.petuska.npm.publish") version "2.1.1"
     id("maven-publish")
     id("signing")
 }
@@ -37,8 +37,9 @@ kotlin {
             useJUnit()
         }
     }
-    js(LEGACY) {
-        binaries.executable()
+    js(IR) {
+        binaries.executable() // enable this for IR (it is default for LEGACY)
+        useCommonJs()
         nodejs {
             testTask {
                 useKarma {
@@ -46,9 +47,8 @@ kotlin {
                     webpackConfig.cssSupport.enabled = true
                 }
             }
-            useCommonJs()
         }
-        //browser()
+        browser()
     }
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")
@@ -114,7 +114,12 @@ kotlin {
                 implementation("junit:junit:4.13.2")
             }
         }
-        val jsMain by getting
+        val jsMain by getting {
+            dependencies {
+                implementation(npm("fs", ""))
+                implementation(npm("buffer", ""))
+            }
+        }
         val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))

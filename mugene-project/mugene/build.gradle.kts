@@ -20,7 +20,7 @@ plugins {
 }
 
 group = "dev.atsushieno"
-version = "0.2.25"
+version = "0.2.26"
 
 val ktmidi_version = "0.3.15"
 
@@ -38,7 +38,7 @@ kotlin {
         }
     }
     js(IR) {
-        binaries.executable() // enable this for IR (it is default for LEGACY)
+        binaries.library() // binaries.executable() did not work, results in empty package.
         useCommonJs()
         nodejs {
             testTask {

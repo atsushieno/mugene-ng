@@ -180,24 +180,24 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
 // you can call the task manually in this case to update the generated sources
 tasks.getByName("compileKotlinJvm").dependsOn("generateKotlinCommonGrammarSource")
 // end of copy(2)
-/*
 //tasks.getByName("compileKotlinJs").dependsOn("generateKotlinCommonGrammarSource")
-tasks.getByName("compileKotlinJsIr").dependsOn("generateKotlinCommonGrammarSource")
-tasks.getByName("compileKotlinJsLegacy").dependsOn("generateKotlinCommonGrammarSource")
+//tasks.getByName("compileKotlinJsIr").dependsOn("generateKotlinCommonGrammarSource")
+//tasks.getByName("compileKotlinJsLegacy").dependsOn("generateKotlinCommonGrammarSource")
 tasks.getByName("compileKotlinMetadata").dependsOn("generateKotlinCommonGrammarSource")
 afterEvaluate {
     tasks.getByName("compileDebugKotlinAndroid").dependsOn("generateKotlinCommonGrammarSource")
     tasks.getByName("compileReleaseKotlinAndroid").dependsOn("generateKotlinCommonGrammarSource")
+    tasks.getByName("androidDebugSourcesJar").dependsOn("generateKotlinCommonGrammarSource")
+    tasks.getByName("androidReleaseSourcesJar").dependsOn("generateKotlinCommonGrammarSource")
 }
-*/
 
 android {
-    compileSdkVersion(30)
+    compileSdk = 31
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].assets.srcDir("src/commonMain/resources") // kind of hack...
     defaultConfig {
-        minSdkVersion(24)
-        targetSdkVersion(30)
+        minSdk = 24
+        targetSdk = 31
     }
     buildTypes {
         val debug by getting {

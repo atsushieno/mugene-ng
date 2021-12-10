@@ -34,7 +34,7 @@ jobs:
       run: sed -i "s/signing {}/signing { sign(publishing.publications) }/" mugene-project/mugene/build.gradle.kts
     - name: build mugene-project
       run: |
-        cd mugene-project && ./gradlew :mugene:generateKotlinCommonGrammarSource build publishToMavenLocal
+        cd mugene-project && ./gradlew :mugene:generateKotlinCommonGrammarSource publishToMavenLocal
       env:
         USERNAME: atsushieno
     - name: build mugene-console-project
@@ -44,7 +44,7 @@ jobs:
         USERNAME: atsushieno
     - name: publish mugene-project
       run: |
-        cd mugene-project && ./gradlew publish
+        cd mugene-project && ./gradlew build publish
       env:
         USERNAME: atsushieno
         OSSRH_USERNAME: atsushieno

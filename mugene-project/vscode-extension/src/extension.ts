@@ -31,8 +31,8 @@ var resPathIROnly = mugeneDirPathIROnly;
 	} else if (fs.existsSync(module.path + "/" + mugeneJSPathLegacy)) { // Legacy dev
 		var mugene = require(mugeneJSPathLegacy);
 		mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(module.path + "/" + resPathLegacy);
-	} else if (fs.existsSync(module.path + "/../../node_modules/@dev.atsushieno/mugene/mugene-ng-mugene.js")) {
-		var mugene = require("@dev.atsushieno/mugene/kotlin/mugene-mugene.js");
+	} else if (fs.existsSync(module.path + "/../../node_modules/@dev.atsushieno/mugene/mugene-mugene.js")) {
+		var mugene = require("@dev.atsushieno/mugene/mugene-mugene.js");
 		mugene.dev.atsushieno.mugene.setNodeModuleResourceStreamResolverBasePath(__dirname + "/../../node_modules/@dev.atsushieno/mugene");
 	} else
 		throw new IllegalStateException("mugene JS implementation not found.")

@@ -60,6 +60,13 @@
 #macro CAF val:number { __MIDI {#D0 + $__channel, $val, 0} }
 #macro PITCH val:number { __MIDI {#E0 + $__channel, $val % #80, $val / #80} }
 
+// Some common CCs
+#macro ALL_SOUNDS_OFF { CC123,0 }
+#macro RESET_ALL_CONTROLLERS { CC121,0 }
+#macro ALL_NOTES_OFF { CC120,0 }
+#macro OMNI_MODE_OFF { CC124,0 }
+#macro OMNI_MODE_ON { CC125,0 }
+
 // Variable storage
 #macro l val:length { __LET{"__length", $val} }
 #macro K val:number { __LET{"__trans", $val} }

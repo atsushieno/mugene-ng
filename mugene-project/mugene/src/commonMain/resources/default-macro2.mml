@@ -254,15 +254,20 @@
 #macro DSD+ val:number { DSD= $__delay_send_depth + $val }
 #macro DSD- val:number { DSD= $__delay_send_depth - $val }
 
-// RPN, NRPN, and DTE are not supported in MIDI 2.0 channel messages, so use CC_OLD.
-#macro NRPNM val:number { CC_OLD #63,$val }
-#macro NRPNL val:number { CC_OLD #62,$val }
+// RPN, NRPN, and DTE are not supported in MIDI 2.0 channel messages,
+// so store those values and emit RPNX or NRPNX at DTE_LSB, which is UMP spec. conforming approach.
+#variable __DTE_TARGET_TYPE:number
+#variable __DTE_TARGET_MSB:number
+#variable __DTE_TARGET_LSB:number
+#variable __DTE_VALUE_MSB:number
+#macro NRPNM val:number { __LET{"__DTE_TARGET_TYPE", 1 } __LET{"__DTE_TARGET_MSB", $val } }
+#macro NRPNL val:number { __LET{"__DTE_TARGET_TYPE", 1 } __LET{"__DTE_TARGET_LSB", $val } }
 #macro NRPN msb:number,lsb:number { NRPNM$msb NRPNL$lsb }
-#macro RPNM val:number { CC_OLD #65,$val }
-#macro RPNL val:number { CC_OLD #64,$val }
+#macro RPNM val:number { __LET{"__DTE_TARGET_TYPE", 0 } __LET{"__DTE_TARGET_MSB", $val } }
+#macro RPNL val:number { __LET{"__DTE_TARGET_TYPE", 0 } __LET{"__DTE_TARGET_LSB", $val } }
 #macro RPN msb:number,lsb:number { RPNM$msb RPNL$lsb }
-#macro DTEM val:number { CC_OLD #06,$val }
-#macro DTEL val:number { CC_OLD #26,$val }
+#macro DTEM val:number { __LET{"__DTE_VALUE_MSB", $val } }
+#macro DTEL val:number { __APPLY{ { $__DTE_TARGET_TYPE ? "RPNX", "NRPNX" }, $__DTE_TARGET_MSB, $__DTE_TARGET_LSB, $__DTE_VALUE_MSB * #100 + $val } }
 #macro DTE msb:number,lsb:number { DTEM$msb DTEL$lsb }
 
 #macro TEXT val:string { __MIDI_META{1, $val} }

@@ -267,7 +267,7 @@
 #macro RPNL val:number { __LET{"__DTE_TARGET_TYPE", 0 } __LET{"__DTE_TARGET_LSB", $val } }
 #macro RPN msb:number,lsb:number { RPNM$msb RPNL$lsb }
 #macro DTEM val:number { __LET{"__DTE_VALUE_MSB", $val } }
-#macro DTEL val:number { __APPLY{ { $__DTE_TARGET_TYPE ? "RPNX", "NRPNX" }, $__DTE_TARGET_MSB, $__DTE_TARGET_LSB, $__DTE_VALUE_MSB * #100 + $val } }
+#macro DTEL val:number { __APPLY{ { $__DTE_TARGET_TYPE ? "RPNX", "NRPNX" }, $__DTE_TARGET_MSB, $__DTE_TARGET_LSB, $__DTE_VALUE_MSB * #1000000 + $val * #10000 } }
 #macro DTE msb:number,lsb:number { DTEM$msb DTEL$lsb }
 
 #macro TEXT val:string { __MIDI_META{1, $val} }

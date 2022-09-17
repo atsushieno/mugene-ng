@@ -22,7 +22,7 @@ plugins {
 group = "dev.atsushieno"
 version = "0.2.27"
 
-val ktmidi_version = "0.3.18"
+val ktmidi_version = "0.3.19"
 
 kotlin {
     android {
@@ -180,7 +180,7 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
 // you can call the task manually in this case to update the generated sources
 tasks.getByName("compileKotlinJvm").dependsOn("generateKotlinCommonGrammarSource")
 // end of copy(2)
-//tasks.getByName("compileKotlinJs").dependsOn("generateKotlinCommonGrammarSource")
+tasks.getByName("compileKotlinJs").dependsOn("generateKotlinCommonGrammarSource")
 //tasks.getByName("compileKotlinJsIr").dependsOn("generateKotlinCommonGrammarSource")
 //tasks.getByName("compileKotlinJsLegacy").dependsOn("generateKotlinCommonGrammarSource")
 tasks.getByName("compileKotlinMetadata").dependsOn("generateKotlinCommonGrammarSource")

@@ -13,16 +13,16 @@ buildscript {
 
 plugins {
     id("com.android.library") version "4.1.3"
-    kotlin("multiplatform") version "1.6.0"
+    kotlin("multiplatform") version "1.7.10"
     id("dev.petuska.npm.publish") version "2.1.1"
     id("maven-publish")
     id("signing")
 }
 
 group = "dev.atsushieno"
-version = "0.2.26"
+version = "0.2.27"
 
-val ktmidi_version = "0.3.15"
+val ktmidi_version = "0.3.18"
 
 kotlin {
     android {
@@ -87,7 +87,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("dev.atsushieno:ktmidi:$ktmidi_version")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
             }
             dependsOn(commonAntlr)
         }

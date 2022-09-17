@@ -16,12 +16,15 @@ operationUse :
 	;
 
 argumentsOptCurly :
+	// It is definitely ambiguous at this vs. "parenthesized" expression i.e. { expression } ...
 	OpenCurly arguments? CloseCurly
 	| arguments
 	;
 
 arguments :
-	argument (commas arguments)?
+	argument
+	| arguments commas argument
+	| commas argument
 	;
 
 argument :

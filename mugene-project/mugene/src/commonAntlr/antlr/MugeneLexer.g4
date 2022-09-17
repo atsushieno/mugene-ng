@@ -26,5 +26,4 @@ KeywordString : 'string' ;
 KeywordBuffer : 'buffer' ;
 
 NumberLiteral : [0-9]+;
-Identifier : [a-zA-Z_][a-zA-Z0-9_]* ;
-
+Identifier : [a-zA-Z_]+ ;

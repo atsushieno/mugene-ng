@@ -411,4 +411,10 @@ class MmlCompilerTest {
         // https://github.com/atsushieno/mugene-ng/issues/22
         assertFails("should report unclosed loop") { MmlTestUtility.testCompile("mml", "1  [ceg") }
     }
+
+    @Test
+    fun skippedArgumentsInLoop() {
+        // https://github.com/atsushieno/mugene-ng/issues/29
+        MmlTestUtility.testCompile("mml", "1  [c,,50]")
+    }
 }

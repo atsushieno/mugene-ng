@@ -150,17 +150,23 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
     }
 
     override fun visitArguments(ctx: MugeneParser.ArgumentsContext): Any {
-        if (ctx.findArguments() == null)
-            return mutableListOf<MmlValueExpr>().apply { add(getSingleContent(ctx) as MmlValueExpr) }
-        val args = visit(ctx.findArguments()!!) as MutableList<MmlValueExpr?>
-        val commas = visit(ctx.findCommas()!!)!! as Int
-        val arg = visit(ctx.findArgument()!!)!! as MmlValueExpr
-        // add default arguments (one comma works as a normal parameter separator, so -1)
-        for (i in 0 until commas - 1)
-            args.add(0, MmlValueExpr.skippedArgument)
-        // add last argument (cannot omit)
-        args.add(0, arg)
-        return args
+        val head = ctx.findArguments()
+        val ret =
+            if (head != null) visitArguments(head) as MutableList<MmlValueExpr>
+            else mutableListOf()
+
+        val commasNode = ctx.findCommas()
+        if (commasNode != null) {
+            val numCommas = visit(commasNode) as Int
+            // only extra commas contribute to default arguments (i.e. skip "only one" comma)
+            ret.addAll((0 until numCommas - 1).map { MmlValueExpr.skippedArgument })
+        }
+
+        val argsNode = ctx.findArgument()
+        if (argsNode != null)
+            ret.add(visitArgument(ctx.findArgument()!!) as MmlValueExpr)
+
+        return ret
     }
 
     override fun visitArgument(ctx: MugeneParser.ArgumentContext): Any {

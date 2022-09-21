@@ -20,7 +20,7 @@ plugins {
 }
 
 group = "dev.atsushieno"
-version = "0.2.27"
+version = "0.2.29" // failed to build 0.2.27 vscode-extension and had to bump 0.2.28 only in vscode-extension, thus 0.2.28 cannot exist...
 
 val ktmidi_version = "0.3.19"
 

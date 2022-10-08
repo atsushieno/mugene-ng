@@ -60,55 +60,55 @@
 // NON (8n), NOFF (9n), PAF (An), CC (Bn), PROGRAM (Cn), CAF (Dn), PITCH (En), EX (F0,F7), META (FF)
 
 #macro NOFF key:number,vel:number,attributeType:number,attributeValue:number { \
-	__LET { "__tmp", $vel * { VALUE_COMPAT_MODE ? #100, 1 } } \
+	__LET { "__tmp", $vel * { VALUE_COMPAT_MODE ? #200, 1 } } \
 	__MIDI_NG { #80, $__channel, $key, $attributeType, $__tmp / #100, $__tmp % #100, \
 	$attributeValue / #100, $attributeValue % #100 } }
 #macro NON key:number,vel:number,attributeType:number,attributeValue:number { \
-	__LET { "__tmp", $vel * { VALUE_COMPAT_MODE ? #100, 1 } } \
+	__LET { "__tmp", $vel * { VALUE_COMPAT_MODE ? #200, 1 } } \
 	__MIDI_NG { #90, $__channel, $key, $attributeType, $__tmp / #100, $__tmp % #100, \
 	$attributeValue / #100, $attributeValue % #100 } }
 #macro PN_MANAGEMENT key:number, optionFlags:number, vel:number { \
-	__LET { "__tmp", $vel * { VALUE_COMPAT_MODE ? #1000000, 1 } } \
+	__LET { "__tmp", $vel * { VALUE_COMPAT_MODE ? #2000000, 1 } } \
 	__MIDI_NG {#F0, $__channel, $key, $optionFlags, \
 	$__tmp / #1000000, {$__tmp / #10000} % #100, {$__tmp / #100} % #100, $__tmp % #100 } }
 #macro PAF key:number,vel:number { \
-	__LET { "__tmp", $vel * { VALUE_COMPAT_MODE ? #1000000, 1 } } \
+	__LET { "__tmp", $vel * { VALUE_COMPAT_MODE ? #2000000, 1 } } \
 	__MIDI_NG {#A0, $__channel, $key, 0, \
 	$__tmp / #1000000, {$__tmp / #10000} % #100, {$__tmp / #100} % #100, $__tmp % #100 } }
 #macro CC_OLD index:number, val:number { \
 	__MIDI {#B0, $__channel, $index, $val } }
 #macro CC index:number, val:number { \
-	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #1000000, 1 } } \
+	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #2000000, 1 } } \
 	__MIDI_NG {#B0, $__channel, $index, 0, \
 	$__tmp / #1000000, {$__tmp / #10000} % #100, {$__tmp / #100} % #100, $__tmp % #100 } }
 #macro PNRCC key:number, index:number, val:number { \
-	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #1000000, 1 } } \
+	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #2000000, 1 } } \
 	__MIDI_NG {#00, $__channel, $key, $index, \
 	$__tmp / #1000000, {$__tmp / #10000} % #100, {$__tmp / #100} % #100, $__tmp % #100 } }
 #macro PNACC key:number, index:number, val:number { \
-	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #1000000, 1 } } \
+	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #2000000, 1 } } \
 	__MIDI_NG {#10, $__channel, $key, $index, \
 	$__tmp / #1000000, {$__tmp / #10000} % #100, {$__tmp / #100} % #100, $__tmp % #100 } }
 #macro RPNX msb:number, lsb:number, val:number { \
-	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #1000000, 1 } } \
+	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #2000000, 1 } } \
 	__MIDI_NG {#20, $__channel, $msb, $lsb, \
 	$__tmp / #1000000, {$__tmp / #10000} % #100, {$__tmp / #100} % #100, $__tmp % #100 } }
 #macro NRPNX msb:number, lsb:number, val:number { \
-	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #1000000, 1 } } \
+	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #2000000, 1 } } \
 	__MIDI_NG {#30, $__channel, $msb, $lsb, \
 	$__tmp / #1000000, {$__tmp / #10000} % #100, {$__tmp / #100} % #100, $__tmp % #100 } }
 #macro RPNREL msb:number, lsb:number, val:number { \
-	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #1000000, 1 } } \
+	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #2000000, 1 } } \
 	__MIDI_NG {#40, $__channel, $msb, $lsb, \
 	$__tmp / #1000000, {$__tmp / #10000} % #100, {$__tmp / #100} % #100, $__tmp % #100 } }
 #macro NRPNREL msb:number, lsb:number, val:number { \
-	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #1000000, 1 } } \
+	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #2000000, 1 } } \
 	__MIDI_NG {#50, $__channel, $msb, $lsb, \
 	$__tmp / #1000000, {$__tmp / #10000} % #100, {$__tmp / #100} % #100, $__tmp % #100 } }
 #macro PROGRAM val:number, bankMsb:number, bankLsb:number, optionFlags:number { \
 	__MIDI_NG {#C0, $__channel, 0, $optionFlags, $val, 0, $bankMsb, $bankLsb } }
 #macro CAF val:number { \
-	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #1000000, 1 } } \
+	__LET { "__tmp", $val * { VALUE_COMPAT_MODE ? #2000000, 1 } } \
 	__MIDI_NG {#D0, $__channel, 0, 0, \
 	$__tmp / #1000000, {$__tmp / #10000} % #100, {$__tmp / #100} % #100, $__tmp % #100 } }
 #macro PITCH val:number { \

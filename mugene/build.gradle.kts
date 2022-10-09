@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithTests
+
 buildscript {
     repositories {
         mavenLocal()
@@ -7,20 +9,17 @@ buildscript {
     }
 
     dependencies {
-        classpath("dev.atsushieno.antlr-kotlin:antlr-kotlin-gradle-plugin:0.0.8")
+        classpath("dev.atsushieno.antlr-kotlin:antlr-kotlin-gradle-plugin:0.0.9")
     }
 }
 
 plugins {
-    id("com.android.library") version "4.1.3"
-    kotlin("multiplatform") version "1.7.10"
-    id("dev.petuska.npm.publish") version "2.1.1"
+    id("com.android.library")
+    kotlin("multiplatform")
+    id("dev.petuska.npm.publish") version "2.1.2"
     id("maven-publish")
     id("signing")
 }
-
-group = "dev.atsushieno"
-version = "0.2.29" // failed to build 0.2.27 vscode-extension and had to bump 0.2.28 only in vscode-extension, thus 0.2.28 cannot exist...
 
 val ktmidi_version = "0.3.19"
 
@@ -80,7 +79,7 @@ kotlin {
         val commonAntlr by creating {
             dependencies {
                 api(kotlin("stdlib-common"))
-                api("dev.atsushieno.antlr-kotlin:antlr-kotlin-runtime:0.0.8")
+                api("dev.atsushieno.antlr-kotlin:antlr-kotlin-runtime:0.0.9")
             }
             kotlin.srcDir("build/generated-src/commonAntlr/kotlin")
         }
@@ -105,7 +104,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                implementation("androidx.startup:startup-runtime:1.1.0")
+                implementation("androidx.startup:startup-runtime:1.1.1")
             }
         }
         val androidTest by getting {
@@ -185,6 +184,8 @@ tasks.getByName("compileKotlinJs").dependsOn("generateKotlinCommonGrammarSource"
 //tasks.getByName("compileKotlinJsLegacy").dependsOn("generateKotlinCommonGrammarSource")
 tasks.getByName("compileKotlinMetadata").dependsOn("generateKotlinCommonGrammarSource")
 afterEvaluate {
+    tasks.getByName("compileCommonAntlrKotlinMetadata").dependsOn("generateKotlinCommonGrammarSource")
+    tasks.getByName("compileCommonMainKotlinMetadata").dependsOn("generateKotlinCommonGrammarSource")
     tasks.getByName("compileDebugKotlinAndroid").dependsOn("generateKotlinCommonGrammarSource")
     tasks.getByName("compileReleaseKotlinAndroid").dependsOn("generateKotlinCommonGrammarSource")
     tasks.getByName("androidDebugSourcesJar").dependsOn("generateKotlinCommonGrammarSource")
@@ -200,12 +201,8 @@ android {
         targetSdk = 31
     }
     buildTypes {
-        val debug by getting {
-            minifyEnabled(false)
-        }
-        val release by getting {
-            minifyEnabled(false)
-        }
+        val debug by getting
+        val release by getting
     }
 }
 

@@ -1,18 +1,19 @@
 pluginManagement {
     repositories {
         google()
-        jcenter()
-        gradlePluginPortal()
         mavenCentral()
+        gradlePluginPortal()
     }
     resolutionStrategy {
         eachPlugin {
             if (requested.id.namespace == "com.android" || requested.id.name == "kotlin-android-extensions") {
-                useModule("com.android.tools.build:gradle:4.1.3")
+                useModule("com.android.tools.build:gradle:7.2.0")
             }
         }
     }
 }
 
-rootProject.name = "mugene"
-include("mugene")
+rootProject.name = "mugene-ng"
+include(":mugene")
+include(":mugene-console-jvm")
+include(":mugene-console")

@@ -1,5 +1,7 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithTests
+
 plugins {
-    kotlin("multiplatform") version "1.7.0"
+    kotlin("multiplatform")
 }
 
 repositories {
@@ -30,7 +32,7 @@ kotlin {
     sourceSets {
         val nativeMain by getting {
             dependencies {
-                implementation("dev.atsushieno:mugene:+")
+                implementation(project(":mugene"))
             }
         }
     }

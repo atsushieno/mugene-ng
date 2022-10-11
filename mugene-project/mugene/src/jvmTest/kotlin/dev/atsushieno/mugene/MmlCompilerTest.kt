@@ -417,4 +417,9 @@ class MmlCompilerTest {
         // https://github.com/atsushieno/mugene-ng/issues/29
         MmlTestUtility.testCompile("mml", "1  [c,,50]")
     }
+
+    @Test
+    fun onlyBlockNameAndTrackNumber() {
+        MmlTestUtility.testCompile("mml", "A 1,2   \n    cde")
+    }
 }

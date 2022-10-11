@@ -411,7 +411,8 @@ class MmlInputSourceReader(private val compiler: MmlCompiler, private val resolv
             }
             if (result.lexer.isNumber(line.peekChar())) {
                 range = result.lexer.readRange(false).toList()
-                result.lexer.skipWhitespaces(true)
+                if (line.peekChar() >= 0) // it may be at end without content
+                    result.lexer.skipWhitespaces(true)
             }
         }
         if (range == null) {
@@ -424,7 +425,8 @@ class MmlInputSourceReader(private val compiler: MmlCompiler, private val resolv
 
         previous_section = section
         previous_range = range
-        result.lexer.skipWhitespaces(false)
+        if (line.peekChar() >= 0)
+            result.lexer.skipWhitespaces(false)
         val ts = MmlTrackSource(section, range)
         ts.lines.add(line)
         result.tracks.add(ts)

@@ -7,7 +7,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("dev.atsushieno.antlr-kotlin:antlr-kotlin-gradle-plugin:0.0.9")
+        classpath("dev.atsushieno.antlr-kotlin:antlr-kotlin-gradle-plugin:0.0.8")
     }
 }
 
@@ -80,7 +80,7 @@ kotlin {
         val commonAntlr by creating {
             dependencies {
                 api(kotlin("stdlib-common"))
-                api("dev.atsushieno.antlr-kotlin:antlr-kotlin-runtime:0.0.9")
+                api("dev.atsushieno.antlr-kotlin:antlr-kotlin-runtime:0.0.8")
             }
             kotlin.srcDir("build/generated-src/commonAntlr/kotlin")
         }
@@ -158,7 +158,7 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
         // project.dependencies.create("org.antlr:antlr4:$antlrVersion"),
 
         // antlr target, required to create kotlin code
-        project.dependencies.create("dev.atsushieno.antlr-kotlin:antlr-kotlin-target:0.0.9")
+        project.dependencies.create("dev.atsushieno.antlr-kotlin:antlr-kotlin-target:0.0.8")
     )
     maxHeapSize = "64m"
     packageName = "dev.atsushieno.mugene.parser"

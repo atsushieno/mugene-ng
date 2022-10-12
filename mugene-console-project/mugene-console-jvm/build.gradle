@@ -1,5 +1,5 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.7.0"
+    id "org.jetbrains.kotlin.jvm" version "1.7.20"
 }
 
 group 'dev.atsushieno'
@@ -7,7 +7,7 @@ version '0.1.0-SNAPSHOT'
 
 dependencies {
     implementation 'dev.atsushieno:mugene:+'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.7.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.7.20"
 }
 
 test {

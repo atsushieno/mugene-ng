@@ -7,22 +7,22 @@ buildscript {
     }
 
     dependencies {
-        classpath("dev.atsushieno.antlr-kotlin:antlr-kotlin-gradle-plugin:0.0.8")
+        classpath("dev.atsushieno.antlr-kotlin:antlr-kotlin-gradle-plugin:0.0.9")
     }
 }
 
 plugins {
-    id("com.android.library") version "4.1.3"
-    kotlin("multiplatform") version "1.7.10"
-    id("dev.petuska.npm.publish") version "2.1.1"
+    id("com.android.library") version "7.3.0"
+    kotlin("multiplatform") version "1.7.20"
+    id("dev.petuska.npm.publish") version "2.1.2"
     id("maven-publish")
     id("signing")
 }
 
 group = "dev.atsushieno"
-version = "0.2.29" // failed to build 0.2.27 vscode-extension and had to bump 0.2.28 only in vscode-extension, thus 0.2.28 cannot exist...
+version = "0.3.0"
 
-val ktmidi_version = "0.3.19"
+val ktmidi_version = "0.4.0"
 
 kotlin {
     android {
@@ -80,7 +80,7 @@ kotlin {
         val commonAntlr by creating {
             dependencies {
                 api(kotlin("stdlib-common"))
-                api("dev.atsushieno.antlr-kotlin:antlr-kotlin-runtime:0.0.8")
+                api("dev.atsushieno.antlr-kotlin:antlr-kotlin-runtime:0.0.9")
             }
             kotlin.srcDir("build/generated-src/commonAntlr/kotlin")
         }
@@ -105,7 +105,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                implementation("androidx.startup:startup-runtime:1.1.0")
+                implementation("androidx.startup:startup-runtime:1.1.1")
             }
         }
         val androidTest by getting {
@@ -158,7 +158,7 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
         // project.dependencies.create("org.antlr:antlr4:$antlrVersion"),
 
         // antlr target, required to create kotlin code
-        project.dependencies.create("dev.atsushieno.antlr-kotlin:antlr-kotlin-target:0.0.8")
+        project.dependencies.create("dev.atsushieno.antlr-kotlin:antlr-kotlin-target:0.0.9")
     )
     maxHeapSize = "64m"
     packageName = "dev.atsushieno.mugene.parser"

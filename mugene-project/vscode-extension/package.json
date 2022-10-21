@@ -3,7 +3,7 @@
 	"description": "mugene MML compiler support",
 	"author": "Atsushi Eno",
 	"license": "MIT",
-	"version": "0.2.28",
+	"version": "0.3.0",
 	"publisher": "atsushieno",
 	"repository": {
 		"type": "git",

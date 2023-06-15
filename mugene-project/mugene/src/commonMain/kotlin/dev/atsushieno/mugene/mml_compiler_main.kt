@@ -3,7 +3,6 @@ package dev.atsushieno.mugene
 import dev.atsushieno.ktmidi.Midi2Music
 import dev.atsushieno.ktmidi.MidiMessage
 import dev.atsushieno.ktmidi.MidiMusic
-import dev.atsushieno.ktmidi.SmfWriter
 import dev.atsushieno.ktmidi.SmfWriterExtension
 import dev.atsushieno.ktmidi.convertDeltaTimesToJRTimestamps
 import dev.atsushieno.ktmidi.write
@@ -86,10 +85,7 @@ abstract class MmlCompiler {
     @JsName("doNotUseCompile_2")
     fun compile(skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, metaWriter: ((Boolean, MidiMessage, MutableList<Byte>) -> Int)?, output: MutableList<Byte>, disableRunningStatus: Boolean) {
         val music = compile(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
-        val writer = SmfWriter(output, metaWriter ?: SmfWriterExtension.DEFAULT_META_EVENT_WRITER).apply {
-            this.disableRunningStatus = disableRunningStatus
-        }
-        writer.writeMusic(music)
+        music.write(output, metaWriter ?: SmfWriterExtension.DEFAULT_META_EVENT_WRITER, disableRunningStatus)
     }
 
     @JsName("doNotUseCompile2_0")

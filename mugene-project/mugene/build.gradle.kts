@@ -7,31 +7,33 @@ buildscript {
     }
 
     dependencies {
-        classpath("dev.atsushieno.antlr-kotlin:antlr-kotlin-gradle-plugin:0.0.8")
+        classpath("dev.atsushieno.antlr-kotlin:antlr-kotlin-gradle-plugin:0.0.10")
     }
 }
 
 plugins {
-    id("com.android.library") version "7.3.0"
-    kotlin("multiplatform") version "1.7.20"
+    id("com.android.library") version "7.4.2"
+    kotlin("multiplatform") version "1.8.20"
     id("dev.petuska.npm.publish") version "2.1.2"
     id("maven-publish")
     id("signing")
 }
 
 group = "dev.atsushieno"
-version = "0.3.0"
+version = "0.4.0"
 
-val ktmidi_version = "0.4.0"
+val ktmidi_version = "0.5.0"
 
 kotlin {
+    jvmToolchain(11)
+
     android {
         publishLibraryVariantsGroupedByFlavor = true
         publishLibraryVariants("debug", "release")
     }
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
+            kotlinOptions.jvmTarget = "11"
         }
         testRuns["test"].executionTask.configure {
             useJUnit()
@@ -44,50 +46,30 @@ kotlin {
             testTask {
                 useKarma {
                     useChromeHeadless()
-                    webpackConfig.cssSupport.enabled = true
+                    //webpackConfig.cssSupport.enabled = true
                 }
             }
         }
         browser()
     }
-    val hostOs = System.getProperty("os.name")
-    val isMingwX64 = hostOs.startsWith("Windows")
-    val isMacOSX64 = hostOs == "Mac OS X"
-    val isLinuxX64 = hostOs == "Linux"
-    val nativeTarget = when {
-        isMacOSX64 -> macosX64("apple") {
-            binaries {
-                staticLib {}
-                sharedLib {}
-            }
-        }
-        isLinuxX64 -> linuxX64("linuxX64") {
-            binaries {
-                staticLib {}
-                sharedLib {}
-            }
-        }
-        isMingwX64 -> mingwX64("mingwX64") {
-            binaries {
-                staticLib {}
-                sharedLib {}
-            }
-        }
-        else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
-    }
+    macosArm64()
+    macosX64()
+    // we could not build it in ktmidi, due to lack of linuxArm64 version of kotlinx-datetime 0.4.0
+    //linuxArm64()
+    linuxX64()
+    mingwX64()
 
     sourceSets {
         val commonAntlr by creating {
             dependencies {
-                api(kotlin("stdlib-common"))
-                api("dev.atsushieno.antlr-kotlin:antlr-kotlin-runtime:0.0.8")
+                api("dev.atsushieno.antlr-kotlin:antlr-kotlin-runtime:0.0.10")
             }
             kotlin.srcDir("build/generated-src/commonAntlr/kotlin")
         }
         val commonMain by getting {
             dependencies {
                 implementation("dev.atsushieno:ktmidi:$ktmidi_version")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
             }
             dependsOn(commonAntlr)
         }
@@ -125,25 +107,30 @@ kotlin {
                 implementation(kotlin("test-js"))
             }
         }
-        val nativeMain by creating
-        if (isLinuxX64) {
-            val linuxX64Main by getting {
-                dependsOn(nativeMain)
-            }
+        val nativeMain by creating {
+            dependsOn(commonMain)
         }
-        if (isMingwX64) {
-            val mingwX64Main by getting {
-                dependsOn(nativeMain)
-            }
+        // call to linuxArm64() is commented out
+        //val linuxArm64Main by getting {
+        //    dependsOn(nativeMain)
+        //}
+        val linuxX64Main by getting {
+            dependsOn(nativeMain)
         }
-        if (isMacOSX64) {
-            val appleMain by getting {
-                dependsOn(nativeMain)
-            }
+        val mingwX64Main by getting {
+            dependsOn(nativeMain)
+        }
+        val appleMain by creating {
+            dependsOn(nativeMain)
+        }
+        val macosArm64Main by getting {
+            dependsOn(appleMain)
+        }
+        val macosX64Main by getting {
+            dependsOn(appleMain)
         }
     }
 }
-
 
 // copying(2) antlr-kotlin mpp example
 
@@ -158,7 +145,7 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
         // project.dependencies.create("org.antlr:antlr4:$antlrVersion"),
 
         // antlr target, required to create kotlin code
-        project.dependencies.create("dev.atsushieno.antlr-kotlin:antlr-kotlin-target:0.0.8")
+        project.dependencies.create("dev.atsushieno.antlr-kotlin:antlr-kotlin-target:0.0.10")
     )
     maxHeapSize = "64m"
     packageName = "dev.atsushieno.mugene.parser"
@@ -178,26 +165,30 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
 // run generate task before build
 // not required if you add the generated sources to version control
 // you can call the task manually in this case to update the generated sources
-tasks.getByName("compileKotlinJvm").dependsOn("generateKotlinCommonGrammarSource")
-// end of copy(2)
-tasks.getByName("compileKotlinJs").dependsOn("generateKotlinCommonGrammarSource")
-//tasks.getByName("compileKotlinJsIr").dependsOn("generateKotlinCommonGrammarSource")
-//tasks.getByName("compileKotlinJsLegacy").dependsOn("generateKotlinCommonGrammarSource")
-tasks.getByName("compileKotlinMetadata").dependsOn("generateKotlinCommonGrammarSource")
+val generateGrammarTask = tasks.getByName("generateKotlinCommonGrammarSource")
+// It is kind of hack, but it's rather error-prone to manually specify *everything* here
+// (can you notice that you missed `compileKotlinLinuxArm64Metadata` ?)
+tasks.filter { it.name.startsWith("compileKotlin") and !it.name.contains("KotlinAndroid") }.forEach {
+    it.dependsOn(generateGrammarTask)
+}
+tasks.filter { it.name.endsWith("ourcesJar") and !it.name.contains("Android") }.forEach {
+    it.dependsOn(generateGrammarTask)
+}
 afterEvaluate {
-    tasks.getByName("compileDebugKotlinAndroid").dependsOn("generateKotlinCommonGrammarSource")
-    tasks.getByName("compileReleaseKotlinAndroid").dependsOn("generateKotlinCommonGrammarSource")
-    tasks.getByName("androidDebugSourcesJar").dependsOn("generateKotlinCommonGrammarSource")
-    tasks.getByName("androidReleaseSourcesJar").dependsOn("generateKotlinCommonGrammarSource")
+    tasks.filter { it.name.matches(Regex("compile.*KotlinAndroid")) }.forEach {
+        it.dependsOn(generateGrammarTask)
+    }
+    tasks.filter { it.name.matches(Regex("android.*SourcesJar")) }.forEach {
+        it.dependsOn(generateGrammarTask)
+    }
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 33
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].assets.srcDir("src/commonMain/resources") // kind of hack...
     defaultConfig {
-        minSdk = 24
-        targetSdk = 31
+        minSdk = 23
     }
     buildTypes {
         val debug by getting {

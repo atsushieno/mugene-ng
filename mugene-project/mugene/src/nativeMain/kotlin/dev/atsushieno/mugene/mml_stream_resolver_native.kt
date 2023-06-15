@@ -14,19 +14,11 @@ import platform.posix.NULL
 import platform.posix.fclose
 import platform.posix.fgets
 import platform.posix.fopen
-import platform.posix.readlink
-import platform.posix.realpath
 import platform.posix.stat
 
 //region input sources to tokenizer sources
 
-internal fun getRealpath(file: String) : String {
-    memScoped {
-        val buffer = allocArray<ByteVar>(4096)
-        realpath(file, buffer)
-        return buffer.toKString()
-    }
-}
+internal expect fun getRealpath(file: String) : String
 
 open class LocalFileStreamResolver : StreamResolver() {
 

@@ -1,12 +1,7 @@
 
 package dev.atsushieno.mugene
 
-import dev.atsushieno.ktmidi.Midi2Music
-import dev.atsushieno.ktmidi.MidiChannelStatus
-import dev.atsushieno.ktmidi.MidiMusic
-import dev.atsushieno.ktmidi.SmfWriter
-import dev.atsushieno.ktmidi.eventType
-import dev.atsushieno.ktmidi.read
+import dev.atsushieno.ktmidi.*
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.test.Test
@@ -210,10 +205,10 @@ class MmlCompilerTest {
         val actualData = msg.event.extraData!!.drop(msg.event.extraDataOffset).take(msg.event.extraDataLength).toTypedArray()
         assertArrayEquals(sysexData, actualData, "sysex data")
         val bytes = mutableListOf<Byte>()
-        SmfWriter(bytes).writeTrack(music.tracks[0])
+        music.write(bytes)
         val trackHead = arrayOf('M'.code, 'T'.code, 'r'.code, 'k'.code, 0, 0, 0, 20, 0, 0xF0).map { v -> v.toByte() }.toTypedArray()
         val trackTail = arrayOf(0xF7.toByte(), 0, 0xFF.toByte(), 0x2F, 0)
-        assertArrayEquals(trackHead + sysexData + trackTail, bytes.toTypedArray(), "SMF track")
+        assertArrayEquals(trackHead + sysexData + trackTail, bytes.drop(14).toTypedArray(), "SMF track")
     }
 
     @Test
@@ -232,10 +227,10 @@ class MmlCompilerTest {
         val actualData = msg.event.extraData!!.drop(msg.event.extraDataOffset).take(msg.event.extraDataLength).toTypedArray()
         assertArrayEquals(sysexData, actualData, "sysex data")
         val bytes = mutableListOf<Byte>()
-        SmfWriter(bytes).writeTrack(music.tracks[0])
+        music.write(bytes)
         val trackHead = arrayOf('M'.code, 'T'.code, 'r'.code, 'k'.code, 0, 0, 0, 29, 0, 0xF0).map { v -> v.toByte() }.toTypedArray()
         val trackTail = arrayOf(0xF7.toByte(), 0, 0xFF.toByte(), 0x2F, 0)
-        assertArrayEquals(trackHead + sysexData + trackTail, bytes.toTypedArray(), "SMF track")
+        assertArrayEquals(trackHead + sysexData + trackTail, bytes.drop(14).toTypedArray(), "SMF track")
     }
 
     @Test
@@ -365,7 +360,7 @@ class MmlCompilerTest {
         val umpx = MmlTestUtility.testCompile2("mml1", mml).toList()
         val music2 = Midi2Music().apply { read(umpx) }
         val ml2 = music2.tracks[0].messages
-        assertEquals(MidiChannelStatus.NOTE_ON, ml2[0].eventType, "umpx: note-on should appear")
+        assertEquals(MidiChannelStatus.NOTE_ON, ml2[0].statusCode, "umpx: note-on should appear")
     }
 
     @Test
@@ -392,7 +387,7 @@ class MmlCompilerTest {
                     notes.remove(it.event.msb)
                 }
                 MidiChannelStatus.NOTE_ON -> {
-                    assertTrue(notes[it.event.msb] == null, "There is already an existing note on: " + it.event.msb)
+                    assertTrue(!notes.containsKey(it.event.msb), "There is already an existing note on: " + it.event.msb)
                     notes[it.event.msb] = current
                 }
             }

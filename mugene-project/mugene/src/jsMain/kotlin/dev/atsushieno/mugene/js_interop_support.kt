@@ -2,7 +2,6 @@ package dev.atsushieno.mugene
 
 import dev.atsushieno.ktmidi.Midi2Music
 import dev.atsushieno.ktmidi.MidiMusic
-import dev.atsushieno.ktmidi.SmfWriter
 import dev.atsushieno.ktmidi.write
 import kotlin.js.JsExport
 import kotlin.js.JsName
@@ -11,7 +10,7 @@ import kotlin.js.JsName
 @JsName("midiMusicToByteArray")
 fun midiMusicToByteArray(music: MidiMusic): ByteArray {
     val list = mutableListOf<Byte>()
-    SmfWriter(list).writeMusic(music)
+    music.write(list)
     return list.toByteArray()
 }
 

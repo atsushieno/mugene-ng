@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.7.20"
+    kotlin("multiplatform") version "1.8.20"
 }
 
 repositories {
@@ -7,61 +7,36 @@ repositories {
 }
 
 kotlin {
-    val hostOs = System.getProperty("os.name")
-    val isMingwX64 = hostOs.startsWith("Windows")
-    val nativeTarget = when {
-        hostOs == "Mac OS X" -> macosX64("native") { // on macOS
-            binaries.executable {
-                freeCompilerArgs += "-Xdisable-phases=EscapeAnalysis"
-            }
-        }
-        hostOs == "Linux" ->  linuxX64("native") { // on Linux
-            binaries.executable {
-                freeCompilerArgs += "-Xdisable-phases=EscapeAnalysis"
-            }
-        }
-        isMingwX64 -> mingwX64("native") { // on Windows
-            binaries.executable {
-                freeCompilerArgs += "-Xdisable-phases=EscapeAnalysis"
-            }
-        }
-        else -> {}
-    }
+    macosArm64()
+    macosX64()
+    // we could not build it in ktmidi, due to lack of linuxArm64 version of kotlinx-datetime 0.4.0
+    //linuxArm64()
+    linuxX64()
+    mingwX64()
     sourceSets {
-        val nativeMain by getting {
+        val nativeMain by creating {
             dependencies {
                 implementation("dev.atsushieno:mugene:+")
             }
         }
-    }
-}
-
-// LAMESPEC: native resources are not copied, including those from dependencies.
-//  https://youtrack.jetbrains.com/issue/KT-29311
-tasks {
-    val sources = arrayOf("../../mugene-project/mugene/build/processedResources/native/main",
-        "../../mugene-project/mugene/build/processedResources/apple/main",
-        "../../mugene-project/mugene/build/processedResources/mingwX64/main",
-        "../../mugene-project/mugene/build/processedResources/linuxX64/main")
-    val copyDebugResource by registering(Copy::class) {
-        configurations.forEach {
-            from(sources)
-            into("build/bin/native/debugExecutable/")
+        // call to linuxArm64() is commented out
+        //val linuxArm64Main by getting {
+        //    dependsOn(nativeMain)
+        //}
+        val linuxX64Main by getting {
+            dependsOn(nativeMain)
+        }
+        val mingwX64Main by getting {
+            dependsOn(nativeMain)
+        }
+        val appleMain by creating {
+            dependsOn(nativeMain)
+        }
+        val macosArm64Main by getting {
+            dependsOn(appleMain)
+        }
+        val macosX64Main by getting {
+            dependsOn(appleMain)
         }
     }
-    val copyReleaseResource by registering(Copy::class) {
-        configurations.forEach {
-            from(sources)
-            into("build/bin/native/releaseExecutable/")
-        }
-    }
-    build {
-        dependsOn(copyDebugResource)
-        dependsOn(copyReleaseResource)
-    }
-}
-
-tasks.withType<Wrapper> {
-  gradleVersion = "7.3"
-  distributionType = Wrapper.DistributionType.BIN
 }

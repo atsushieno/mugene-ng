@@ -70,6 +70,7 @@ kotlin {
             dependencies {
                 implementation("dev.atsushieno:ktmidi:$ktmidi_version")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
+                implementation("io.ktor:ktor-io:2.1.0")
             }
             dependsOn(commonAntlr)
         }

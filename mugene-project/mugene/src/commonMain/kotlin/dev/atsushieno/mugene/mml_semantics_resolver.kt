@@ -1,6 +1,7 @@
 package dev.atsushieno.mugene
 
-import dev.atsushieno.ktmidi.MidiMessage
+import dev.atsushieno.ktmidi.*
+import io.ktor.utils.io.core.*
 import kotlin.math.pow
 import kotlin.native.concurrent.ThreadLocal
 
@@ -659,10 +660,62 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                 }
                 "__MIDI_META" -> {
                     oper.validateArguments(rctx, oper.arguments.size)
-                    val mmop = MmlResolvedEvent("META", rctx.timelinePosition)
-                    mmop.arguments.add(0xFF.toByte())
-                    for (arg in arguments)
+                    // We try best to output Flex Data if applicable.
+                    val first = arguments.firstOrNull()
+                    val flexDataStatus = if (first == null) -1 else when (first.resolver.byteArrayValue[0].toInt()) {
+                        MidiMetaType.COPYRIGHT -> MetadataTextStatus.COPYRIGHT
+                        MidiMetaType.TEXT -> MetadataTextStatus.UNKNOWN
+                        // It is how we map #meta title to MidiMetaType now...
+                        MidiMetaType.TRACK_NAME -> MetadataTextStatus.COMPOSITION_NAME
+                        else -> -1
+                    }
+                    if (flexDataStatus >= 0) {
+                        val umps = UmpFactory.metadataText(0, FlexDataAddress.GROUP, 0, flexDataStatus, arguments[1].resolver.stringValue)
+                        val mmop = MmlResolvedEvent("FLEX_TEXT", rctx.timelinePosition)
+                        for (u in umps)
+                            mmop.arguments.addAll(u.toPlatformBytes(ByteOrder.BIG_ENDIAN).toList())
+                        currentOutput.add(mmop)
+                    } else {
+                        val mmop = MmlResolvedEvent("META", rctx.timelinePosition)
+                        mmop.arguments.add(0xFF.toByte())
+                        for (arg in arguments)
+                            mmop.arguments.addAll(arg.resolver.byteArrayValue.toList())
+                        currentOutput.add(mmop)
+                    }
+                }
+                "__FLEX_BINARY" -> {
+                    oper.validateArguments(rctx, oper.arguments.size)
+                    val mmop = MmlResolvedEvent("FLEX_BINARY", rctx.timelinePosition)
+                    val channel = arguments[0].resolver.byteValue
+                    val address = arguments[1].resolver.byteValue
+                    val status = arguments[2].resolver.byteValue
+                    mmop.arguments.add((0xD0).toByte())
+                    // They (tempo, timesig, ..., chord name) all complete in one packet, so `format` is always 0
+                    mmop.arguments.add(((address.toInt() shl 4) + channel).toByte())
+                    mmop.arguments.add(0) // status bank 0
+                    mmop.arguments.add(status) // status bank 0
+                    // The rest depends on each message
+                    for (arg in arguments.drop(3))
                         mmop.arguments.addAll(arg.resolver.byteArrayValue.toList())
+                    // pad 12 bytes with zero
+                    if (arguments.size < 12)
+                        mmop.arguments.addAll(List(12 - arguments.size + 3) { 0 })
+                    currentOutput.add(mmop)
+                }
+                "__FLEX_TEXT" -> {
+                    oper.validateArguments(rctx, oper.arguments.size)
+                    val mmop = MmlResolvedEvent("FLEX_TEXT", rctx.timelinePosition)
+                    val channel = arguments[0].resolver.byteValue
+                    val address = arguments[1].resolver.byteValue
+                    val statusBank = arguments[2].resolver.byteValue
+                    val status = arguments[3].resolver.byteValue
+                    val text = arguments[4].resolver.stringValue
+                    val umps = if (statusBank == FlexDataStatusBank.METADATA_TEXT)
+                        UmpFactory.metadataText(0, address, channel, status, text)
+                    else
+                        UmpFactory.performanceText(0, address, channel, status, text)
+                    for (u in umps)
+                        mmop.arguments.addAll(u.toPlatformBytes(ByteOrder.BIG_ENDIAN).toList())
                     currentOutput.add(mmop)
                 }
                 "__SAVE_OPER_BEGIN" -> {

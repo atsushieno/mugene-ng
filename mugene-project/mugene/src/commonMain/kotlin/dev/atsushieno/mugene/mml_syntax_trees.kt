@@ -431,6 +431,8 @@ class MmlPrimitiveOperation {
             MmlPrimitiveOperation().apply { name = "__SYNC_NOFF_WITH_NEXT" };
         val OnMidiNoteOff = MmlPrimitiveOperation().apply { name = "__ON_MIDI_NOTE_OFF" };
         val MidiMeta = MmlPrimitiveOperation().apply { name = "__MIDI_META" };
+        val FlexBinary = MmlPrimitiveOperation().apply { name = "__FLEX_BINARY" };
+        val FlexText = MmlPrimitiveOperation().apply { name = "__FLEX_TEXT" };
         val SaveOperationBegin = MmlPrimitiveOperation().apply { name = "__SAVE_OPER_BEGIN" };
         val SaveOperationEnd = MmlPrimitiveOperation().apply { name = "__SAVE_OPER_END" };
         val RestoreOperation = MmlPrimitiveOperation().apply { name = "__RESTORE_OPER" };
@@ -460,6 +462,8 @@ class MmlPrimitiveOperation {
                 SyncNoteOffWithNext,
                 OnMidiNoteOff,
                 MidiMeta,
+                FlexBinary,
+                FlexText,
                 SaveOperationBegin,
                 SaveOperationEnd,
                 RestoreOperation,

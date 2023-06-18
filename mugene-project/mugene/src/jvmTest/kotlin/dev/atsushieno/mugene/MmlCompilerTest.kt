@@ -324,6 +324,52 @@ class MmlCompilerTest {
         assertEquals(0x10000000, ml[7].int2, "7.int2")
     }
 
+
+    @Test
+    fun midi2Tempo() {
+        val mml = """
+1 t120
+"""
+        val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
+        val music = Midi2Music().apply { read(umpx) }
+        val ml = music.tracks[0].messages
+        assertEquals(2, ml.size)
+        assertEquals(0xD010_0000u, ml[0].int1.toUInt(), "1.int1")
+        assertEquals(0x2faf080, ml[0].int2, "1.int2")
+        assertEquals(0, ml[0].int3, "1.int3")
+        assertEquals(0, ml[0].int4, "1.int4")
+    }
+
+    @Test
+    fun midi2FlexData() {
+        val mml = """
+1 TEXT "TestText"
+"""
+        val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
+        val music = Midi2Music().apply { read(umpx) }
+        val ml = music.tracks[0].messages
+        assertEquals(2, ml.size)
+        assertEquals(0xD0000100u, ml[0].int1.toUInt(), "1.int1")
+        assertEquals(0x54657374, ml[0].int2, "1.int2")
+        assertEquals(0x54657874, ml[0].int3, "1.int3")
+        assertEquals(0, ml[0].int4, "1.int4")
+    }
+
+    @Test
+    fun midi2PragmaMetaText() {
+        val mml = """
+#meta title "Song Title"
+"""
+        val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
+        val music = Midi2Music().apply { read(umpx) }
+        val ml = music.tracks[0].messages
+        assertEquals(2, ml.size)
+        assertEquals(0xD0100102u, ml[0].int1.toUInt(), "1.int1")
+        assertEquals(0x536f6e67, ml[0].int2, "1.int2")
+        assertEquals(0x20546974, ml[0].int3, "1.int3")
+        assertEquals(0x6c650000, ml[0].int4, "1.int4")
+    }
+
     @Test
     fun gateTime() {
         val mml = """

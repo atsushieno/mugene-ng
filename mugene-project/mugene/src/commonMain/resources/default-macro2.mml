@@ -153,16 +153,18 @@
 
 #variable __tempo:number
 #variable __tempo_tmp:number
-#variable __tempo_f:number
-#variable __tempo_s:number
-#variable __tempo_t:number
+#variable __tempo_first:number
+#variable __tempo_second:number
+#variable __tempo_third:number
+#variable __tempo_fourth:number
 #macro TEMPO val:number { \
 	__LET{"__tempo", $val} \
-	__LET{"__tempo_tmp", 1000000 * {60 / $val} } \
-	__LET{"__tempo_f", $__tempo_tmp / #10000} \
-	__LET{"__tempo_s", {$__tempo_tmp / #100} % #100} \
-	__LET{"__tempo_t", $__tempo_tmp % #100 } \
-	__MIDI_META {#51, $__tempo_f, $__tempo_s, $__tempo_t } \
+	__LET{"__tempo_tmp", 100000000 * {60 / $val} } \
+	__LET{"__tempo_first", $__tempo_tmp / #1000000 } \
+	__LET{"__tempo_second", {$__tempo_tmp % #1000000} / #10000 } \
+	__LET{"__tempo_third", {$__tempo_tmp % #10000} / #100 } \
+	__LET{"__tempo_fourth", $__tempo_tmp % #100 } \
+	__FLEX_BINARY {$__channel, 1, 0, $__tempo_first, $__tempo_second, $__tempo_third, $__tempo_fourth } \
 	}
 #macro t val:number { TEMPO $val }
 #macro t= val:number { TEMPO $val }
@@ -270,16 +272,18 @@
 #macro DTEL val:number { __APPLY{ { $__DTE_TARGET_TYPE ? "RPNX", "NRPNX" }, $__DTE_TARGET_MSB, $__DTE_TARGET_LSB, $__DTE_VALUE_MSB * #1000000 + $val * #10000 } }
 #macro DTE msb:number,lsb:number { DTEM$msb DTEL$lsb }
 
-#macro TEXT val:string { __MIDI_META{1, $val} }
-#macro COPYRIGHT val:string { __MIDI_META{2, $val} }
-#macro TRACKNAME val:string { __MIDI_META{3, $val} }
-#macro INSTRUMENTNAME val:string { __MIDI_META{4, $val} }
-#macro LYRIC val:string { __MIDI_META{5, $val} }
-#macro MARKER val:string { __MIDI_META{6, $val} }
-#macro CUE val:string { __MIDI_META{7, $val} }
-#macro BEAT num:number,denom:number { __MIDI_META{#58, $num, \
-	$denom - 16 ? $denom - 8 ? $denom - 4 ? $denom - 2 ? $denom, \
-	1, 2, 3, 4, 0, 0} }
+// INSTRUMENTNAME, MARKER and CUE cannot be represented in Flex Data, so keep using fake MIDI META events
+#macro TEXT val:string { __FLEX_TEXT{0, 0, 1, 0, $val} } // unknown text
+#macro COPYRIGHT val:string { __FLEX_TEXT{0, 0, 1, 4, $val} }
+#macro TRACKNAME val:string { __FLEX_TEXT{0, 0, 1, 3, $val} } // mapped to MIDI Clip Name
+#macro INSTRUMENTNAME val:string { __MIDI_META{4, $val} } // no corresponding Flex Data
+#macro LYRIC val:string { __FLEX_TEXT{0, 0, 2, 1, $val} }
+#macro MARKER val:string { __MIDI_META{6, $val} } // no corresponding Flex Data
+#macro CUE val:string { __MIDI_META{7, $val} } // no corresponding Flex Data
+#macro BEAT num:number,denom:number { \
+	__FLEX_BINARY {$__channel, 1, 1, \
+	$num, $denom - 16 ? $denom - 8 ? $denom - 4 ? $denom - 2 ? $denom, 1, 2, 3, 4, \
+	0, 0} }
 // #macro KEY TBD {__MIDI_META{ 59h}}
 
 #macro PITCH_BEND_SENSITIVITY val:number { RPN 0,0 DTE $val,0 }

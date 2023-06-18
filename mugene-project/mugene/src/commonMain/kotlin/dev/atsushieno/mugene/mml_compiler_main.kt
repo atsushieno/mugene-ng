@@ -135,7 +135,7 @@ abstract class MmlCompiler {
         // semantic trees -> simplified streams
         MmlMacroExpander.expand(tree, this)
         // simplified streams -> raw events
-        val resolved = MmlEventStreamGenerator.generate(tree, this)
+        val resolved = MmlEventStreamGenerator.generate(tree, this, false)
         // raw events -> SMF
         return MmlSmfGenerator.generate(resolved)
     }
@@ -144,7 +144,7 @@ abstract class MmlCompiler {
         // semantic trees -> simplified streams
         MmlMacroExpander.expand(tree, this)
         // simplified streams -> raw events
-        val resolved = MmlEventStreamGenerator.generate(tree, this)
+        val resolved = MmlEventStreamGenerator.generate(tree, this, true)
         // raw events -> UMP music format
         val umpmf = MmlMidi2Generator.generate(resolved)
         if (outputDeltaTime)

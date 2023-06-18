@@ -384,10 +384,10 @@ class MmlResolveContext(
     }
 }
 
-class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private val compiler: MmlCompiler) {
+class MmlEventStreamGenerator(private val isMidi2: Boolean, private val source: MmlSemanticTreeSet, private val compiler: MmlCompiler) {
     companion object {
-        fun generate(source: MmlSemanticTreeSet, compiler: MmlCompiler): MmlResolvedMusic {
-            val gen = MmlEventStreamGenerator(source, compiler)
+        fun generate(source: MmlSemanticTreeSet, compiler: MmlCompiler, isMidi2: Boolean = false): MmlResolvedMusic {
+            val gen = MmlEventStreamGenerator(isMidi2, source, compiler)
             gen.generate()
             return gen.result
         }
@@ -661,8 +661,8 @@ class MmlEventStreamGenerator(private val source: MmlSemanticTreeSet, private va
                 "__MIDI_META" -> {
                     oper.validateArguments(rctx, oper.arguments.size)
                     // We try best to output Flex Data if applicable.
-                    val first = arguments.firstOrNull()
-                    val flexDataStatus = if (first == null) -1 else when (first.resolver.byteArrayValue[0].toInt()) {
+                    val midi2First = if (isMidi2) arguments.firstOrNull() else null
+                    val flexDataStatus = if (midi2First == null) -1 else when (midi2First.resolver.byteArrayValue[0].toInt()) {
                         MidiMetaType.COPYRIGHT -> MetadataTextStatus.COPYRIGHT
                         MidiMetaType.TEXT -> MetadataTextStatus.UNKNOWN
                         // It is how we map #meta title to MidiMetaType now...

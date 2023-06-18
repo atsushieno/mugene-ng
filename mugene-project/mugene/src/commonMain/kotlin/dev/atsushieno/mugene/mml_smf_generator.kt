@@ -79,14 +79,12 @@ class MmlMidi2Generator(private val source: MmlResolvedMusic) {
         val rtrk = Midi2Track()
         var cur = 0
         for (ev in source.events) {
-            var wasKnownUmp = false
+            var wasFlexData = false
             var wasSysex = false
             var wasMetaSysex8 = false
             lateinit var evt: Ump
-            if (ev.operation == "FLEX_TEXT" || ev.operation == "FLEX_BINARY") {
-                wasKnownUmp = true
-                rtrk.messages.addAll(UmpFactory.fromPlatformBytes(ByteOrder.BIG_ENDIAN, ev.arguments))
-            }
+            if (ev.operation == "FLEX_TEXT" || ev.operation == "FLEX_BINARY")
+                wasFlexData = true
             else if (ev.operation == "MIDI_NG") {
                 val rest32 = ev.arguments[4].toUnsigned() * 0x1000000 + ev.arguments[5].toUnsigned() * 0x10000 +
                         ev.arguments[6].toUnsigned() * 0x100 + ev.arguments[7].toUnsigned()
@@ -112,15 +110,18 @@ class MmlMidi2Generator(private val source: MmlResolvedMusic) {
                     ev.arguments[0] % 0x10,
                     ev.arguments[1],
                     ev.arguments[2]))
-            if (ev.tick != cur)
-                rtrk.messages.addAll(UmpFactory.jrTimestamps(ev.tick.toLong() - cur).map { i -> Ump(i) })
 
-            if (wasMetaSysex8)
+            if (ev.tick != cur)
+                rtrk.messages.add(Ump(UmpFactory.deltaClockstamp(ev.tick - cur)))
+
+            if (wasFlexData)
+                rtrk.messages.addAll(UmpFactory.fromPlatformBytes(ByteOrder.BIG_ENDIAN, ev.arguments))
+            else if (wasMetaSysex8)
                 // those extra 4 bytes are for sysex ManufacturerID, deviceID, subID1, and subID2. They are all dummy values. Then 3 0xFF bytes.
                 rtrk.messages.addAll(UmpFactory.sysex8(0, listOf(0, 0, 0, 0, 0xFF, 0xFF, 0xFF).map { it.toByte() } + ev.arguments.drop(1)))
             else if (wasSysex)
                 rtrk.messages.addAll(UmpFactory.sysex7(0, ev.arguments.drop(1)))
-            else if (!wasKnownUmp)
+            else
                 rtrk.messages.add(evt)
 
             cur = ev.tick

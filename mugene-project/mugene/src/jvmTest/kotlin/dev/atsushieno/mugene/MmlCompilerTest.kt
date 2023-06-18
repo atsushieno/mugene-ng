@@ -159,7 +159,9 @@ class MmlCompilerTest {
         assertEquals(72, music.getTotalTicks(), "midi1 total ticks")
         val midi2Bytes = MmlTestUtility.testCompile2("midi2", mml, outputDeltaTime = true)
         val music2 = Midi2Music().apply { read (midi2Bytes.toList()) }
-        assertEquals(72, music2.getTotalTicks(), "midi2 total ticks")
+        assertEquals(72,
+            music2.getTotalTicks(),
+            "midi2 total ticks")
     }
 
     // FIXME: uncomment this once we fixed https://github.com/atsushieno/mugene-ng/issues/25

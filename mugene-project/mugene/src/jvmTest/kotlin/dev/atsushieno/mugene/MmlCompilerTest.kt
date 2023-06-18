@@ -258,9 +258,10 @@ class MmlCompilerTest {
 1   Bn=64,0 n64,4
 """
         val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
-        val music = Midi2Music().apply { read(umpx) }
-        assertEquals(0x40604000, music.tracks[0].messages[0].int1, "int1")
-        assertEquals(0x80000000.toUInt(), music.tracks[0].messages[0].int2.toUInt(), "int2")
+        val music = Midi2Music().apply { read(umpx, removeEmptyDeltaClockstamps = false) }
+        val ml = music.tracks[0].messages.drop(4).dropLast(2) // skip DCS, DCTPQ, DCS, and Start of Clip | drop DCS and End of Clip
+        assertEquals(0x40604000, ml[1].int1, "int1")
+        assertEquals(0x80000000.toUInt(), ml[1].int2.toUInt(), "int2")
     }
 
     @Test
@@ -269,14 +270,14 @@ class MmlCompilerTest {
 1   BEND_CENT_MODE24 n64,0,4 Bc=0 r8 Bc=100 r8 Bc=-100
 """
         val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
-        val music = Midi2Music().apply { read(umpx) }
-        val ml = music.tracks[0].messages
-        assertEquals(0x40604000, ml[1].int1, "1.int1")
-        assertEquals(0x80000000.toUInt(), ml[1].int2.toUInt(), "1.int2")
+        val music = Midi2Music().apply { read(umpx, removeEmptyDeltaClockstamps = false) }
+        val ml = music.tracks[0].messages.drop(4).dropLast(2) // skip DCS, DCTPQ, DCS, and Start of Clip | drop DCS and End of Clip
         assertEquals(0x40604000, ml[3].int1, "3.int1")
-        assertEquals(0x85555555.toUInt(), ml[3].int2.toUInt(), "3.int2")
-        assertEquals(0x40604000, ml[6].int1, "6.int1")
-        assertEquals(0x7AAAAAAA.toUInt(), ml[6].int2.toUInt(), "6.int2")
+        assertEquals(0x80000000.toUInt(), ml[3].int2.toUInt(), "3.int2")
+        assertEquals(0x40604000, ml[5].int1, "5.int1")
+        assertEquals(0x85555555.toUInt(), ml[5].int2.toUInt(), "5.int2")
+        assertEquals(0x40604000, ml[9].int1, "9.int1")
+        assertEquals(0x7AAAAAAA.toUInt(), ml[9].int2.toUInt(), "9.int2")
     }
 
     @Test
@@ -286,8 +287,9 @@ class MmlCompilerTest {
 """
         val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
         val music = Midi2Music().apply { read(umpx) }
-        assertTrue(music.tracks[0].messages.filter { it.int1 == 0x40603C00 }.size > 10, "PN.o5c")
-        assertTrue(music.tracks[0].messages.filter { it.int1 == 0x40604100 }.size > 10, "PN.o5f")
+        val ml = music.tracks[0].messages.drop(4).dropLast(2) // skip DCS, DCTPQ, DCS, and Start of Clip | drop DCS and End of Clip
+        assertTrue(ml.filter { it.int1 == 0x40603C00 }.size > 10, "PN.o5c")
+        assertTrue(ml.filter { it.int1 == 0x40604100 }.size > 10, "PN.o5f")
     }
 
     @Test
@@ -296,16 +298,16 @@ class MmlCompilerTest {
 1   o5 c0,1 Bc=0 r4 Bc=-8192 r4 Bc+4096 r4 Bc-3072
 """
         val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
-        val music = Midi2Music().apply { read(umpx) }
-        val ml = music.tracks[0].messages
-        assertEquals(0x40603C00, ml[1].int1, "1.int1")
-        assertEquals(0x80000000.toInt(), ml[1].int2, "1.int2")
-        assertEquals(0x40603C00, ml[3].int1, "3.int1")
-        assertEquals(0x00000000, ml[3].int2, "3.int2")
-        assertEquals(0x40603C00, ml[5].int1, "5.int1")
-        assertEquals(0x40000000, ml[5].int2, "5.int2")
-        assertEquals(0x40603C00, ml[7].int1, "7.int1")
-        assertEquals(0x10000000, ml[7].int2, "7.int2")
+        val music = Midi2Music().apply { read(umpx, removeEmptyDeltaClockstamps = false) }
+        val ml = music.tracks[0].messages.drop(4).dropLast(2) // skip DCS, DCTPQ, DCS, and Start of Clip | drop DCS and End of Clip
+        assertEquals(0x40603C00, ml[3].int1, "2.int1")
+        assertEquals(0x80000000.toInt(), ml[3].int2, "2.int2")
+        assertEquals(0x40603C00, ml[5].int1, "3.int1")
+        assertEquals(0x00000000, ml[5].int2, "3.int2")
+        assertEquals(0x40603C00, ml[7].int1, "5.int1")
+        assertEquals(0x40000000, ml[7].int2, "5.int2")
+        assertEquals(0x40603C00, ml[9].int1, "7.int1")
+        assertEquals(0x10000000, ml[9].int2, "7.int2")
     }
 
     @Test
@@ -314,16 +316,16 @@ class MmlCompilerTest {
 1   o5 c0,1 B=0 r4 B=-8192 r4 B+4096 r4 B-3072
 """
         val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
-        val music = Midi2Music().apply { read(umpx) }
-        val ml = music.tracks[0].messages
-        assertEquals(0x40E00000, ml[1].int1, "1.int1")
-        assertEquals(0x80000000.toInt(), ml[1].int2, "1.int2")
-        assertEquals(0x40E00000, ml[3].int1, "3.int1")
-        assertEquals(0x00000000, ml[3].int2, "3.int2")
-        assertEquals(0x40E00000, ml[5].int1, "5.int1")
-        assertEquals(0x40000000, ml[5].int2, "5.int2")
-        assertEquals(0x40E00000, ml[7].int1, "7.int1")
-        assertEquals(0x10000000, ml[7].int2, "7.int2")
+        val music = Midi2Music().apply { read(umpx, removeEmptyDeltaClockstamps = false) }
+        val ml = music.tracks[0].messages.drop(4).dropLast(2) // skip DCS, DCTPQ, DCS, and Start of Clip | drop DCS and End of Clip
+        assertEquals(0x40E00000, ml[3].int1, "1.int1")
+        assertEquals(0x80000000.toInt(), ml[3].int2, "1.int2")
+        assertEquals(0x40E00000, ml[5].int1, "3.int1")
+        assertEquals(0x00000000, ml[5].int2, "3.int2")
+        assertEquals(0x40E00000, ml[7].int1, "5.int1")
+        assertEquals(0x40000000, ml[7].int2, "5.int2")
+        assertEquals(0x40E00000, ml[9].int1, "7.int1")
+        assertEquals(0x10000000, ml[9].int2, "7.int2")
     }
 
 
@@ -333,13 +335,13 @@ class MmlCompilerTest {
 1 t120
 """
         val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
-        val music = Midi2Music().apply { read(umpx) }
-        val ml = music.tracks[0].messages
+        val music = Midi2Music().apply { read(umpx, removeEmptyDeltaClockstamps = false) }
+        val ml = music.tracks[0].messages.drop(4).dropLast(2) // skip DCS, DCTPQ, DCS, and Start of Clip | drop DCS and End of Clip
         assertEquals(2, ml.size)
-        assertEquals(0xD010_0000u, ml[0].int1.toUInt(), "1.int1")
-        assertEquals(0x2faf080, ml[0].int2, "1.int2")
-        assertEquals(0, ml[0].int3, "1.int3")
-        assertEquals(0, ml[0].int4, "1.int4")
+        assertEquals(0xD010_0000u, ml[1].int1.toUInt(), "1.int1")
+        assertEquals(0x2faf080, ml[1].int2, "1.int2")
+        assertEquals(0, ml[1].int3, "1.int3")
+        assertEquals(0, ml[1].int4, "1.int4")
     }
 
     @Test
@@ -348,13 +350,13 @@ class MmlCompilerTest {
 1 TEXT "TestText"
 """
         val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
-        val music = Midi2Music().apply { read(umpx) }
-        val ml = music.tracks[0].messages
+        val music = Midi2Music().apply { read(umpx, removeEmptyDeltaClockstamps = false) }
+        val ml = music.tracks[0].messages.drop(4).dropLast(2) // skip DCS, DCTPQ, DCS, and Start of Clip | drop DCS and End of Clip
         assertEquals(2, ml.size)
-        assertEquals(0xD0000100u, ml[0].int1.toUInt(), "1.int1")
-        assertEquals(0x54657374, ml[0].int2, "1.int2")
-        assertEquals(0x54657874, ml[0].int3, "1.int3")
-        assertEquals(0, ml[0].int4, "1.int4")
+        assertEquals(0xD0000100u, ml[1].int1.toUInt(), "1.int1")
+        assertEquals(0x54657374, ml[1].int2, "1.int2")
+        assertEquals(0x54657874, ml[1].int3, "1.int3")
+        assertEquals(0, ml[1].int4, "1.int4")
     }
 
     @Test
@@ -363,13 +365,13 @@ class MmlCompilerTest {
 #meta title "Song Title"
 """
         val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
-        val music = Midi2Music().apply { read(umpx) }
-        val ml = music.tracks[0].messages
+        val music = Midi2Music().apply { read(umpx, removeEmptyDeltaClockstamps = false) }
+        val ml = music.tracks[0].messages.drop(4).dropLast(2) // skip DCS, DCTPQ, DCS, and Start of Clip | drop DCS and End of Clip
         assertEquals(2, ml.size)
-        assertEquals(0xD0100102u, ml[0].int1.toUInt(), "1.int1")
-        assertEquals(0x536f6e67, ml[0].int2, "1.int2")
-        assertEquals(0x20546974, ml[0].int3, "1.int3")
-        assertEquals(0x6c650000, ml[0].int4, "1.int4")
+        assertEquals(0xD0100102u, ml[1].int1.toUInt(), "1.int1")
+        assertEquals(0x536f6e67, ml[1].int2, "1.int2")
+        assertEquals(0x20546974, ml[1].int3, "1.int3")
+        assertEquals(0x6c650000, ml[1].int4, "1.int4")
     }
 
     @Test
@@ -406,9 +408,9 @@ class MmlCompilerTest {
         assertEquals(MidiChannelStatus.NOTE_ON, ml[0].event.eventType.toUnsigned(), "smf: note-on should appear")
 
         val umpx = MmlTestUtility.testCompile2("mml1", mml).toList()
-        val music2 = Midi2Music().apply { read(umpx) }
-        val ml2 = music2.tracks[0].messages
-        assertEquals(MidiChannelStatus.NOTE_ON, ml2[0].statusCode, "umpx: note-on should appear")
+        val music2 = Midi2Music().apply { read(umpx, removeEmptyDeltaClockstamps = false) }
+        val ml2 = music2.tracks[0].messages.drop(4).dropLast(2) // skip DCS, DCTPQ, DCS, and Start of Clip | drop DCS and End of Clip
+        assertEquals(MidiChannelStatus.NOTE_ON, ml2[1].statusCode, "umpx: note-on should appear")
     }
 
     @Test

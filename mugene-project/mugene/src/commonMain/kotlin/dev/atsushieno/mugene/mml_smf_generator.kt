@@ -127,9 +127,6 @@ class MmlMidi2Generator(private val source: MmlResolvedMusic) {
             cur = ev.tick
         }
 
-        // end of sequence
-        rtrk.messages.add(Ump(UmpFactory.systemMessage(0,0xFF.toByte(), 0x2F, 0)))
-
         return rtrk
     }
 }

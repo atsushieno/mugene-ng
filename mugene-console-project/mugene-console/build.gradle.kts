@@ -1,9 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.8.20"
-}
-
-repositories {
-    mavenCentral()
+    kotlin("multiplatform")
 }
 
 kotlin {
@@ -16,7 +12,7 @@ kotlin {
     sourceSets {
         val nativeMain by creating {
             dependencies {
-                implementation("dev.atsushieno:mugene:+")
+                implementation(libs.mugene)
             }
         }
         // call to linuxArm64() is commented out

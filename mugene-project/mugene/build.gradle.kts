@@ -7,25 +7,23 @@ buildscript {
     }
 
     dependencies {
-        classpath("dev.atsushieno.antlr-kotlin:antlr-kotlin-gradle-plugin:0.0.10")
+        classpath(libs.antlr.kotlin.gradle.plugin)
     }
 }
 
 plugins {
-    id("com.android.library") version "7.4.2"
-    kotlin("multiplatform") version "1.8.20"
-    id("dev.petuska.npm.publish") version "2.1.2"
+    id("com.android.library")
+    kotlin("multiplatform")
+    id("dev.petuska.npm.publish")
     id("maven-publish")
     id("signing")
 }
 
 group = "dev.atsushieno"
-version = "0.4.0"
-
-val ktmidi_version = "0.5.0"
+version = "0.4.1"
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(17)
 
     android {
         publishLibraryVariantsGroupedByFlavor = true
@@ -33,7 +31,7 @@ kotlin {
     }
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = "11"
+            kotlinOptions.jvmTarget = "17"
         }
         testRuns["test"].executionTask.configure {
             useJUnit()
@@ -62,17 +60,17 @@ kotlin {
     sourceSets {
         val commonAntlr by creating {
             dependencies {
-                api("dev.atsushieno.antlr-kotlin:antlr-kotlin-runtime:0.0.10")
+                api(libs.antlr.kotlin.runtime)
             }
-            kotlin.srcDir("build/generated-src/commonAntlr/kotlin")
         }
         val commonMain by getting {
             dependencies {
-                implementation("dev.atsushieno:ktmidi:$ktmidi_version")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
-                implementation("io.ktor:ktor-io:2.1.0")
+                implementation(libs.ktmidi)
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.ktor.io)
             }
             dependsOn(commonAntlr)
+            kotlin.srcDir("build/generated-src/commonAntlr/kotlin")
         }
         val commonTest by getting {
             dependencies {
@@ -88,13 +86,13 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                implementation("androidx.startup:startup-runtime:1.1.1")
+                implementation(libs.startup.runtime)
             }
         }
         val androidTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
-                implementation("junit:junit:4.13.2")
+                implementation(libs.junit)
             }
         }
         val jsMain by getting {
@@ -166,7 +164,7 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
 // run generate task before build
 // not required if you add the generated sources to version control
 // you can call the task manually in this case to update the generated sources
-val generateGrammarTask = tasks.getByName("generateKotlinCommonGrammarSource")
+val generateGrammarTask: Task = tasks.getByName("generateKotlinCommonGrammarSource")
 // It is kind of hack, but it's rather error-prone to manually specify *everything* here
 // (can you notice that you missed `compileKotlinLinuxArm64Metadata` ?)
 tasks.filter { it.name.startsWith("compileKotlin") and !it.name.contains("KotlinAndroid") }.forEach {
@@ -193,10 +191,10 @@ android {
     }
     buildTypes {
         val debug by getting {
-            minifyEnabled(false)
+            //minifyEnabled(false)
         }
         val release by getting {
-            minifyEnabled(false)
+            //minifyEnabled(false)
         }
     }
 }

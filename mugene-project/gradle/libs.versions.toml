@@ -1,0 +1,23 @@
+[versions]
+antlr-kotlin-gradle-plugin = "0.0.10"
+junit = "4.13.2"
+kotlinx-coroutines-core = "1.7.0"
+ktmidi = "0.5.1"
+mugene = "0.4.1"
+ktor-io = "2.3.0"
+startup-runtime = "1.1.1"
+
+[libraries]
+antlr-kotlin-gradle-plugin = { module = "dev.atsushieno.antlr-kotlin:antlr-kotlin-gradle-plugin", version.ref = "antlr-kotlin-gradle-plugin" }
+antlr-kotlin-runtime = { module = "dev.atsushieno.antlr-kotlin:antlr-kotlin-runtime", version.ref = "antlr-kotlin-gradle-plugin" }
+junit = { module = "junit:junit", version.ref = "junit" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
+ktmidi = { module = "dev.atsushieno:ktmidi", version.ref = "ktmidi" }
+mugene = { module = "dev.atsushieno:mugene", version.ref = "mugene" }
+ktor-io = { module = "io.ktor:ktor-io", version.ref = "ktor-io" }
+startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "startup-runtime" }
+
+[plugins]
+
+[bundles]
+

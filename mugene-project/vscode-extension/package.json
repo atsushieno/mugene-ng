@@ -3,7 +3,7 @@
 	"description": "mugene MML compiler support",
 	"author": "Atsushi Eno",
 	"license": "MIT",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"publisher": "atsushieno",
 	"repository": {
 		"type": "git",
@@ -87,7 +87,7 @@
 		"typescript": "^4.3.5"
 	},
 	"dependencies": {
-        "@dev.atsushieno/mugene": "^0.3.0",
+        "@dev.atsushieno/mugene": "^0.4.0",
 		"@js-joda/core": "^3.2.0",
 		"rx-lite": "^4.0.8",
 		"vscode-languageclient": "^7.0.0"

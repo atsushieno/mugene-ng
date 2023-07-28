@@ -1,5 +1,5 @@
 [versions]
-antlr-kotlin-gradle-plugin = "0.0.10"
+antlr-kotlin-gradle-plugin = "0.0.11"
 junit = "4.13.2"
 kotlinx-coroutines-core = "1.7.0"
 ktmidi = "0.5.1"

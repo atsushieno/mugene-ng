@@ -144,7 +144,7 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
         // project.dependencies.create("org.antlr:antlr4:$antlrVersion"),
 
         // antlr target, required to create kotlin code
-        project.dependencies.create("dev.atsushieno.antlr-kotlin:antlr-kotlin-target:0.0.10")
+        project.dependencies.create("dev.atsushieno.antlr-kotlin:antlr-kotlin-target:0.0.11")
     )
     maxHeapSize = "64m"
     packageName = "dev.atsushieno.mugene.parser"
@@ -164,20 +164,12 @@ tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generate
 // run generate task before build
 // not required if you add the generated sources to version control
 // you can call the task manually in this case to update the generated sources
-val generateGrammarTask: Task = tasks.getByName("generateKotlinCommonGrammarSource")
-// It is kind of hack, but it's rather error-prone to manually specify *everything* here
-// (can you notice that you missed `compileKotlinLinuxArm64Metadata` ?)
-tasks.filter { it.name.startsWith("compileKotlin") and !it.name.contains("KotlinAndroid") }.forEach {
-    it.dependsOn(generateGrammarTask)
-}
-tasks.filter { it.name.endsWith("ourcesJar") and !it.name.contains("Android") }.forEach {
-    it.dependsOn(generateGrammarTask)
-}
 afterEvaluate {
-    tasks.filter { it.name.matches(Regex("compile.*KotlinAndroid")) }.forEach {
+    val generateGrammarTask: Task = tasks.getByName("generateKotlinCommonGrammarSource")
+    tasks.filter { it.name.startsWith("compile") and it.name.contains("Kotlin") }.forEach {
         it.dependsOn(generateGrammarTask)
     }
-    tasks.filter { it.name.matches(Regex("android.*SourcesJar")) }.forEach {
+    tasks.filter { it.name.endsWith("ourcesJar") }.forEach {
         it.dependsOn(generateGrammarTask)
     }
 }
@@ -196,6 +188,10 @@ android {
         val release by getting {
             //minifyEnabled(false)
         }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 

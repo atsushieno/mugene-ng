@@ -1,8 +1,10 @@
+@file:OptIn(ExperimentalJsExport::class)
+
 package dev.atsushieno.mugene
 
+import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 import kotlin.math.pow
-
 
 abstract class StreamResolver {
 

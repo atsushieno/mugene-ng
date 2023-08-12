@@ -13,4 +13,4 @@ class MmlCompilerAndroid(assets: AssetManager) : MmlCompiler() {
 // Developers are supposed to set this property before trying to create any default MML compiler.
 lateinit var applicationContextForDefaultCompiler: Context
 
-internal actual fun createDefaultCompiler() : MmlCompiler = MmlCompilerAndroid(applicationContextForDefaultCompiler!!.assets)
+internal actual fun createDefaultCompiler() : MmlCompiler = MmlCompilerAndroid(applicationContextForDefaultCompiler.assets)

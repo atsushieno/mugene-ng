@@ -7,8 +7,6 @@ import java.nio.file.Path
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
-import kotlin.test.assertFalse
-import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -79,7 +77,7 @@ class MmlCompilerTest {
             0x30, 0x80, 0x40, 0,
             0, 0xFF, 0x2F, 0).map { i -> i.toByte() }.toByteArray()
         assertArrayEquals(expected.toTypedArray(), actual.toTypedArray(), "MIDI bytes")
-        val music = MidiMusic()
+        val music = Midi1Music()
         music.read(actual.toList())
         assertEquals(144, music.getTotalTicks(), "total ticks")
     }
@@ -122,20 +120,20 @@ class MmlCompilerTest {
     // U and L cannot share case-insensitively identical fields for JNI signature...
     class U {
         companion object {
-            val M = 'M'.toInt()
-            val T = 'T'.toInt()
+            val M = 'M'.code
+            val T = 'T'.code
         }
     }
 
     class L {
         companion object {
-            val h = 'h'.toInt()
-            val d = 'd'.toInt()
-            val r = 'r'.toInt()
-            val k = 'k'.toInt()
-            val e = 'e'.toInt()
-            val s = 's'.toInt()
-            val t = 't'.toInt()
+            val h = 'h'.code
+            val d = 'd'.code
+            val r = 'r'.code
+            val k = 'k'.code
+            val e = 'e'.code
+            val s = 's'.code
+            val t = 't'.code
         }
     }
 
@@ -155,7 +153,7 @@ class MmlCompilerTest {
     fun noteSkippingLength() {
         val mml = """1	c8d8,,60e8"""
         val midi1Bytes = MmlTestUtility.testCompile("midi1", mml)
-        val music = MidiMusic().apply { read(midi1Bytes.toList()) }
+        val music = Midi1Music().apply { read(midi1Bytes.toList()) }
         assertEquals(72, music.getTotalTicks(), "midi1 total ticks")
         val midi2Bytes = MmlTestUtility.testCompile2("midi2", mml, outputDeltaTime = true)
         val music2 = Midi2Music().apply { read (midi2Bytes.toList()) }
@@ -198,13 +196,14 @@ class MmlCompilerTest {
 #macro X { __MIDI #F0, #7D, 11, "-1472549978", #F7 }
 1   X
 """
-        val music = MidiMusic().apply { read(MmlTestUtility.testCompile("midi1", mml).toList()) }
+        val music = Midi1Music().apply { read(MmlTestUtility.testCompile("midi1", mml).toList()) }
         assertEquals(1, music.tracks.size, "tracks.size")
-        val msg = music.tracks[0].messages.first()
-        assertEquals(0xF0, msg.event.statusByte.toUnsigned(), "status")
+        val evt = music.tracks[0].events.first()
+        assertEquals(0xF0, evt.message.statusByte.toUnsigned(), "status")
         val sysexData = arrayOf(0x7D, 0x0B, 0x2D, 0x31, 0x34, 0x37, 0x32, 0x35, 0x34, 0x39, 0x39, 0x37, 0x38)
             .map { v -> v.toByte() }.toTypedArray()
-        val actualData = msg.event.extraData!!.drop(msg.event.extraDataOffset).take(msg.event.extraDataLength).toTypedArray()
+        val msg = evt.message as Midi1CompoundMessage
+        val actualData = msg.extraData!!.drop(msg.extraDataOffset).take(msg.extraDataLength).toTypedArray()
         assertArrayEquals(sysexData, actualData, "sysex data")
         val bytes = mutableListOf<Byte>()
         music.write(bytes)
@@ -219,14 +218,15 @@ class MmlCompilerTest {
 #macro X { __MIDI #F0, #7D, "augene-ng", 11, "-1472549978", #F7 }
 1   X
 """
-        val music = MidiMusic().apply { read(MmlTestUtility.testCompile("midi1", mml).toList()) }
+        val music = Midi1Music().apply { read(MmlTestUtility.testCompile("midi1", mml).toList()) }
         assertEquals(1, music.tracks.size, "tracks.size")
-        val msg = music.tracks[0].messages.first()
-        assertEquals(0xF0, msg.event.statusByte.toUnsigned(), "status")
+        val evt = music.tracks[0].events.first()
+        val msg = evt.message as Midi1CompoundMessage
+        assertEquals(0xF0, msg.statusByte.toUnsigned(), "status")
         val sysexData = arrayOf(0x7D, 'a'.code, 'u'.code, 'g'.code, 'e'.code, 'n'.code, 'e'.code, '-'.code, 'n'.code, 'g'.code,
                                 0x0B, 0x2D, 0x31, 0x34, 0x37, 0x32, 0x35, 0x34, 0x39, 0x39, 0x37, 0x38)
             .map { v -> v.toByte() }.toTypedArray()
-        val actualData = msg.event.extraData!!.drop(msg.event.extraDataOffset).take(msg.event.extraDataLength).toTypedArray()
+        val actualData = msg.extraData!!.drop(msg.extraDataOffset).take(msg.extraDataLength).toTypedArray()
         assertArrayEquals(sysexData, actualData, "sysex data")
         val bytes = mutableListOf<Byte>()
         music.write(bytes)
@@ -240,7 +240,7 @@ class MmlCompilerTest {
         val mml = """
 1   CH1 @1 o5 l4 v100 cdefgab>c
 """
-        val music = MidiMusic().apply { read(MmlTestUtility.testCompile("midi1", mml).toList()) }
+        val music = Midi1Music().apply { read(MmlTestUtility.testCompile("midi1", mml).toList()) }
         assertEquals(1, music.tracks.size, "tracks.size")
         val messages = music.tracks[0].messages
         assertEquals(0xB0, messages[0].event.statusByte.toUnsigned(), "msg0")
@@ -380,7 +380,7 @@ class MmlCompilerTest {
 1   c4 q4 c4 Q4 c4 q0 c4 l12 c Q8 c
 """
         val smf = MmlTestUtility.testCompile("mml1", mml).toList()
-        val music = MidiMusic().apply { read(smf) }
+        val music = Midi1Music().apply { read(smf) }
         val ml = music.tracks[0].messages
         assertEquals(MidiChannelStatus.NOTE_OFF, ml[1].event.eventType.toUnsigned(), "eventType1")
         assertEquals(48, ml[1].deltaTime, "deltaTime1")
@@ -403,7 +403,7 @@ class MmlCompilerTest {
 1   q1 c0e4c4
 """
         val smf = MmlTestUtility.testCompile("mml1", mml).toList()
-        val music = MidiMusic().apply { read(smf) }
+        val music = Midi1Music().apply { read(smf) }
         val ml = music.tracks[0].messages
         assertEquals(MidiChannelStatus.NOTE_ON, ml[0].event.eventType.toUnsigned(), "smf: note-on should appear")
 
@@ -422,7 +422,7 @@ class MmlCompilerTest {
         val reports = mutableListOf<String>()
         val smf = MmlTestUtility.testCompile("mml1", mml, reporter = {  _, _, message -> reports.add(message) }).toList()
         assertEquals(0, reports.size, "reported: " + reports.firstOrNull())
-        val music = MidiMusic().apply { read(smf) }
+        val music = Midi1Music().apply { read(smf) }
         var current = 0
         val notes = mutableMapOf<Byte,Int>()
         var count = 0

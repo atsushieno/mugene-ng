@@ -1,13 +1,6 @@
 package dev.atsushieno.mugene
 
-import dev.atsushieno.ktmidi.Midi2Music
-import dev.atsushieno.ktmidi.Midi2Track
-import dev.atsushieno.ktmidi.MidiEvent
-import dev.atsushieno.ktmidi.MidiMessage
-import dev.atsushieno.ktmidi.MidiMusic
-import dev.atsushieno.ktmidi.MidiTrack
-import dev.atsushieno.ktmidi.Ump
-import dev.atsushieno.ktmidi.UmpFactory
+import dev.atsushieno.ktmidi.*
 import io.ktor.utils.io.core.*
 import kotlin.experimental.and
 
@@ -15,46 +8,45 @@ internal fun Byte.toUnsigned() : Int = if (this < 0) this.toUByte().toInt() else
 
 class MmlSmfGenerator(private val source: MmlResolvedMusic) {
     companion object {
-        fun generate(source: MmlResolvedMusic): MidiMusic {
+        fun generate(source: MmlResolvedMusic): Midi1Music {
             val gen = MmlSmfGenerator(source)
             gen.generateSong()
             return gen.result
         }
     }
 
-    var result: MidiMusic = MidiMusic().apply { deltaTimeSpec = source.baseCount / 4 }
+    var result: Midi1Music = Midi1Music().apply { deltaTimeSpec = source.baseCount / 4 }
 
     private fun generateSong() {
         for (t in source.tracks)
             result.tracks.add(generateTrack(t))
     }
 
-    private fun generateTrack(source: MmlResolvedTrack): MidiTrack {
-        val rtrk = MidiTrack()
+    private fun generateTrack(source: MmlResolvedTrack): Midi1Track {
+        val rtrk = Midi1Track()
         var cur = 0
         for (ev in source.events) {
-            var evt: MidiEvent?
+            var msg: Midi1Message =
             if (ev.arguments[0] == 0xFF.toByte())
-                evt = MidiEvent(
+                Midi1CompoundMessage(
                     ev.arguments[0].toUnsigned(),
                     ev.arguments[1].toUnsigned(),
                     0,
                     ev.arguments.drop(2).toByteArray()
                 )
-            else if (ev.arguments.size == 3)
-                evt = MidiEvent(
+            else if (ev.arguments.size <= 3)
+                Midi1SimpleMessage(
                     ev.arguments[0].toUnsigned(),
                     ev.arguments[1].toUnsigned(),
-                    ev.arguments[2].toUnsigned(),
-                    null
+                    if (ev.arguments.size > 2) ev.arguments[2].toUnsigned() else 0
                 )
-            else
-                evt = MidiEvent(ev.arguments[0].toUnsigned(), 0, 0, ev.arguments.drop(1).toByteArray())
-            val msg = MidiMessage(ev.tick - cur, evt)
-            rtrk.messages.add(msg)
+            else // size unknown (SysEx)
+                Midi1CompoundMessage(ev.arguments[0].toUnsigned(), 0, 0, ev.arguments.drop(1).toByteArray())
+            val evt = Midi1Event(ev.tick - cur, msg)
+            rtrk.events.add(evt)
             cur = ev.tick
         }
-        rtrk.messages.add(MidiMessage(0, MidiEvent(0xFF, 0x2F, 0, byteArrayOf())))
+        rtrk.events.add(Midi1Event(0, Midi1CompoundMessage(0xFF, 0x2F, 0, byteArrayOf())))
         return rtrk
     }
 }

@@ -1,11 +1,12 @@
 package dev.atsushieno.mugene
 
 import dev.atsushieno.ktmidi.Midi2Music
-import dev.atsushieno.ktmidi.MidiMessage
-import dev.atsushieno.ktmidi.MidiMusic
-import dev.atsushieno.ktmidi.SmfWriterExtension
+import dev.atsushieno.ktmidi.Midi1Event
+import dev.atsushieno.ktmidi.Midi1Music
+import dev.atsushieno.ktmidi.Midi1WriterExtension
 import dev.atsushieno.ktmidi.convertDeltaTimesToJRTimestamps
 import dev.atsushieno.ktmidi.write
+import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.jvm.JvmName
@@ -37,6 +38,7 @@ typealias MmlDiagnosticReporter = (verbosity: MmlDiagnosticVerbosity, location: 
 
 internal expect fun createDefaultCompiler(): MmlCompiler
 
+@OptIn(ExperimentalJsExport::class)
 @JsExport
 abstract class MmlCompiler {
     companion object {
@@ -69,8 +71,8 @@ abstract class MmlCompiler {
             throw MmlException(output, null)
     }
 
-    @JsName("doNotUseCompile_0")
-    fun compile(skipDefaultMmlFiles: Boolean, vararg mmlParts: String): MidiMusic {
+    @JsExport.Ignore
+    fun compile(skipDefaultMmlFiles: Boolean, vararg mmlParts: String): Midi1Music {
         val sources = mmlParts.map { mml -> MmlInputSource("<string>", mml) }.toTypedArray()
         return compile(skipDefaultMmlFiles, inputs = sources)
     }
@@ -79,40 +81,68 @@ abstract class MmlCompiler {
     @JvmName("doNotUseCompile")
     fun compile(skipDefaultMmlFiles: Boolean, inputs: Array<MmlInputSource>) = generateMusic(buildSemanticTree(tokenizeInputs(false, skipDefaultMmlFiles, inputs.toList())))
 
-    @JsName("doNotUseCompile_1")
+    @JsExport.Ignore
     fun compile(skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) = generateMusic(buildSemanticTree(tokenizeInputs(false, skipDefaultMmlFiles, inputs.toList())))
 
-    @JsName("doNotUseCompile_2")
-    fun compile(skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, metaWriter: ((Boolean, MidiMessage, MutableList<Byte>) -> Int)?, output: MutableList<Byte>, disableRunningStatus: Boolean) {
+    @JsExport.Ignore
+    fun compile(skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, metaWriter: ((Boolean, Midi1Event, MutableList<Byte>) -> Int)?, output: MutableList<Byte>, disableRunningStatus: Boolean) {
         val music = compile(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
-        music.write(output, metaWriter ?: SmfWriterExtension.DEFAULT_META_EVENT_WRITER, disableRunningStatus)
+        music.write(output, metaWriter ?: Midi1WriterExtension.defaultMetaEventWriter, disableRunningStatus)
     }
 
-    @JsName("doNotUseCompile2_0")
-    fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, vararg mmlParts: String): Midi2Music {
-        val sources = mmlParts.map { mml -> MmlInputSource("<string>", mml) }.toTypedArray()
-        return compile2(outputDeltaTime, skipDefaultMmlFiles, inputs = sources)
-    }
+    @JsExport.Ignore
+    fun compile2(skipDefaultMmlFiles: Boolean, vararg mmlParts: String): Midi2Music =
+        compile2(skipDefaultMmlFiles, mmlParts.map { mml -> MmlInputSource("<string>", mml) }.toTypedArray())
+
+    @JsExport.Ignore
+    @Deprecated("outputDeltaTime argument is deprecated. Use another overload without it.",
+        ReplaceWith("compile2(skipDefaultMmlFiles, mmlParts)")
+    )
+    fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, vararg mmlParts: String): Midi2Music =
+        compile2(skipDefaultMmlFiles, mmlParts.map { mml -> MmlInputSource("<string>", mml) }.toTypedArray())
 
     @JsName("compile2")
+    @JvmName("doNotUseCompile2a")
+    fun compile2(skipDefaultMmlFiles: Boolean, inputs: Array<MmlInputSource>) =
+        generateMusic2(buildSemanticTree(tokenizeInputs(true, skipDefaultMmlFiles, inputs.toList())))
+
+    @Deprecated("outputDeltaTime argument is deprecated. Use another overload without it.",
+        ReplaceWith("compile2(skipDefaultMmlFiles, inputs)")
+    )
+    @JsExport.Ignore
     @JvmName("doNotUseCompile2")
     fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, inputs: Array<MmlInputSource>) =
-        generateMusic2(outputDeltaTime, buildSemanticTree(tokenizeInputs(true, skipDefaultMmlFiles, inputs.toList())))
+        compile2(skipDefaultMmlFiles, inputs)
 
-    @JsName("doNotUseCompile2_1")
+    @JsExport.Ignore
+    fun compile2(skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) =
+        generateMusic2(buildSemanticTree(tokenizeInputs(true, skipDefaultMmlFiles, inputs.toList())))
+
+    @Deprecated("outputDeltaTime argument is deprecated. Use another overload without it.",
+        ReplaceWith("compile2(skipDefaultMmlFiles, inputs)")
+    )
+    @JsExport.Ignore
     fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) =
-        generateMusic2(outputDeltaTime, buildSemanticTree(tokenizeInputs(true, skipDefaultMmlFiles, inputs.toList())))
+        generateMusic2(buildSemanticTree(tokenizeInputs(true, skipDefaultMmlFiles, inputs.toList())))
 
-    @JsName("doNotUseCompile2_2")
-    fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, output: MutableList<Byte>) {
-        val music = compile2(outputDeltaTime, skipDefaultMmlFiles, inputs = inputs.toTypedArray())
+    @JsExport.Ignore
+    fun compile2(skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, output: MutableList<Byte>) {
+        val music = compile2(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
         music.write(output)
     }
 
+    @Deprecated("outputDeltaTime argument is deprecated. Use another overload without it.",
+        ReplaceWith("compile2(skipDefaultMmlFiles, inputs, output)")
+    )
+    @JsName("doNotUseCompile2_2")
+    fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, output: MutableList<Byte>) =
+        compile2(skipDefaultMmlFiles, inputs, output)
+
+    // FIXME: make it public maybe, but once all those @JsExport issues are resolved (or maybe we should wait for Kotlin/Wasm)
     // used by language server and compiler.
-    fun tokenizeInputs(isMidi2: Boolean, skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>): MmlTokenSet {
+    private fun tokenizeInputs(isMidi2: Boolean, skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>): MmlTokenSet {
         val defaults = if (isMidi2) Util.defaultIncludes2 else Util.defaultIncludes
-        var actualInputs =
+        val actualInputs =
             if (!skipDefaultMmlFiles)
                 defaults.map { f -> MmlInputSource(f, resolver.getEntity(f)) } + inputs
             else
@@ -131,7 +161,7 @@ abstract class MmlCompiler {
         return MmlSemanticTreeBuilder.compile(tokens, this)
     }
 
-    private fun generateMusic(tree: MmlSemanticTreeSet): MidiMusic {
+    private fun generateMusic(tree: MmlSemanticTreeSet): Midi1Music {
         // semantic trees -> simplified streams
         MmlMacroExpander.expand(tree, this)
         // simplified streams -> raw events
@@ -140,17 +170,13 @@ abstract class MmlCompiler {
         return MmlSmfGenerator.generate(resolved)
     }
 
-    private fun generateMusic2(outputDeltaTime: Boolean, tree: MmlSemanticTreeSet): Midi2Music {
+    private fun generateMusic2(tree: MmlSemanticTreeSet): Midi2Music {
         // semantic trees -> simplified streams
         MmlMacroExpander.expand(tree, this)
         // simplified streams -> raw events
         val resolved = MmlEventStreamGenerator.generate(tree, this, true)
         // raw events -> UMP music format
-        val umpmf = MmlMidi2Generator.generate(resolved)
-        if (outputDeltaTime)
-            return umpmf
-        // convert DeltaTimes to JR Timestamps (which UMP players can directly play each track)
-        return umpmf.convertDeltaTimesToJRTimestamps()
+        return MmlMidi2Generator.generate(resolved)
     }
 
     init {

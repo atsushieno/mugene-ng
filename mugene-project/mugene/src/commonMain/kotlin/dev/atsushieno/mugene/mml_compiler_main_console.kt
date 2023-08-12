@@ -1,7 +1,7 @@
 package dev.atsushieno.mugene
 
-import dev.atsushieno.ktmidi.MidiMessage
-import dev.atsushieno.ktmidi.SmfWriterExtension
+import dev.atsushieno.ktmidi.Midi1Event
+import dev.atsushieno.ktmidi.Midi1WriterExtension
 
 abstract class MmlCompilerConsole : MmlCompiler() {
     companion object {
@@ -11,7 +11,7 @@ abstract class MmlCompilerConsole : MmlCompiler() {
     class MmlCompilerOptions {
         var skipDefaultMmlFiles = false
         var disableRunningStatus = false
-        var metaWriter: ((Boolean, MidiMessage, MutableList<Byte>) -> Int)? = null
+        var metaWriter: ((Boolean, Midi1Event, MutableList<Byte>) -> Int)? = null
     }
 
     abstract fun writeToFile(filename: String, bytes: ByteArray)
@@ -60,21 +60,20 @@ Options:
         var explicitFilename: String? = null
         var disableRunningStatus = false
         var extension = ".mid"
-        val metaWriter = SmfWriterExtension.DEFAULT_META_EVENT_WRITER
+        val metaWriter = Midi1WriterExtension.defaultMetaEventWriter
         var noDefault = false
         var midi2 = false
-        var outputDeltaTime = false
 
         for (arg in args) {
             when (arg) {
                 "--midi2" -> {
                     midi2 = true
-                    extension = ".umps"
+                    extension = ".umpx"
                     continue
                 }
                 "--midi2x" -> {
+                    // It used to be different from --midi2, but now they are the same.
                     midi2 = true
-                    outputDeltaTime = true
                     extension = ".umpx"
                     continue
                 }
@@ -117,12 +116,12 @@ Options:
         // FIXME: stream resolver should be processed within the actual parsing phase.
         // This makes it redundant to support #include
         val inputs = mutableListOf<MmlInputSource>()
-        for (fname in inputFilenames)
-            inputs.add(MmlInputSource(fname, resolver.getEntity(fname)))
+        for (name in inputFilenames)
+            inputs.add(MmlInputSource(name, resolver.getEntity(name)))
 
         val outputBytes = mutableListOf<Byte>()
         if (midi2)
-            compile2(outputDeltaTime, noDefault, inputs, outputBytes)
+            compile2(noDefault, inputs, outputBytes)
         else
             compile(noDefault, inputs, metaWriter, outputBytes, disableRunningStatus)
 

@@ -2,9 +2,9 @@
 antlr-kotlin-gradle-plugin = "0.0.11"
 junit = "4.13.2"
 kotlinx-coroutines-core = "1.7.3"
-ktmidi = "0.6.0-preview3"
-mugene = "0.4.1"
-ktor-io = "2.3.0"
+ktmidi = "0.6.0"
+mugene = "0.4.4"
+ktor-io = "2.3.3"
 startup-runtime = "1.1.1"
 
 [libraries]

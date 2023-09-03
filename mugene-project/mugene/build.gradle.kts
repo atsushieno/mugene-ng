@@ -20,7 +20,7 @@ plugins {
 }
 
 group = "dev.atsushieno"
-version = "0.4.3"
+version = libs.versions.mugene.get()
 
 kotlin {
     jvmToolchain(17)

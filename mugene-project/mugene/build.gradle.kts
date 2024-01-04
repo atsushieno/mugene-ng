@@ -17,6 +17,7 @@ plugins {
     id("dev.petuska.npm.publish")
     id("maven-publish")
     id("signing")
+    id("org.jetbrains.dokka")
     id("com.strumenta.antlr-kotlin")
 }
 
@@ -174,23 +175,14 @@ val generateKotlinGrammarSource = tasks.register<AntlrKotlinTask>("generateKotli
     outputDirectory = layout.buildDirectory.dir(outDir).get().asFile
 }
 
-tasks.withType<KotlinCompile<*>> {
-    dependsOn(generateKotlinGrammarSource)
-}
-
-/*
-// run generate task before build
-// not required if you add the generated sources to version control
-// you can call the task manually in this case to update the generated sources
+tasks.withType<KotlinCompile<*>> { dependsOn(generateKotlinGrammarSource) }
 afterEvaluate {
-    val generateGrammarTask: Task = tasks.getByName("generateKotlinGrammarSource")
-    tasks.filter { it.name.startsWith("compile") and it.name.contains("Kotlin") }.forEach {
-        it.dependsOn(generateGrammarTask)
-    }
-    tasks.filter { it.name.endsWith("ourcesJar") }.forEach {
-        it.dependsOn(generateGrammarTask)
-    }
-}*/
+    tasks.findByPath(":mugene:androidDebugSourcesJar") !!.dependsOn(generateKotlinGrammarSource)
+    tasks.findByPath(":mugene:androidReleaseSourcesJar")!!.dependsOn(generateKotlinGrammarSource)
+}
+tasks.filter { it.name.endsWith("ourcesJar")}.forEach {
+    it.dependsOn(generateKotlinGrammarSource)
+}
 
 android {
     namespace = "dev.atsushieno.mugene"
@@ -215,10 +207,6 @@ android {
 }
 
 afterEvaluate {
-    val javadocJar by tasks.registering(Jar::class) {
-        archiveClassifier.set("javadoc")
-    }
-
     publishing {
 
         repositories {
@@ -234,7 +222,19 @@ afterEvaluate {
 
         publications.withType<MavenPublication> {
 
-            artifact(javadocJar)
+            // https://github.com/gradle/gradle/issues/26091#issuecomment-1681343496
+            val dokkaJar = project.tasks.register("${name}DokkaJar", Jar::class) {
+                group = JavaBasePlugin.DOCUMENTATION_GROUP
+                description = "Assembles Kotlin docs with Dokka into a Javadoc jar"
+                archiveClassifier.set("javadoc")
+                from(tasks.named("dokkaHtml"))
+
+                // Each archive name should be distinct, to avoid implicit dependency issues.
+                // We use the same format as the sources Jar tasks.
+                // https://youtrack.jetbrains.com/issue/KT-46466
+                archiveBaseName.set("${archiveBaseName.get()}-${name}")
+            }
+            artifact(dokkaJar)
 
             pom {
                 name.set("mugene-ng")

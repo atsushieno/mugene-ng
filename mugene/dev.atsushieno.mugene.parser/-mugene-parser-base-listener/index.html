@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>MugeneParserBaseListener</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+                    <a class="library-name--link" href="../../../index.html">
+                            mugene
+                    </a>
+            </div>
+            <div class="library-version">
+0.4.5            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":mugene:dokkaHtml/commonMain">common</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="mugene::dev.atsushieno.mugene.parser/MugeneParserBaseListener///PointingToDeclaration//188414511">
+  <div class="breadcrumbs"><a href="../../../index.html">mugene</a><span class="delimiter">/</span><a href="../index.html">dev.atsushieno.mugene.parser</a><span class="delimiter">/</span><span class="current">MugeneParserBaseListener</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Mugene</span><wbr></wbr><span>Parser</span><wbr></wbr><span>Base</span><wbr></wbr><span><span>Listener</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">MugeneParserBaseListener</a> : <a href="../-mugene-parser-listener/index.html">MugeneParserListener</a></div><p class="paragraph">This class provides an empty implementation of <a href="../-mugene-parser-listener/index.html">MugeneParserListener</a>, which can be extended to create a listener which only needs to handle a subset of the available methods.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-664038853%2FConstructors%2F188414511" anchor-label="MugeneParserBaseListener" id="-664038853%2FConstructors%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-mugene-parser-base-listener.html"><span>Mugene</span><wbr></wbr><span>Parser</span><wbr></wbr><span>Base</span><wbr></wbr><span><span>Listener</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-664038853%2FConstructors%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-1892561701%2FFunctions%2F188414511" anchor-label="enterAddSubExpr" id="-1892561701%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-add-sub-expr.html"><span>enter</span><wbr></wbr><span>Add</span><wbr></wbr><span>Sub</span><wbr></wbr><span><span>Expr</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1892561701%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-add-sub-expr.html"><span class="token function">enterAddSubExpr</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-add-sub-expr-context/index.html">MugeneParser.AddSubExprContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1379741075%2FFunctions%2F188414511" anchor-label="enterArgument" id="-1379741075%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-argument.html"><span>enter</span><wbr></wbr><span><span>Argument</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1379741075%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-argument.html"><span class="token function">enterArgument</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-argument-context/index.html">MugeneParser.ArgumentContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-495288321%2FFunctions%2F188414511" anchor-label="enterArguments" id="-495288321%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-arguments.html"><span>enter</span><wbr></wbr><span><span>Arguments</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-495288321%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-arguments.html"><span class="token function">enterArguments</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-arguments-context/index.html">MugeneParser.ArgumentsContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2096761793%2FFunctions%2F188414511" anchor-label="enterArgumentsOptCurly" id="-2096761793%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-arguments-opt-curly.html"><span>enter</span><wbr></wbr><span>Arguments</span><wbr></wbr><span>Opt</span><wbr></wbr><span><span>Curly</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2096761793%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-arguments-opt-curly.html"><span class="token function">enterArgumentsOptCurly</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-arguments-opt-curly-context/index.html">MugeneParser.ArgumentsOptCurlyContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="748249535%2FFunctions%2F188414511" anchor-label="enterCanBeIdentifier" id="748249535%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-can-be-identifier.html"><span>enter</span><wbr></wbr><span>Can</span><wbr></wbr><span>Be</span><wbr></wbr><span><span>Identifier</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="748249535%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-can-be-identifier.html"><span class="token function">enterCanBeIdentifier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-can-be-identifier-context/index.html">MugeneParser.CanBeIdentifierContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-987246353%2FFunctions%2F188414511" anchor-label="enterCommas" id="-987246353%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-commas.html"><span>enter</span><wbr></wbr><span><span>Commas</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-987246353%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-commas.html"><span class="token function">enterCommas</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-commas-context/index.html">MugeneParser.CommasContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-285807185%2FFunctions%2F188414511" anchor-label="enterComparisonExpr" id="-285807185%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-comparison-expr.html"><span>enter</span><wbr></wbr><span>Comparison</span><wbr></wbr><span><span>Expr</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-285807185%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-comparison-expr.html"><span class="token function">enterComparisonExpr</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-comparison-expr-context/index.html">MugeneParser.ComparisonExprContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2118906291%2FFunctions%2F188414511" anchor-label="enterComparisonOperator" id="-2118906291%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-comparison-operator.html"><span>enter</span><wbr></wbr><span>Comparison</span><wbr></wbr><span><span>Operator</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2118906291%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-comparison-operator.html"><span class="token function">enterComparisonOperator</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-comparison-operator-context/index.html">MugeneParser.ComparisonOperatorContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-370605473%2FFunctions%2F188414511" anchor-label="enterConditionalExpr" id="-370605473%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-conditional-expr.html"><span>enter</span><wbr></wbr><span>Conditional</span><wbr></wbr><span><span>Expr</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-370605473%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-conditional-expr.html"><span class="token function">enterConditionalExpr</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-conditional-expr-context/index.html">MugeneParser.ConditionalExprContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1000525959%2FFunctions%2F188414511" anchor-label="enterDots" id="1000525959%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-dots.html"><span>enter</span><wbr></wbr><span><span>Dots</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1000525959%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-dots.html"><span class="token function">enterDots</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-dots-context/index.html">MugeneParser.DotsContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-259916283%2FFunctions%2F188414511" anchor-label="enterEveryRule" id="-259916283%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-every-rule.html"><span>enter</span><wbr></wbr><span>Every</span><wbr></wbr><span><span>Rule</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-259916283%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-every-rule.html"><span class="token function">enterEveryRule</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><span data-unresolved-link="org.antlr.v4.kotlinruntime/ParserRuleContext///PointingToDeclaration/">ParserRuleContext</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="244234275%2FFunctions%2F188414511" anchor-label="enterExpression" id="244234275%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-expression.html"><span>enter</span><wbr></wbr><span><span>Expression</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="244234275%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-expression.html"><span class="token function">enterExpression</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-expression-context/index.html">MugeneParser.ExpressionContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1721935553%2FFunctions%2F188414511" anchor-label="enterExpressionOrOperationUses" id="-1721935553%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-expression-or-operation-uses.html"><span>enter</span><wbr></wbr><span>Expression</span><wbr></wbr><span>Or</span><wbr></wbr><span>Operation</span><wbr></wbr><span><span>Uses</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1721935553%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-expression-or-operation-uses.html"><span class="token function">enterExpressionOrOperationUses</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-expression-or-operation-uses-context/index.html">MugeneParser.ExpressionOrOperationUsesContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1792849791%2FFunctions%2F188414511" anchor-label="enterMulDivModExpr" id="1792849791%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-mul-div-mod-expr.html"><span>enter</span><wbr></wbr><span>Mul</span><wbr></wbr><span>Div</span><wbr></wbr><span>Mod</span><wbr></wbr><span><span>Expr</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1792849791%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-mul-div-mod-expr.html"><span class="token function">enterMulDivModExpr</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-mul-div-mod-expr-context/index.html">MugeneParser.MulDivModExprContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2109050849%2FFunctions%2F188414511" anchor-label="enterNumberOrLengthConstant" id="-2109050849%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-number-or-length-constant.html"><span>enter</span><wbr></wbr><span>Number</span><wbr></wbr><span>Or</span><wbr></wbr><span>Length</span><wbr></wbr><span><span>Constant</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2109050849%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-number-or-length-constant.html"><span class="token function">enterNumberOrLengthConstant</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-number-or-length-constant-context/index.html">MugeneParser.NumberOrLengthConstantContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-958366669%2FFunctions%2F188414511" anchor-label="enterOperationUse" id="-958366669%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-operation-use.html"><span>enter</span><wbr></wbr><span>Operation</span><wbr></wbr><span><span>Use</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-958366669%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-operation-use.html"><span class="token function">enterOperationUse</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-operation-use-context/index.html">MugeneParser.OperationUseContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1792801889%2FFunctions%2F188414511" anchor-label="enterOperationUses" id="-1792801889%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-operation-uses.html"><span>enter</span><wbr></wbr><span>Operation</span><wbr></wbr><span><span>Uses</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1792801889%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-operation-uses.html"><span class="token function">enterOperationUses</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-operation-uses-context/index.html">MugeneParser.OperationUsesContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-200934561%2FFunctions%2F188414511" anchor-label="enterPrimaryExpr" id="-200934561%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-primary-expr.html"><span>enter</span><wbr></wbr><span>Primary</span><wbr></wbr><span><span>Expr</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-200934561%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-primary-expr.html"><span class="token function">enterPrimaryExpr</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-primary-expr-context/index.html">MugeneParser.PrimaryExprContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="367662099%2FFunctions%2F188414511" anchor-label="enterStepConstant" id="367662099%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-step-constant.html"><span>enter</span><wbr></wbr><span>Step</span><wbr></wbr><span><span>Constant</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="367662099%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-step-constant.html"><span class="token function">enterStepConstant</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-step-constant-context/index.html">MugeneParser.StepConstantContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1156794147%2FFunctions%2F188414511" anchor-label="enterStringConstant" id="-1156794147%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-string-constant.html"><span>enter</span><wbr></wbr><span>String</span><wbr></wbr><span><span>Constant</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1156794147%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-string-constant.html"><span class="token function">enterStringConstant</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-string-constant-context/index.html">MugeneParser.StringConstantContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1227217087%2FFunctions%2F188414511" anchor-label="enterUnaryExpr" id="1227217087%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-unary-expr.html"><span>enter</span><wbr></wbr><span>Unary</span><wbr></wbr><span><span>Expr</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1227217087%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-unary-expr.html"><span class="token function">enterUnaryExpr</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-unary-expr-context/index.html">MugeneParser.UnaryExprContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2101696353%2FFunctions%2F188414511" anchor-label="enterVariableReference" id="-2101696353%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enter-variable-reference.html"><span>enter</span><wbr></wbr><span>Variable</span><wbr></wbr><span><span>Reference</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2101696353%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="enter-variable-reference.html"><span class="token function">enterVariableReference</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-variable-reference-context/index.html">MugeneParser.VariableReferenceContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1671014077%2FFunctions%2F188414511" anchor-label="exitAddSubExpr" id="-1671014077%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-add-sub-expr.html"><span>exit</span><wbr></wbr><span>Add</span><wbr></wbr><span>Sub</span><wbr></wbr><span><span>Expr</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1671014077%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-add-sub-expr.html"><span class="token function">exitAddSubExpr</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-add-sub-expr-context/index.html">MugeneParser.AddSubExprContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1430400299%2FFunctions%2F188414511" anchor-label="exitArgument" id="-1430400299%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-argument.html"><span>exit</span><wbr></wbr><span><span>Argument</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1430400299%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-argument.html"><span class="token function">exitArgument</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-argument-context/index.html">MugeneParser.ArgumentContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1934162329%2FFunctions%2F188414511" anchor-label="exitArguments" id="-1934162329%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-arguments.html"><span>exit</span><wbr></wbr><span><span>Arguments</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1934162329%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-arguments.html"><span class="token function">exitArguments</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-arguments-context/index.html">MugeneParser.ArgumentsContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-461854041%2FFunctions%2F188414511" anchor-label="exitArgumentsOptCurly" id="-461854041%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-arguments-opt-curly.html"><span>exit</span><wbr></wbr><span>Arguments</span><wbr></wbr><span>Opt</span><wbr></wbr><span><span>Curly</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-461854041%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-arguments-opt-curly.html"><span class="token function">exitArgumentsOptCurly</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-arguments-opt-curly-context/index.html">MugeneParser.ArgumentsOptCurlyContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-680031193%2FFunctions%2F188414511" anchor-label="exitCanBeIdentifier" id="-680031193%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-can-be-identifier.html"><span>exit</span><wbr></wbr><span>Can</span><wbr></wbr><span>Be</span><wbr></wbr><span><span>Identifier</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-680031193%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-can-be-identifier.html"><span class="token function">exitCanBeIdentifier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-can-be-identifier-context/index.html">MugeneParser.CanBeIdentifierContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-549239465%2FFunctions%2F188414511" anchor-label="exitCommas" id="-549239465%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-commas.html"><span>exit</span><wbr></wbr><span><span>Commas</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-549239465%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-commas.html"><span class="token function">exitCommas</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-commas-context/index.html">MugeneParser.CommasContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="816615959%2FFunctions%2F188414511" anchor-label="exitComparisonExpr" id="816615959%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-comparison-expr.html"><span>exit</span><wbr></wbr><span>Comparison</span><wbr></wbr><span><span>Expr</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="816615959%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-comparison-expr.html"><span class="token function">exitComparisonExpr</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-comparison-expr-context/index.html">MugeneParser.ComparisonExprContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1364380341%2FFunctions%2F188414511" anchor-label="exitComparisonOperator" id="1364380341%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-comparison-operator.html"><span>exit</span><wbr></wbr><span>Comparison</span><wbr></wbr><span><span>Operator</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1364380341%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-comparison-operator.html"><span class="token function">exitComparisonOperator</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-comparison-operator-context/index.html">MugeneParser.ComparisonOperatorContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1798886201%2FFunctions%2F188414511" anchor-label="exitConditionalExpr" id="-1798886201%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-conditional-expr.html"><span>exit</span><wbr></wbr><span>Conditional</span><wbr></wbr><span><span>Expr</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1798886201%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-conditional-expr.html"><span class="token function">exitConditionalExpr</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-conditional-expr-context/index.html">MugeneParser.ConditionalExprContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1563998447%2FFunctions%2F188414511" anchor-label="exitDots" id="1563998447%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-dots.html"><span>exit</span><wbr></wbr><span><span>Dots</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1563998447%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-dots.html"><span class="token function">exitDots</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-dots-context/index.html">MugeneParser.DotsContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1089231469%2FFunctions%2F188414511" anchor-label="exitEveryRule" id="1089231469%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-every-rule.html"><span>exit</span><wbr></wbr><span>Every</span><wbr></wbr><span><span>Rule</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1089231469%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-every-rule.html"><span class="token function">exitEveryRule</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><span data-unresolved-link="org.antlr.v4.kotlinruntime/ParserRuleContext///PointingToDeclaration/">ParserRuleContext</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="465781899%2FFunctions%2F188414511" anchor-label="exitExpression" id="465781899%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-expression.html"><span>exit</span><wbr></wbr><span><span>Expression</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="465781899%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-expression.html"><span class="token function">exitExpression</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-expression-context/index.html">MugeneParser.ExpressionContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1604730791%2FFunctions%2F188414511" anchor-label="exitExpressionOrOperationUses" id="1604730791%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-expression-or-operation-uses.html"><span>exit</span><wbr></wbr><span>Expression</span><wbr></wbr><span>Or</span><wbr></wbr><span>Operation</span><wbr></wbr><span><span>Uses</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1604730791%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-expression-or-operation-uses.html"><span class="token function">exitExpressionOrOperationUses</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-expression-or-operation-uses-context/index.html">MugeneParser.ExpressionOrOperationUsesContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="654333415%2FFunctions%2F188414511" anchor-label="exitMulDivModExpr" id="654333415%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-mul-div-mod-expr.html"><span>exit</span><wbr></wbr><span>Mul</span><wbr></wbr><span>Div</span><wbr></wbr><span>Mod</span><wbr></wbr><span><span>Expr</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="654333415%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-mul-div-mod-expr.html"><span class="token function">exitMulDivModExpr</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-mul-div-mod-expr-context/index.html">MugeneParser.MulDivModExprContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1362773127%2FFunctions%2F188414511" anchor-label="exitNumberOrLengthConstant" id="1362773127%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-number-or-length-constant.html"><span>exit</span><wbr></wbr><span>Number</span><wbr></wbr><span>Or</span><wbr></wbr><span>Length</span><wbr></wbr><span><span>Constant</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1362773127%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-number-or-length-constant.html"><span class="token function">exitNumberOrLengthConstant</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-number-or-length-constant-context/index.html">MugeneParser.NumberOrLengthConstantContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-727149413%2FFunctions%2F188414511" anchor-label="exitOperationUse" id="-727149413%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-operation-use.html"><span>exit</span><wbr></wbr><span>Operation</span><wbr></wbr><span><span>Use</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-727149413%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-operation-use.html"><span class="token function">exitOperationUse</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-operation-use-context/index.html">MugeneParser.OperationUseContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1363649031%2FFunctions%2F188414511" anchor-label="exitOperationUses" id="1363649031%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-operation-uses.html"><span>exit</span><wbr></wbr><span>Operation</span><wbr></wbr><span><span>Uses</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1363649031%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-operation-uses.html"><span class="token function">exitOperationUses</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-operation-uses-context/index.html">MugeneParser.OperationUsesContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2042032697%2FFunctions%2F188414511" anchor-label="exitPrimaryExpr" id="-2042032697%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-primary-expr.html"><span>exit</span><wbr></wbr><span>Primary</span><wbr></wbr><span><span>Expr</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2042032697%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-primary-expr.html"><span class="token function">exitPrimaryExpr</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-primary-expr-context/index.html">MugeneParser.PrimaryExprContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="598879355%2FFunctions%2F188414511" anchor-label="exitStepConstant" id="598879355%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-step-constant.html"><span>exit</span><wbr></wbr><span>Step</span><wbr></wbr><span><span>Constant</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="598879355%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-step-constant.html"><span class="token function">exitStepConstant</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-step-constant-context/index.html">MugeneParser.StepConstantContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-54371003%2FFunctions%2F188414511" anchor-label="exitStringConstant" id="-54371003%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-string-constant.html"><span>exit</span><wbr></wbr><span>String</span><wbr></wbr><span><span>Constant</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-54371003%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-string-constant.html"><span class="token function">exitStringConstant</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-string-constant-context/index.html">MugeneParser.StringConstantContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-211656921%2FFunctions%2F188414511" anchor-label="exitUnaryExpr" id="-211656921%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-unary-expr.html"><span>exit</span><wbr></wbr><span>Unary</span><wbr></wbr><span><span>Expr</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-211656921%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-unary-expr.html"><span class="token function">exitUnaryExpr</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-unary-expr-context/index.html">MugeneParser.UnaryExprContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-466788601%2FFunctions%2F188414511" anchor-label="exitVariableReference" id="-466788601%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exit-variable-reference.html"><span>exit</span><wbr></wbr><span>Variable</span><wbr></wbr><span><span>Reference</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-466788601%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="exit-variable-reference.html"><span class="token function">exitVariableReference</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../-mugene-parser/-variable-reference-context/index.html">MugeneParser.VariableReferenceContext</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="633856687%2FFunctions%2F188414511" anchor-label="visitErrorNode" id="633856687%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="visit-error-node.html"><span>visit</span><wbr></wbr><span>Error</span><wbr></wbr><span><span>Node</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="633856687%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="visit-error-node.html"><span class="token function">visitErrorNode</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><span data-unresolved-link="org.antlr.v4.kotlinruntime.tree/ErrorNode///PointingToDeclaration/">ErrorNode</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-682528635%2FFunctions%2F188414511" anchor-label="visitTerminal" id="-682528635%2FFunctions%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
+          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="visit-terminal.html"><span>visit</span><wbr></wbr><span><span>Terminal</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-682528635%2FFunctions%2F188414511"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="visit-terminal.html"><span class="token function">visitTerminal</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><span data-unresolved-link="org.antlr.v4.kotlinruntime.tree/TerminalNode///PointingToDeclaration/">TerminalNode</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">The default implementation does nothing.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

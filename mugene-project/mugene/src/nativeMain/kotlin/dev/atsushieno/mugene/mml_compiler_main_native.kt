@@ -1,5 +1,6 @@
 package dev.atsushieno.mugene
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.usePinned
@@ -14,6 +15,7 @@ class MmlCompilerNative : MmlCompilerConsole() {
         // FIXME: respect charset
         s.encodeToByteArray()
 
+    @OptIn(ExperimentalForeignApi::class)
     override fun writeToFile(filename: String, bytes: ByteArray) {
         val fp = fopen(filename, "w+") ?: throw IllegalArgumentException("File '$filename' is not writable")
         bytes.usePinned { bytesPinned ->

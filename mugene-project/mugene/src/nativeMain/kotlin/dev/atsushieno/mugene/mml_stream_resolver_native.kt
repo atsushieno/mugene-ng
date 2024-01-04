@@ -1,15 +1,6 @@
 package dev.atsushieno.mugene
 
-import kotlinx.cinterop.ByteVar
-import kotlinx.cinterop.CValuesRef
-import kotlinx.cinterop.CVariable
-import kotlinx.cinterop.allocArray
-import kotlinx.cinterop.cValue
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.nativeHeap
-import kotlinx.cinterop.nativeNullPtr
-import kotlinx.cinterop.ptr
-import kotlinx.cinterop.toKString
+import kotlinx.cinterop.*
 import platform.posix.NULL
 import platform.posix.fclose
 import platform.posix.fgets
@@ -22,6 +13,7 @@ internal expect fun getRealpath(file: String) : String
 
 open class LocalFileStreamResolver : StreamResolver() {
 
+    @OptIn(ExperimentalForeignApi::class)
     internal fun exists(file: String) : Boolean {
         val st = cValue<stat>()
         return stat(file, st) == 0
@@ -39,6 +31,7 @@ open class LocalFileStreamResolver : StreamResolver() {
         return getRealpath(includes.last() + '/' + file)
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     override fun onGetEntity(file: String): String? {
         val filePath = resolveFilePath(file) ?: return null
 

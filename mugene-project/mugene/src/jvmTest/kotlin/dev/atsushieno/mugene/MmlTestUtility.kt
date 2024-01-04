@@ -14,13 +14,13 @@ class MmlTestUtility {
                 .compile(skipDefault, sources, null, outs, false)
             return outs.toByteArray()
         }
-        fun testCompile2 (testLabel: String, mml: String, skipDefault: Boolean = false, outputDeltaTime: Boolean = false, reporter: MmlDiagnosticReporter? = null) : ByteArray {
+        fun testCompile2 (testLabel: String, mml: String, skipDefault: Boolean = false, reporter: MmlDiagnosticReporter? = null) : ByteArray {
             val sources = mutableListOf<MmlInputSource> ()
             sources.add ( MmlInputSource ("fakefilename.mml", mml))
             val outs = mutableListOf<Byte> ()
             MmlCompiler.create()
                 .apply { if (reporter != null) this.report = reporter }
-                .compile2(outputDeltaTime, skipDefault, sources, outs)
+                .compile2(skipDefault, sources, outs)
             return outs.toByteArray()
         }
     }

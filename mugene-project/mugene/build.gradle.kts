@@ -1,13 +1,13 @@
+import com.strumenta.antlrkotlin.gradle.AntlrKotlinTask
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+
 buildscript {
     repositories {
         mavenLocal()
         google()
         mavenCentral()
         maven("https://jitpack.io")
-    }
-
-    dependencies {
-        classpath(libs.antlr.kotlin.gradle.plugin)
     }
 }
 
@@ -17,6 +17,7 @@ plugins {
     id("dev.petuska.npm.publish")
     id("maven-publish")
     id("signing")
+    id("com.strumenta.antlr-kotlin")
 }
 
 group = "dev.atsushieno"
@@ -25,7 +26,13 @@ version = libs.versions.mugene.get()
 kotlin {
     jvmToolchain(17)
 
-    android {
+    // FIXME: remove this section once https://github.com/Strumenta/antlr-kotlin/issues/136 got fixed
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        optIn.add("kotlin.ExperimentalStdlibApi")
+    }
+
+    androidTarget {
         publishLibraryVariantsGroupedByFlavor = true
         publishLibraryVariants("debug", "release")
     }
@@ -37,7 +44,9 @@ kotlin {
             useJUnit()
         }
     }
-    js(IR) {
+    // FIXME: enable JS target once https://youtrack.jetbrains.com/issue/KT-62809 got fixed
+    /*
+    js {
         binaries.library() // binaries.executable() did not work, results in empty package.
         useCommonJs()
         nodejs {
@@ -49,11 +58,10 @@ kotlin {
             }
         }
         browser()
-    }
+    }*/
     macosArm64()
     macosX64()
-    // we could not build it in ktmidi, due to lack of linuxArm64 version of kotlinx-datetime 0.4.0
-    //linuxArm64()
+    linuxArm64()
     linuxX64()
     mingwX64()
 
@@ -68,9 +76,9 @@ kotlin {
                 implementation(libs.ktmidi)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.ktor.io)
+                implementation(libs.antlr.kotlin.runtime)
             }
-            dependsOn(commonAntlr)
-            kotlin.srcDir("build/generated-src/commonAntlr/kotlin")
+            kotlin.srcDir(layout.buildDirectory.dir("generatedAntlr"))
         }
         val commonTest by getting {
             dependencies {
@@ -78,7 +86,9 @@ kotlin {
                 implementation(kotlin("test-annotations-common"))
             }
         }
-        val jvmMain by getting
+        val jvmMain by getting {
+            dependsOn(commonAntlr)
+        }
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
@@ -88,33 +98,39 @@ kotlin {
             dependencies {
                 implementation(libs.startup.runtime)
             }
+            dependsOn(commonAntlr)
         }
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
                 implementation(libs.junit)
             }
         }
+        /*
         val jsMain by getting {
             dependencies {
                 implementation(npm("fs", ""))
                 implementation(npm("buffer", ""))
             }
+            dependsOn(commonAntlr)
         }
         val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))
             }
-        }
+        }*/
         val nativeMain by creating {
             dependsOn(commonMain)
+            dependsOn(commonAntlr)
         }
-        // call to linuxArm64() is commented out
-        //val linuxArm64Main by getting {
-        //    dependsOn(nativeMain)
-        //}
-        val linuxX64Main by getting {
+        val linuxCommonMain by creating {
             dependsOn(nativeMain)
+        }
+        val linuxArm64Main by getting {
+            dependsOn(linuxCommonMain)
+        }
+        val linuxX64Main by getting {
+            dependsOn(linuxCommonMain)
         }
         val mingwX64Main by getting {
             dependsOn(nativeMain)
@@ -131,51 +147,54 @@ kotlin {
     }
 }
 
-// copying(2) antlr-kotlin mpp example
+// copying antlr-kotlin README
 
-// in antlr-kotlin-plugin <0.0.5, the configuration was applied by the plugin.
-// starting from verison 0.0.5, you have to apply it manually:
-tasks.register<com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask>("generateKotlinCommonGrammarSource") {
-    // the classpath used to run antlr code generation
-    antlrClasspath = configurations.detachedConfiguration(
-        // antlr itself
-        // antlr is transitive added by antlr-kotlin-target,
-        // add another dependency if you want to choose another antlr4 version (not recommended)
-        // project.dependencies.create("org.antlr:antlr4:$antlrVersion"),
+val generateKotlinGrammarSource = tasks.register<AntlrKotlinTask>("generateKotlinGrammarSource") {
+    dependsOn("cleanGenerateKotlinGrammarSource")
 
-        // antlr target, required to create kotlin code
-        project.dependencies.create("dev.atsushieno.antlr-kotlin:antlr-kotlin-target:0.0.11")
-    )
-    maxHeapSize = "64m"
-    packageName = "dev.atsushieno.mugene.parser"
-    arguments = listOf("-listener", "-visitor")
+    // ANTLR .g4 files are under {example-project}/antlr
+    // Only include *.g4 files. This allows tools (e.g., IDE plugins)
+    // to generate temporary files inside the base path
     source = project.objects
         .sourceDirectorySet("antlr", "antlr")
         .srcDir("src/commonAntlr/antlr").apply {
             include("*.g4")
         }
-    // outputDirectory is required, put it into the build directory
-    // if you do not want to add the generated sources to version control
-    outputDirectory = File("build/generated-src/commonAntlr/kotlin")
-    // use this settings if you want to add the generated sources to version control
-    // outputDirectory = File("src/commonAntlr/kotlin")
+
+    // We want the generated source files to have this package name
+    val pkgName = "dev.atsushieno.mugene.parser"
+    packageName = pkgName
+
+    // We want visitors alongside listeners.
+    // The Kotlin target language is implicit, as is the file encoding (UTF-8)
+    arguments = listOf("-visitor")
+
+    // Generated files are outputted inside build/generatedAntlr/{package-name}
+    val outDir = "generatedAntlr/${pkgName.replace(".", "/")}"
+    outputDirectory = layout.buildDirectory.dir(outDir).get().asFile
 }
 
+tasks.withType<KotlinCompile<*>> {
+    dependsOn(generateKotlinGrammarSource)
+}
+
+/*
 // run generate task before build
 // not required if you add the generated sources to version control
 // you can call the task manually in this case to update the generated sources
 afterEvaluate {
-    val generateGrammarTask: Task = tasks.getByName("generateKotlinCommonGrammarSource")
+    val generateGrammarTask: Task = tasks.getByName("generateKotlinGrammarSource")
     tasks.filter { it.name.startsWith("compile") and it.name.contains("Kotlin") }.forEach {
         it.dependsOn(generateGrammarTask)
     }
     tasks.filter { it.name.endsWith("ourcesJar") }.forEach {
         it.dependsOn(generateGrammarTask)
     }
-}
+}*/
 
 android {
-    compileSdk = 33
+    namespace = "dev.atsushieno.mugene"
+    compileSdk = 34
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].assets.srcDir("src/commonMain/resources") // kind of hack...
     defaultConfig {

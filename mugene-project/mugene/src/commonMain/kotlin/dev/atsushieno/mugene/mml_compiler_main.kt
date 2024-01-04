@@ -94,35 +94,13 @@ abstract class MmlCompiler {
     fun compile2(skipDefaultMmlFiles: Boolean, vararg mmlParts: String): Midi2Music =
         compile2(skipDefaultMmlFiles, mmlParts.map { mml -> MmlInputSource("<string>", mml) }.toTypedArray())
 
-    @JsExport.Ignore
-    @Deprecated("outputDeltaTime argument is deprecated. Use another overload without it.",
-        ReplaceWith("compile2(skipDefaultMmlFiles, mmlParts)")
-    )
-    fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, vararg mmlParts: String): Midi2Music =
-        compile2(skipDefaultMmlFiles, mmlParts.map { mml -> MmlInputSource("<string>", mml) }.toTypedArray())
-
     @JsName("compile2")
     @JvmName("doNotUseCompile2a")
     fun compile2(skipDefaultMmlFiles: Boolean, inputs: Array<MmlInputSource>) =
         generateMusic2(buildSemanticTree(tokenizeInputs(true, skipDefaultMmlFiles, inputs.toList())))
 
-    @Deprecated("outputDeltaTime argument is deprecated. Use another overload without it.",
-        ReplaceWith("compile2(skipDefaultMmlFiles, inputs)")
-    )
-    @JsExport.Ignore
-    @JvmName("doNotUseCompile2")
-    fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, inputs: Array<MmlInputSource>) =
-        compile2(skipDefaultMmlFiles, inputs)
-
     @JsExport.Ignore
     fun compile2(skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) =
-        generateMusic2(buildSemanticTree(tokenizeInputs(true, skipDefaultMmlFiles, inputs.toList())))
-
-    @Deprecated("outputDeltaTime argument is deprecated. Use another overload without it.",
-        ReplaceWith("compile2(skipDefaultMmlFiles, inputs)")
-    )
-    @JsExport.Ignore
-    fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) =
         generateMusic2(buildSemanticTree(tokenizeInputs(true, skipDefaultMmlFiles, inputs.toList())))
 
     @JsExport.Ignore
@@ -130,13 +108,6 @@ abstract class MmlCompiler {
         val music = compile2(skipDefaultMmlFiles, inputs = inputs.toTypedArray())
         music.write(output)
     }
-
-    @Deprecated("outputDeltaTime argument is deprecated. Use another overload without it.",
-        ReplaceWith("compile2(skipDefaultMmlFiles, inputs, output)")
-    )
-    @JsName("doNotUseCompile2_2")
-    fun compile2(outputDeltaTime: Boolean, skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, output: MutableList<Byte>) =
-        compile2(skipDefaultMmlFiles, inputs, output)
 
     // FIXME: make it public maybe, but once all those @JsExport issues are resolved (or maybe we should wait for Kotlin/Wasm)
     // used by language server and compiler.

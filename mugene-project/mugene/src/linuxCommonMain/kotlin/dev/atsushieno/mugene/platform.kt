@@ -1,12 +1,10 @@
 package dev.atsushieno.mugene
 
-import kotlinx.cinterop.ByteVar
-import kotlinx.cinterop.allocArray
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.toKString
+import kotlinx.cinterop.*
 import platform.posix.readlink
 import platform.posix.realpath
 
+@OptIn(ExperimentalForeignApi::class)
 internal actual fun getRealpath(file: String) : String {
     memScoped {
         val buffer = allocArray<ByteVar>(4096)
@@ -15,6 +13,7 @@ internal actual fun getRealpath(file: String) : String {
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
 internal fun getReadLinkPath(file: String) : String {
     memScoped {
         val buffer = allocArray<ByteVar>(4096)

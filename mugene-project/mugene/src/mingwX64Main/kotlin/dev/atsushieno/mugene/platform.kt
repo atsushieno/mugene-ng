@@ -5,6 +5,7 @@ import platform.windows.GetFullPathNameW
 import platform.windows.GetModuleFileName
 import platform.windows.WCHARVar
 
+@OptIn(ExperimentalForeignApi::class)
 internal actual fun getRealpath(file: String) : String {
     memScoped {
         val buffer = allocArray<WCHARVar>(4096)
@@ -13,6 +14,7 @@ internal actual fun getRealpath(file: String) : String {
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
 actual fun getSelfExecutablePath() : String {
     memScoped {
         val buffer = allocArray<WCHARVar>(4096)

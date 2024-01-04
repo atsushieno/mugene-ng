@@ -8,7 +8,7 @@ import org.antlr.v4.kotlinruntime.Token
 import org.antlr.v4.kotlinruntime.TokenFactory
 import org.antlr.v4.kotlinruntime.TokenSource
 import org.antlr.v4.kotlinruntime.tree.TerminalNode
-import org.antlr.v4.kotlinruntime.tree.pattern.DEFAULT_CHANNEL
+import org.antlr.v4.kotlinruntime.Token.Companion.DEFAULT_CHANNEL
 
 class SimpleEOFToken(source: TokenSource) : Token {
     override val channel: Int = -1
@@ -88,6 +88,8 @@ class WrappedTokenFactory<T> : TokenFactory<T> where T : Token {
 class WrappedTokenSource(private val ts: TokenStream) : TokenSource {
     override val charPositionInLine: Int
         get() = ts.source[ts.position].location.linePosition
+    override val inputStream: CharStream?
+        get() = null // FIXME: anything better?
     override val line: Int
         get() = ts.source[ts.position].location.lineNumber
     override val sourceName: String
@@ -97,10 +99,6 @@ class WrappedTokenSource(private val ts: TokenStream) : TokenSource {
     override fun nextToken() : Token =
         if (ts.position == ts.source.size) SimpleEOFToken(this)
         else WrappedToken(ts.source[ts.position++], this)
-
-    override fun readInputStream(): CharStream? {
-        TODO("Not yet implemented")
-    }
 }
 
 @Suppress("UNCHECKED_CAST")

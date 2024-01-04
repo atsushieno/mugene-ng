@@ -2,7 +2,7 @@
 
 package dev.atsushieno.mugene
 
-import com.strumenta.kotlinmultiplatform.assert
+import com.strumenta.antlrkotlin.runtime.assert
 import dev.atsushieno.ktmidi.Midi2Music
 import dev.atsushieno.ktmidi.Midi1Music
 

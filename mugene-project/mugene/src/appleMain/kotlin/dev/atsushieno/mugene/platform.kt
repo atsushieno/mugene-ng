@@ -6,6 +6,7 @@ import platform.osx.proc_pidpath
 import platform.posix.getpid
 import platform.posix.realpath
 
+@OptIn(ExperimentalForeignApi::class)
 internal actual fun getRealpath(file: String) : String {
     memScoped {
         val buffer = allocArray<ByteVar>(4096)
@@ -14,6 +15,7 @@ internal actual fun getRealpath(file: String) : String {
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
 actual fun getSelfExecutablePath() : String {
     memScoped {
         val buffer = allocArray<ByteVar>(4096)

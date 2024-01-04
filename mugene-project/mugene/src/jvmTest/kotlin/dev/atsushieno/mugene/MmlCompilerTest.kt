@@ -155,7 +155,7 @@ class MmlCompilerTest {
         val midi1Bytes = MmlTestUtility.testCompile("midi1", mml)
         val music = Midi1Music().apply { read(midi1Bytes.toList()) }
         assertEquals(72, music.getTotalTicks(), "midi1 total ticks")
-        val midi2Bytes = MmlTestUtility.testCompile2("midi2", mml, outputDeltaTime = true)
+        val midi2Bytes = MmlTestUtility.testCompile2("midi2", mml)
         val music2 = Midi2Music().apply { read (midi2Bytes.toList()) }
         assertEquals(72,
             music2.getTotalTicks(),
@@ -200,15 +200,15 @@ class MmlCompilerTest {
         assertEquals(1, music.tracks.size, "tracks.size")
         val evt = music.tracks[0].events.first()
         assertEquals(0xF0, evt.message.statusByte.toUnsigned(), "status")
-        val sysexData = arrayOf(0x7D, 0x0B, 0x2D, 0x31, 0x34, 0x37, 0x32, 0x35, 0x34, 0x39, 0x39, 0x37, 0x38)
+        val sysexData = arrayOf(0x7D, 0x0B, 0x2D, 0x31, 0x34, 0x37, 0x32, 0x35, 0x34, 0x39, 0x39, 0x37, 0x38, 0xF7)
             .map { v -> v.toByte() }.toTypedArray()
         val msg = evt.message as Midi1CompoundMessage
         val actualData = msg.extraData!!.drop(msg.extraDataOffset).take(msg.extraDataLength).toTypedArray()
         assertArrayEquals(sysexData, actualData, "sysex data")
         val bytes = mutableListOf<Byte>()
         music.write(bytes)
-        val trackHead = arrayOf('M'.code, 'T'.code, 'r'.code, 'k'.code, 0, 0, 0, 20, 0, 0xF0).map { v -> v.toByte() }.toTypedArray()
-        val trackTail = arrayOf(0xF7.toByte(), 0, 0xFF.toByte(), 0x2F, 0)
+        val trackHead = arrayOf('M'.code, 'T'.code, 'r'.code, 'k'.code, 0, 0, 0, 21, 0, 0xF0, 14).map { v -> v.toByte() }.toTypedArray()
+        val trackTail = arrayOf(0, 0xFF.toByte(), 0x2F, 0)
         assertArrayEquals(trackHead + sysexData + trackTail, bytes.drop(14).toTypedArray(), "SMF track")
     }
 
@@ -224,14 +224,14 @@ class MmlCompilerTest {
         val msg = evt.message as Midi1CompoundMessage
         assertEquals(0xF0, msg.statusByte.toUnsigned(), "status")
         val sysexData = arrayOf(0x7D, 'a'.code, 'u'.code, 'g'.code, 'e'.code, 'n'.code, 'e'.code, '-'.code, 'n'.code, 'g'.code,
-                                0x0B, 0x2D, 0x31, 0x34, 0x37, 0x32, 0x35, 0x34, 0x39, 0x39, 0x37, 0x38)
+                                0x0B, 0x2D, 0x31, 0x34, 0x37, 0x32, 0x35, 0x34, 0x39, 0x39, 0x37, 0x38, 0xF7)
             .map { v -> v.toByte() }.toTypedArray()
         val actualData = msg.extraData!!.drop(msg.extraDataOffset).take(msg.extraDataLength).toTypedArray()
         assertArrayEquals(sysexData, actualData, "sysex data")
         val bytes = mutableListOf<Byte>()
         music.write(bytes)
-        val trackHead = arrayOf('M'.code, 'T'.code, 'r'.code, 'k'.code, 0, 0, 0, 29, 0, 0xF0).map { v -> v.toByte() }.toTypedArray()
-        val trackTail = arrayOf(0xF7.toByte(), 0, 0xFF.toByte(), 0x2F, 0)
+        val trackHead = arrayOf('M'.code, 'T'.code, 'r'.code, 'k'.code, 0, 0, 0, 30, 0, 0xF0, 23).map { v -> v.toByte() }.toTypedArray()
+        val trackTail = arrayOf(0, 0xFF.toByte(), 0x2F, 0)
         assertArrayEquals(trackHead + sysexData + trackTail, bytes.drop(14).toTypedArray(), "SMF track")
     }
 
@@ -447,7 +447,7 @@ class MmlCompilerTest {
 
     @Test
     fun compileLargeMml() {
-        val music = createDefaultCompiler().compile2(true, false,
+        val music = createDefaultCompiler().compile2(false,
             Files.readString(Path.of("../samples/mars.mugene")))
     }
 

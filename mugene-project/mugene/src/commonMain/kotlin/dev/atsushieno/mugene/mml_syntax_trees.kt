@@ -1,6 +1,6 @@
 package dev.atsushieno.mugene
 
-import com.strumenta.kotlinmultiplatform.BitSet
+import com.strumenta.antlrkotlin.runtime.BitSet
 import dev.atsushieno.mugene.parser.MugeneParser
 import org.antlr.v4.kotlinruntime.*
 import org.antlr.v4.kotlinruntime.atn.ATNConfigSet

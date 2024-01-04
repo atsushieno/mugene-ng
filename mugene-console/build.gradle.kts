@@ -11,7 +11,7 @@ kotlin {
     sourceSets {
         val nativeMain by creating {
             dependencies {
-                implementation(libs.mugene)
+                implementation(project(":mugene"))
             }
         }
         val linuxArm64Main by getting {

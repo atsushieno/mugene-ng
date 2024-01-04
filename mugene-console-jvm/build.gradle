@@ -6,7 +6,7 @@ group 'dev.atsushieno'
 version '0.1.0-SNAPSHOT'
 
 dependencies {
-    implementation libs.mugene
+    implementation project(":mugene")
     implementation libs.kotlin.stdlib
 }
 

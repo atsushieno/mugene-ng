@@ -7,37 +7,32 @@ on:
 jobs:
   linux-build:
     name: build on linux
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v3
       with:
         submodules: recursive
     - name: apt update
       run: |
         sudo apt-get update
-    - name: set up JDK 11
-      uses: actions/setup-java@v1
+    - name: set up JDK 17
+      uses: actions/setup-java@v3
       with:
-        java-version: 11
+        java-version: 17
+        distribution: temurin
     - name: apt install
       run: |
         echo y | sudo apt-get install doxygen cmake ninja-build libasound2-dev
-    - name: stupid NDK setup workaround for GitHub Actions
-      run: sudo mkdir -p /usr/local/lib/android/sdk/ndk && sudo chmod 777 /usr/local/lib/android/sdk/ndk
     - name: build mugene-project
       run: |
-        cd mugene-project && ./gradlew :mugene:generateKotlinCommonGrammarSource build publishToMavenLocal
-      env:
-        USERNAME: atsushieno
+        cd mugene-project && ./gradlew build publishToMavenLocal
     - name: build mugene-console-project
       run: |
         cd mugene-console-project && ./gradlew build mugene-console-jvm:jar
-      env:
-        USERNAME: atsushieno
     - name: upload artifact
       if: success()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: mugene-ng-artifacts
         path: |

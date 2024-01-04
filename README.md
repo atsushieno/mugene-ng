@@ -27,15 +27,12 @@ dependencies {
 To use mugene-ng as command line compiler, at this state, you have to run a couple of Gradle tasks to build whatever you'll likely need:
 
 ```
-cd mugene-project
-./gradlew mugene:generateKotlinCommonGrammarSource build packJsNpmPublication publishToMavenLocal
-cd ../mugene-console-project
-./gradlew build mugene-console-jvm:jar
+./gradlew mugene:generateKotlinCommonGrammarSource build packJsNpmPublication publishToMavenLocal mugene-console-jvm:jar
 ```
 
 This generates some syntax file support code, builds libs and tools, package a single jar for JVM desktop, and generate NPM artifacts that are also used by VSCodium extension (under development).
 
-Once you are done with `build` Gradle build task, there will be `mugene-console-project/mugene-console/build/bin/native/debugExecutable/mugene-console.kexe` (or `.exe` on Windows). You can then run it to compile mugene MML files like: `(the/path/to/)mugene-console.kexe samples/escape.mugene`. For the complete list of command line arguments, just run this executable without arguments.
+Once you are done with `build` Gradle build task, there will be `mugene-console/build/bin/native/debugExecutable/mugene-console.kexe` (or `.exe` on Windows). You can then run it to compile mugene MML files like: `(the/path/to/)mugene-console.kexe samples/escape.mugene`. For the complete list of command line arguments, just run this executable without arguments.
 
 ## mugene-ng VSCode extension
 
@@ -55,6 +52,6 @@ When porting from C#, I disabled `__STORE_FORMAT` primitive operation (because i
 
 mugene-ng is distributed under the MIT License.
 
-mugene-ng depends on [my fork](https://github.com/atsushieno/antlr-kotlin/tree/main) of [Strumenta/antlr-kotliin](https://github.com/Strumenta/antlr-kotlin) which is distributed under the Apache 2.0 License. (It will go back to the original version once my contributed change is released in their new version.)
+mugene-ng depends on [Strumenta/antlr-kotliin](https://github.com/Strumenta/antlr-kotlin) which is distributed under the Apache 2.0 License.
 
 mugene-ng depends on [atsushieno/ktmidi](https://github.com/atsushieno/ktmidi) which is distributed under the MIT License.

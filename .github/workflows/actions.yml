@@ -26,7 +26,7 @@ jobs:
         echo y | sudo apt-get install doxygen cmake ninja-build libasound2-dev
     - name: build
       run: |
-        cd ./gradlew build publishToMavenLocal mugene-console-jvm:jar
+        ./gradlew build publishToMavenLocal mugene-console-jvm:jar
     - name: upload artifact
       if: success()
       uses: actions/upload-artifact@v3

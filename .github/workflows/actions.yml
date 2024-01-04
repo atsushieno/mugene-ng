@@ -24,20 +24,17 @@ jobs:
     - name: apt install
       run: |
         echo y | sudo apt-get install doxygen cmake ninja-build libasound2-dev
-    - name: build mugene-project
+    - name: build
       run: |
-        cd mugene-project && ./gradlew build publishToMavenLocal
-    - name: build mugene-console-project
-      run: |
-        cd mugene-console-project && ./gradlew build mugene-console-jvm:jar
+        cd ./gradlew build publishToMavenLocal mugene-console-jvm:jar
     - name: upload artifact
       if: success()
       uses: actions/upload-artifact@v3
       with:
         name: mugene-ng-artifacts
         path: |
-          mugene-project/mugene/build/libs/*.jar
-          mugene-project/mugene/build/outputs/aar/*.aar
-          mugene-console-project/mugene-console/build/bin/
-          mugene-console-project/mugene-console-jvm/build/libs/*.jar
+          mugene/build/libs/*.jar
+          mugene/build/outputs/aar/*.aar
+          mugene-console/build/bin/
+          mugene-console-jvm/build/libs/*.jar
 

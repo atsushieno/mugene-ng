@@ -30,6 +30,7 @@ ktmidi = "0.6.2"
 mugene = "0.4.5"
 
 [libraries]
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 ktmidi = { module = "dev.atsushieno:ktmidi", version.ref = "ktmidi" }
 mugene = { module = "dev.atsushieno:mugene", version.ref = "mugene" }
 

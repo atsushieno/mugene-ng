@@ -5,8 +5,7 @@ plugins {
 kotlin {
     macosArm64()
     macosX64()
-    // we could not build it in ktmidi, due to lack of linuxArm64 version of kotlinx-datetime 0.4.0
-    //linuxArm64()
+    linuxArm64()
     linuxX64()
     mingwX64()
     sourceSets {
@@ -15,10 +14,9 @@ kotlin {
                 implementation(libs.mugene)
             }
         }
-        // call to linuxArm64() is commented out
-        //val linuxArm64Main by getting {
-        //    dependsOn(nativeMain)
-        //}
+        val linuxArm64Main by getting {
+            dependsOn(nativeMain)
+        }
         val linuxX64Main by getting {
             dependsOn(nativeMain)
         }

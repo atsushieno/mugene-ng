@@ -7,7 +7,7 @@ version '0.1.0-SNAPSHOT'
 
 dependencies {
     implementation libs.mugene
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.20"
+    implementation libs.kotlin.stdlib
 }
 
 test {

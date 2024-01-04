@@ -24,17 +24,54 @@ jobs:
     - name: apt install
       run: |
         echo y | sudo apt-get install doxygen cmake ninja-build libasound2-dev
-    - name: build
-      run: |
-        ./gradlew build publishToMavenLocal mugene-console-jvm:jar
-    - name: upload artifact
-      if: success()
-      uses: actions/upload-artifact@v3
-      with:
-        name: mugene-ng-artifacts
-        path: |
-          mugene/build/libs/*.jar
-          mugene/build/outputs/aar/*.aar
-          mugene-console/build/bin/
-          mugene-console-jvm/build/libs/*.jar
+
+        # Only for release tags
+      - name: setup gpg necessities
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          mkdir -p '${{ github.workspace }}'
+          echo '${{ secrets.GPG_KEY_CONTENTS }}' | base64 -d > '${{ github.workspace }}/${{ secrets.SIGNING_SECRET_KEY_RING_FILE }}'
+      - name: rewrite build.gradle to require signing on awkward OS
+        if: startsWith(github.ref, 'refs/tags/') && startsWith(matrix.os, 'macos')
+        run: |
+          sed -i "" "s/signing {}/signing { sign(publishing.publications) }/" */build.gradle*
+      - name: rewrite build.gradle to require signing on standard OS
+        shell: bash
+        if: startsWith(github.ref, 'refs/tags/') && !startsWith(matrix.os, 'macos')
+        run: |
+          sed -i "s/signing {}/signing { sign(publishing.publications) }/" */build.gradle*
+
+      # only for NON-releases
+      - name: build
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        run: ./gradlew --warning-mode all build publishToMavenLocal mugene-console-jvm:jar
+      # only for releases
+      - name: publish with Gradle
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        run: ./gradlew --warning-mode all build mugene-console-jvm:jar publish
+        env:
+          OSSRH_USERNAME: atsushieno
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+          SIGNING_SECRET_KEY_RING_FILE: ${{ format('{0}/{1}', github.workspace, secrets.SIGNING_SECRET_KEY_RING_FILE) }}
+
+      - name: upload artifact
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: mugene-ng-artifacts
+          path: |
+            mugene/build/libs/*.jar
+            mugene/build/outputs/aar/*.aar
+            mugene-console/build/bin/
+            mugene-console-jvm/build/libs/*.jar
+      # only for releases
+      - name: deploy to GitHub Pages
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        uses: JamesIves/github-pages-deploy-action@4.1.2
+        with:
+          branch: gh-pages
+          folder: mugene/build/dokka/html
 

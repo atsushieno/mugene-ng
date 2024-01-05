@@ -27,11 +27,12 @@ version = libs.versions.mugene.get()
 kotlin {
     jvmToolchain(17)
 
+    /*
     // FIXME: remove this section once https://github.com/Strumenta/antlr-kotlin/issues/136 got fixed
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         optIn.add("kotlin.ExperimentalStdlibApi")
-    }
+    }*/
 
     androidTarget {
         publishLibraryVariantsGroupedByFlavor = true

@@ -61,7 +61,7 @@ kotlin {
         }
         browser()
     }*/
-    macosArm64()
+    //macosArm64()
     macosX64()
     linuxArm64()
     linuxX64()

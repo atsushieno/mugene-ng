@@ -140,9 +140,6 @@ kotlin {
         val appleMain by creating {
             dependsOn(nativeMain)
         }
-        val macosArm64Main by getting {
-            dependsOn(appleMain)
-        }
         val macosX64Main by getting {
             dependsOn(appleMain)
         }

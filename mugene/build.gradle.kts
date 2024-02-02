@@ -7,7 +7,6 @@ buildscript {
         mavenLocal()
         google()
         mavenCentral()
-        maven("https://jitpack.io")
     }
 }
 
@@ -182,11 +181,11 @@ tasks.filter { it.name.endsWith("ourcesJar")}.forEach {
 
 android {
     namespace = "dev.atsushieno.mugene"
-    compileSdk = 34
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].assets.srcDir("src/commonMain/resources") // kind of hack...
     defaultConfig {
-        minSdk = 23
+        minSdk = libs.versions.android.minSdk.get().toInt()
     }
     buildTypes {
         val debug by getting {

@@ -473,8 +473,7 @@ class MmlCompilerTest {
         MmlTestUtility.testCompile("mml", "1  l8 c.d.e")
     }
 
-    // FIXME: enable this once we fixed https://github.com/atsushieno/mugene-ng/issues/30
-    //@Test
+    @Test
     fun spanMultipleTracks() {
         val mml = """
             1 o7 l8

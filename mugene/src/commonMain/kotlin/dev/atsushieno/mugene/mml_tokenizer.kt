@@ -631,7 +631,6 @@ abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal v
             val ch = line.peekChar().toChar()
             val processAtComma = {
                 sequence {
-                    yield(n)
                     line.readChar()
                     // recursion
                     for (ii in readRange(whitespacesAcceptable))
@@ -652,9 +651,11 @@ abstract class MmlLexer(internal val reporter: MmlDiagnosticReporter, internal v
                         for (x in processAtComma())
                             yield(x)
                 }
-                ',' ->
+                ',' -> {
+                    yield(n)
                     for (x in processAtComma())
                         yield(x)
+                }
                 else -> yield(n)
             }
         }.toList()

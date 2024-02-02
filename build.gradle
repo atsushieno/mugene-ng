@@ -7,8 +7,8 @@ plugins {
     alias(libs.plugins.dokka) apply false
     alias(libs.plugins.gradleJavacppBuild) apply false
     alias(libs.plugins.gradleJavacppPlatform) apply false
-    id("dev.petuska.npm.publish") version "3.4.2" apply false
-    id("com.strumenta.antlr-kotlin") version "0.1.0-RC14" apply false
+    alias(libs.plugins.npmPublish) apply false
+    alias(libs.plugins.antlrKotlinPlugin) apply false
     // FIXME: re-enable metalava when we could migrate to Gradle 8.x
     //id 'me.tylerbwong.gradle.metalava' version '0.3.5' apply false
 }

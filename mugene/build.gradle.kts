@@ -63,13 +63,9 @@ kotlin {
     mingwX64()
 
     sourceSets {
-        val commonAntlr by creating {
-            dependencies {
-                api(libs.antlr.kotlin.runtime)
-            }
-        }
         val commonMain by getting {
             dependencies {
+                api(libs.antlr.kotlin.runtime)
                 implementation(libs.ktmidi)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.ktor.io)
@@ -83,9 +79,7 @@ kotlin {
                 implementation(kotlin("test-annotations-common"))
             }
         }
-        val jvmMain by getting {
-            dependsOn(commonAntlr)
-        }
+        val jvmMain by getting
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
@@ -95,7 +89,6 @@ kotlin {
             dependencies {
                 implementation(libs.startup.runtime)
             }
-            dependsOn(commonAntlr)
         }
         val androidUnitTest by getting {
             dependencies {
@@ -108,7 +101,6 @@ kotlin {
                 implementation(npm("fs", ""))
                 implementation(npm("buffer", ""))
             }
-            dependsOn(commonAntlr)
         }
         val jsTest by getting {
             dependencies {
@@ -117,7 +109,6 @@ kotlin {
         }
         val nativeMain by creating {
             dependsOn(commonMain)
-            dependsOn(commonAntlr)
         }
         val linuxCommonMain by creating {
             dependsOn(nativeMain)

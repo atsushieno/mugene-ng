@@ -3,7 +3,6 @@ package dev.atsushieno.mugene
 import dev.atsushieno.ktmidi.*
 import io.ktor.utils.io.core.*
 import kotlin.math.pow
-import kotlin.native.concurrent.ThreadLocal
 
 // variable resolver structures
 

@@ -35,32 +35,32 @@ class WrappedToken(src: MmlToken, sourceTokenSource: TokenSource) : Token {
     override val tokenIndex = src.tokenType.ordinal
     override val tokenSource = sourceTokenSource
     override val type = when (src.tokenType) {
-        MmlTokenType.Asterisk -> MugeneParser.Tokens.Asterisk.ordinal
-        MmlTokenType.BackSlashGreater -> MugeneParser.Tokens.BackSlashGreater.ordinal
-        MmlTokenType.BackSlashGreaterEqual -> MugeneParser.Tokens.BackSlashGreaterEqual.ordinal
-        MmlTokenType.BackSlashLesser -> MugeneParser.Tokens.BackSlashLesser.ordinal
-        MmlTokenType.BackSlashLesserEqual -> MugeneParser.Tokens.BackSlashLesserEqual.ordinal
-        MmlTokenType.Caret -> MugeneParser.Tokens.Caret.ordinal
-        MmlTokenType.CloseCurly -> MugeneParser.Tokens.CloseCurly.ordinal
-        MmlTokenType.CloseParen -> MugeneParser.Tokens.CloseParen.ordinal
-        MmlTokenType.Colon -> MugeneParser.Tokens.Colon.ordinal
-        MmlTokenType.Comma -> MugeneParser.Tokens.Comma.ordinal
-        MmlTokenType.Dollar -> MugeneParser.Tokens.Dollar.ordinal
-        MmlTokenType.Identifier -> MugeneParser.Tokens.Identifier.ordinal
-        MmlTokenType.KeywordBuffer -> MugeneParser.Tokens.KeywordBuffer.ordinal
-        MmlTokenType.KeywordLength -> MugeneParser.Tokens.KeywordLength.ordinal
-        MmlTokenType.KeywordNumber -> MugeneParser.Tokens.KeywordNumber.ordinal
-        MmlTokenType.KeywordString -> MugeneParser.Tokens.KeywordString.ordinal
-        MmlTokenType.Minus -> MugeneParser.Tokens.Minus.ordinal
-        MmlTokenType.NumberLiteral -> MugeneParser.Tokens.NumberLiteral.ordinal
-        MmlTokenType.OpenCurly -> MugeneParser.Tokens.OpenCurly.ordinal
-        MmlTokenType.OpenParen -> MugeneParser.Tokens.OpenParen.ordinal
-        MmlTokenType.Percent -> MugeneParser.Tokens.Percent.ordinal
-        MmlTokenType.Period -> MugeneParser.Tokens.Dot.ordinal
-        MmlTokenType.Plus -> MugeneParser.Tokens.Plus.ordinal
-        MmlTokenType.Question -> MugeneParser.Tokens.Question.ordinal
-        MmlTokenType.Slash -> MugeneParser.Tokens.Slash.ordinal
-        MmlTokenType.StringLiteral -> MugeneParser.Tokens.StringLiteral.ordinal
+        MmlTokenType.Asterisk -> MugeneParser.Tokens.Asterisk
+        MmlTokenType.BackSlashGreater -> MugeneParser.Tokens.BackSlashGreater
+        MmlTokenType.BackSlashGreaterEqual -> MugeneParser.Tokens.BackSlashGreaterEqual
+        MmlTokenType.BackSlashLesser -> MugeneParser.Tokens.BackSlashLesser
+        MmlTokenType.BackSlashLesserEqual -> MugeneParser.Tokens.BackSlashLesserEqual
+        MmlTokenType.Caret -> MugeneParser.Tokens.Caret
+        MmlTokenType.CloseCurly -> MugeneParser.Tokens.CloseCurly
+        MmlTokenType.CloseParen -> MugeneParser.Tokens.CloseParen
+        MmlTokenType.Colon -> MugeneParser.Tokens.Colon
+        MmlTokenType.Comma -> MugeneParser.Tokens.Comma
+        MmlTokenType.Dollar -> MugeneParser.Tokens.Dollar
+        MmlTokenType.Identifier -> MugeneParser.Tokens.Identifier
+        MmlTokenType.KeywordBuffer -> MugeneParser.Tokens.KeywordBuffer
+        MmlTokenType.KeywordLength -> MugeneParser.Tokens.KeywordLength
+        MmlTokenType.KeywordNumber -> MugeneParser.Tokens.KeywordNumber
+        MmlTokenType.KeywordString -> MugeneParser.Tokens.KeywordString
+        MmlTokenType.Minus -> MugeneParser.Tokens.Minus
+        MmlTokenType.NumberLiteral -> MugeneParser.Tokens.NumberLiteral
+        MmlTokenType.OpenCurly -> MugeneParser.Tokens.OpenCurly
+        MmlTokenType.OpenParen -> MugeneParser.Tokens.OpenParen
+        MmlTokenType.Percent -> MugeneParser.Tokens.Percent
+        MmlTokenType.Period -> MugeneParser.Tokens.Dot
+        MmlTokenType.Plus -> MugeneParser.Tokens.Plus
+        MmlTokenType.Question -> MugeneParser.Tokens.Question
+        MmlTokenType.Slash -> MugeneParser.Tokens.Slash
+        MmlTokenType.StringLiteral -> MugeneParser.Tokens.StringLiteral
         else -> 0
     }
 }
@@ -120,7 +120,7 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
 
     override fun visitOperationUses(ctx: MugeneParser.OperationUsesContext): Any {
         val ret = mutableListOf<MmlOperationUse>()
-        ctx.findOperationUse().forEach {
+        ctx.getOperationUse().forEach {
             val content = visitOperationUse(it)
             if (content is MmlOperationUse)
                 ret.add(content)
@@ -129,10 +129,10 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
     }
 
     override fun visitOperationUse(ctx: MugeneParser.OperationUseContext): Any {
-        val i = visit(ctx.findCanBeIdentifier()!!)!! as MmlToken
+        val i = visit(ctx.getCanBeIdentifier()!!)!! as MmlToken
         val o = MmlOperationUse (i.value as String, i.location)
-        if (ctx.findArgumentsOptCurly() != null) {
-            val l = visit(ctx.findArgumentsOptCurly()!!)!! as List<MmlValueExpr>
+        if (ctx.getArgumentsOptCurly() != null) {
+            val l = visit(ctx.getArgumentsOptCurly()!!)!! as List<MmlValueExpr>
             for (a in l)
                 o.arguments.add(if (a == MmlValueExpr.skippedArgument) null else a)
         }
@@ -144,25 +144,23 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
     }
 
     override fun visitArgumentsOptCurly(ctx: MugeneParser.ArgumentsOptCurlyContext): Any {
-        return if (ctx.findArguments() == null) mutableListOf<MmlValueExpr>() else visit(ctx.findArguments()!!)!!
+        return if (ctx.getArguments() == null) mutableListOf<MmlValueExpr>() else visit(ctx.getArguments()!!)!!
     }
 
     override fun visitArguments(ctx: MugeneParser.ArgumentsContext): Any {
-        val head = ctx.findArguments()
+        val head = ctx.getArguments()
         val ret =
             if (head != null) visitArguments(head) as MutableList<MmlValueExpr>
             else mutableListOf()
 
-        val commasNode = ctx.findCommas()
+        val commasNode = ctx.getCommas()
         if (commasNode != null) {
             val numCommas = visit(commasNode) as Int
             // only extra commas contribute to default arguments (i.e. skip "only one" comma)
             ret.addAll((0 until numCommas - 1).map { MmlValueExpr.skippedArgument })
         }
 
-        val argsNode = ctx.findArgument()
-        if (argsNode != null)
-            ret.add(visitArgument(ctx.findArgument()!!) as MmlValueExpr)
+        ret.add(visitArgument(ctx.getArgument()) as MmlValueExpr)
 
         return ret
     }
@@ -233,10 +231,10 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
 
     override fun visitPrimaryExpr(ctx: MugeneParser.PrimaryExprContext): Any {
         return when {
-            ctx.findVariableReference() != null || ctx.findStringConstant() != null ||
-                ctx.findStepConstant() != null || ctx.findUnaryExpr() != null
+            ctx.getVariableReference() != null || ctx.getStringConstant() != null ||
+                ctx.getStepConstant() != null || ctx.getUnaryExpr() != null
                 -> getSingleContent(ctx)
-            else -> MmlParenthesizedExpr (visit(ctx.findExpression()!!) as MmlValueExpr)
+            else -> MmlParenthesizedExpr (visit(ctx.getExpression()!!) as MmlValueExpr)
         }
     }
 
@@ -246,7 +244,7 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
             MmlAddExpr(MmlVariableReferenceExpr(expr.location!!, "__length"), expr)
         } else {
             val mul = if (ctx.Minus() != null) -1 else 1
-            val expr = visit(ctx.findNumberOrLengthConstant()!!) as MmlValueExpr
+            val expr = visit(ctx.getNumberOrLengthConstant()!!) as MmlValueExpr
             MmlMultiplyExpr(MmlConstantExpr(expr.location, MmlDataType.Number, mul), expr)
         }
     }
@@ -271,28 +269,29 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
     }
 
     override fun visitNumberOrLengthConstant(ctx: MugeneParser.NumberOrLengthConstantContext): Any {
+        val dots = ctx.getDots()
         return if (ctx.NumberLiteral() != null) {
             val t = visit(ctx.NumberLiteral()!!) as MmlToken
-            if (ctx.findDots() == null) {
+            if (dots == null) {
                 MmlConstantExpr(t.location, MmlDataType.Number, t.value)
             } else {
-                val d = visit(ctx.findDots()!!) as Int
+                val d = visit(dots) as Int
                 MmlConstantExpr(
                     t.location,
                     MmlDataType.Length,
-                    MmlLength((t.value as Double).toInt()).apply { dots = d })
+                    MmlLength((t.value as Double).toInt()).apply { this.dots = d })
             }
         } else {
-            val d = if (ctx.findDots() == null) 1 else visit(ctx.findDots()!!) as Int
+            val d = if (dots == null) 1 else visit(dots) as Int
             MmlMultiplyExpr ( MmlConstantExpr (MmlLineInfo.empty, MmlDataType.Number, MmlValueExprResolver.lengthDotsToMultiplier (d)), MmlVariableReferenceExpr (MmlLineInfo.empty, "__length"))
         }
     }
 
     override fun visitDots(ctx: MugeneParser.DotsContext): Any {
-        return if (ctx.findDots() == null) 1 else getSingleContent(ctx) as Int + 1
+        return if (ctx.getDots() == null) 1 else getSingleContent(ctx) as Int + 1
     }
 
     override fun visitCommas(ctx: MugeneParser.CommasContext): Any {
-        return if (ctx.findCommas() == null) 1 else getSingleContent(ctx) as Int + 1
+        return if (ctx.getCommas() == null) 1 else getSingleContent(ctx) as Int + 1
     }
 }

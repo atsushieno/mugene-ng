@@ -27,7 +27,6 @@ version = libs.versions.mugene.get()
 kotlin {
     jvmToolchain(17)
 
-    // FIXME: remove this section once https://github.com/Strumenta/antlr-kotlin/issues/136 got fixed
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         optIn.add("kotlin.ExperimentalStdlibApi")
@@ -45,9 +44,7 @@ kotlin {
             useJUnit()
         }
     }
-    // FIXME: enable JS target once https://youtrack.jetbrains.com/issue/KT-62809 got fixed
-    /*
-    js {
+    js(IR) {
         binaries.library() // binaries.executable() did not work, results in empty package.
         useCommonJs()
         nodejs {
@@ -59,7 +56,7 @@ kotlin {
             }
         }
         browser()
-    }*/
+    }
     macosArm64()
     macosX64()
     linuxArm64()
@@ -107,7 +104,6 @@ kotlin {
                 implementation(libs.junit)
             }
         }
-        /*
         val jsMain by getting {
             dependencies {
                 implementation(npm("fs", ""))
@@ -119,7 +115,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-js"))
             }
-        }*/
+        }
         val nativeMain by creating {
             dependsOn(commonMain)
             dependsOn(commonAntlr)

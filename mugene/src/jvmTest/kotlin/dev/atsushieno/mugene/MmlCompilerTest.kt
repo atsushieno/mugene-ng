@@ -467,4 +467,30 @@ class MmlCompilerTest {
     fun onlyBlockNameAndTrackNumber() {
         MmlTestUtility.testCompile("mml", "A 1,2   \n    cde")
     }
+
+    @Test
+    fun dotsOnDefaultLength() {
+        MmlTestUtility.testCompile("mml", "1  l8 c.d.e")
+    }
+
+    // FIXME: enable this once we fixed https://github.com/atsushieno/mugene-ng/issues/30
+    //@Test
+    fun spanMultipleTracks() {
+        val mml = """
+            1 o7 l8
+            2 o5 l8
+            3 o3 l8
+
+            1-2,3 cdef g2
+            1,2-3 gfed c2
+        """.trimIndent()
+        val result = MmlTestUtility.testCompile("mml", mml)
+        val music = Midi1Music().apply { read(result.toList()) }
+        assertEquals(3, music.tracks.size)
+        music.tracks.forEachIndexed { index, track ->
+            println(track.events.size)
+            track.events.forEach { println(it) }
+            assertEquals(21, track.events.size, "track #${index + 1}")
+        }
+    }
 }

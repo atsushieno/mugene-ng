@@ -283,12 +283,10 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
                     MmlLength((t.value as Double).toInt()).apply { dots = d })
             }
         } else {
-            val d = getSingleContent(ctx.findDots()!!) as Int
-            MmlMultiplyExpr ( MmlConstantExpr (ctx.start!!.toMmlLineInfo(), MmlDataType.Number, MmlValueExprResolver.lengthDotsToMultiplier (d)), MmlVariableReferenceExpr (ctx.start!!.toMmlLineInfo(), "__length"))
+            val d = if (ctx.findDots() == null) 1 else visit(ctx.findDots()!!) as Int
+            MmlMultiplyExpr ( MmlConstantExpr (MmlLineInfo.empty, MmlDataType.Number, MmlValueExprResolver.lengthDotsToMultiplier (d)), MmlVariableReferenceExpr (MmlLineInfo.empty, "__length"))
         }
     }
-
-    private fun Token.toMmlLineInfo() = MmlLineInfo(tokenSource!!.sourceName ?: "", line, charPositionInLine)
 
     override fun visitDots(ctx: MugeneParser.DotsContext): Any {
         return if (ctx.findDots() == null) 1 else getSingleContent(ctx) as Int + 1

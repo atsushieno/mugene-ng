@@ -23,10 +23,10 @@ kotlinx-datetime = "0.5.0"
 ktor-io = "2.3.7"
 metalava-gradle = "0.2.3"
 dokka = "1.9.10"
-gradle-javacpp = "1.5.9"
+gradle-javacpp = "1.5.10"
 startup-runtime = "1.1.1"
 
-ktmidi = "0.8.0"
+ktmidi = "0.8.1"
 mugene = "0.4.7"
 
 [libraries]

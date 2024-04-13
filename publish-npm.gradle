@@ -1,5 +1,5 @@
 
-ext["npmAuthToken"] = System.getenv('NPM_AUTH_TOKEN') ?: ''
+var npmAuthToken = System.getenv('NPM_AUTH_TOKEN') ?: ''
 
 npmPublish {
   readme = file("../README.md")

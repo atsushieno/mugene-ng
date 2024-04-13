@@ -15,7 +15,7 @@ internal actual fun getRealpath(file: String) : String {
 }
 
 @OptIn(ExperimentalForeignApi::class)
-actual fun getSelfExecutablePath() : String {
+internal actual fun getSelfExecutablePath() : String {
     memScoped {
         val buffer = allocArray<WCHARVar>(4096)
         GetModuleFileName!!(null, buffer, 4096u)

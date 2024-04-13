@@ -73,4 +73,4 @@ class ExecutablePathStreamResolver : LocalFileStreamResolver() {
     }
 }
 
-expect fun getSelfExecutablePath() : String
+internal expect fun getSelfExecutablePath() : String

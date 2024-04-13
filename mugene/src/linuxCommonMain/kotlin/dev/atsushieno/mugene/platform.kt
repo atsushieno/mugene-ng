@@ -22,4 +22,4 @@ internal fun getReadLinkPath(file: String) : String {
     }
 }
 
-actual fun getSelfExecutablePath() = getReadLinkPath("/proc/self/exe")
+internal actual fun getSelfExecutablePath() = getReadLinkPath("/proc/self/exe")

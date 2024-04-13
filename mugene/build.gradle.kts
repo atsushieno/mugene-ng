@@ -43,8 +43,8 @@ kotlin {
             useJUnit()
         }
     }
-    js(IR) {
-        binaries.library() // binaries.executable() did not work, results in empty package.
+    js {
+        binaries.library()
         useCommonJs()
         nodejs {
             testTask {
@@ -58,6 +58,16 @@ kotlin {
     }
     macosArm64()
     macosX64()
+
+    val iosTargets = listOf(
+        iosArm64(),
+        iosX64(),
+        iosSimulatorArm64()
+    ).onEach {
+        it.binaries {
+            framework { baseName = "mugene" }
+        }
+    }
     linuxArm64()
     linuxX64()
     mingwX64()
@@ -125,12 +135,15 @@ kotlin {
         val appleMain by creating {
             dependsOn(nativeMain)
         }
-        val macosArm64Main by getting {
+        val macosMain by creating {
             dependsOn(appleMain)
         }
-        val macosX64Main by getting {
-            dependsOn(appleMain)
-        }
+        val macosArm64Main by getting { dependsOn(macosMain) }
+        val macosX64Main by getting { dependsOn(macosMain) }
+        val iosMain by creating { dependsOn(appleMain) }
+        val iosArm64Main by getting { dependsOn(iosMain) }
+        val iosSimulatorArm64Main by getting { dependsOn(iosMain) }
+        val iosX64Main by getting { dependsOn(iosMain) }
     }
 }
 

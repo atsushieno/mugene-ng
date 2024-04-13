@@ -4,11 +4,13 @@ ext["npmAuthToken"] = ''
 ext["npmAuthToken"] = System.getenv('NPM_AUTH_TOKEN') ?: ext["npmAuthToken"]
 
 npmPublish {
+  readme = file("../../README.md")
+  version = "$version"
   organization = "dev.atsushieno"
   registries {
     register("npmjs") {
       uri.set(uri("https://registry.npmjs.org"))
-      authToken.set("obfuscated")
+      authToken = npmAuthToken
     }
   }
 }

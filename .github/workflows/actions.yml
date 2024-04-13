@@ -79,6 +79,7 @@ jobs:
         SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
         SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         SIGNING_SECRET_KEY_RING_FILE: ${{ format('{0}/{1}', github.workspace, secrets.SIGNING_SECRET_KEY_RING_FILE) }}
+        NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       # only for NON-releases on macos-14
     - name: macos-14 lightweight build with Gradle for libs and apps
       if: ${{ !startsWith(github.ref, 'refs/tags/') && contains(matrix.os, 'macos-14') }}
@@ -94,6 +95,7 @@ jobs:
         SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
         SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         SIGNING_SECRET_KEY_RING_FILE: ${{ format('{0}/{1}', github.workspace, secrets.SIGNING_SECRET_KEY_RING_FILE) }}
+        NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
     # only for NON-releases on Linux
     - name: build
       if: ${{ !startsWith(github.ref, 'refs/tags/') }}
@@ -105,9 +107,11 @@ jobs:
       env:
         OSSRH_USERNAME: atsushieno
         OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+        OSSRH_STAGING_REPOSITORY_ID: ${{ needs.create_staging_repository.outputs.repository_id }}
         SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
         SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         SIGNING_SECRET_KEY_RING_FILE: ${{ format('{0}/{1}', github.workspace, secrets.SIGNING_SECRET_KEY_RING_FILE) }}
+        NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
     - name: upload artifact
       if: success()

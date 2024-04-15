@@ -557,11 +557,11 @@ $dokka.location:dev.atsushieno.mugene/MmlCompilerConsole/MmlCompilerConsole/#/Po
 $dokka.location:dev.atsushieno.mugene/MmlCompilerConsole/compile/#kotlin.collections.List[kotlin.String]/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler-console/compile.html
 $dokka.location:dev.atsushieno.mugene/MmlCompilerConsole/compileCore/#kotlin.collections.List[kotlin.String]/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler-console/compile-core.html
 $dokka.location:dev.atsushieno.mugene/MmlCompilerConsole/writeToFile/#kotlin.String#kotlin.ByteArray/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler-console/write-to-file.html
-$dokka.location:dev.atsushieno.mugene/MmlCompilerJs///PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler-js/index.html
-$dokka.location:dev.atsushieno.mugene/MmlCompilerJs/MmlCompilerJs/#/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler-js/-mml-compiler-js.html
-$dokka.location:dev.atsushieno.mugene/MmlCompilerJs/decodeStringUsingEncoding/#kotlin.String#kotlin.String/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler-js/decode-string-using-encoding.html
-$dokka.location:dev.atsushieno.mugene/MmlCompilerJs/resolver/#/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler-js/resolver.html
-$dokka.location:dev.atsushieno.mugene/MmlCompilerJs/writeToFile/#kotlin.String#kotlin.ByteArray/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler-js/write-to-file.html
+$dokka.location:dev.atsushieno.mugene/MmlCompilerJs///PointingToDeclaration/mugene/dev.atsushieno.mugene/[wasm-js]-mml-compiler-js/index.html
+$dokka.location:dev.atsushieno.mugene/MmlCompilerJs/MmlCompilerJs/#/PointingToDeclaration/mugene/dev.atsushieno.mugene/[wasm-js]-mml-compiler-js/-mml-compiler-js.html
+$dokka.location:dev.atsushieno.mugene/MmlCompilerJs/decodeStringUsingEncoding/#kotlin.String#kotlin.String/PointingToDeclaration/mugene/dev.atsushieno.mugene/[wasm-js]-mml-compiler-js/decode-string-using-encoding.html
+$dokka.location:dev.atsushieno.mugene/MmlCompilerJs/resolver/#/PointingToDeclaration/mugene/dev.atsushieno.mugene/[wasm-js]-mml-compiler-js/resolver.html
+$dokka.location:dev.atsushieno.mugene/MmlCompilerJs/writeToFile/#kotlin.String#kotlin.ByteArray/PointingToDeclaration/mugene/dev.atsushieno.mugene/[wasm-js]-mml-compiler-js/write-to-file.html
 $dokka.location:dev.atsushieno.mugene/MmlCompilerJvm///PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler-jvm/index.html
 $dokka.location:dev.atsushieno.mugene/MmlCompilerJvm/MmlCompilerJvm/#/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler-jvm/-mml-compiler-jvm.html
 $dokka.location:dev.atsushieno.mugene/MmlCompilerJvm/decodeStringUsingEncoding/#kotlin.String#kotlin.String/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler-jvm/decode-string-using-encoding.html

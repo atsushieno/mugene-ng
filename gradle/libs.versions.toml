@@ -26,8 +26,8 @@ dokka = "1.9.10"
 gradle-javacpp = "1.5.10"
 startup-runtime = "1.1.1"
 
-ktmidi = "0.8.1"
-mugene = "0.4.7"
+ktmidi = "0.8.2"
+mugene = "0.5.0"
 
 [libraries]
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }

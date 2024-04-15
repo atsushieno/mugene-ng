@@ -1,36 +1,46 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+
 plugins {
     kotlin("multiplatform")
+    id("application")
 }
 
 kotlin {
-    macosArm64()
-    macosX64()
-    linuxArm64()
-    linuxX64()
-    mingwX64()
+    jvm {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        mainRun { mainClass = "MainKt" }
+    }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser { binaries.executable() }
+        nodejs { binaries.executable() }
+    }
+    js {
+        browser { binaries.executable() }
+        nodejs { binaries.executable() }
+    }
+    listOf(
+        linuxArm64(),
+        linuxX64(),
+        macosArm64(),
+        macosX64(),
+        iosArm64(),
+        iosSimulatorArm64(),
+        iosX64(),
+        mingwX64(),
+    ).forEach { it.binaries.executable() }
+
     sourceSets {
-        val nativeMain by creating {
+        val commonMain by getting {
             dependencies {
                 implementation(project(":mugene"))
             }
         }
-        val linuxArm64Main by getting {
-            dependsOn(nativeMain)
-        }
-        val linuxX64Main by getting {
-            dependsOn(nativeMain)
-        }
-        val mingwX64Main by getting {
-            dependsOn(nativeMain)
-        }
-        val appleMain by creating {
-            dependsOn(nativeMain)
-        }
-        val macosArm64Main by getting {
-            dependsOn(appleMain)
-        }
-        val macosX64Main by getting {
-            dependsOn(appleMain)
-        }
     }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }

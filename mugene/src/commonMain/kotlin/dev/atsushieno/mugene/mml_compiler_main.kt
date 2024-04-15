@@ -39,7 +39,7 @@ typealias MmlDiagnosticReporter = (verbosity: MmlDiagnosticVerbosity, location: 
 internal expect fun createDefaultCompiler(): MmlCompiler
 
 @OptIn(ExperimentalJsExport::class)
-@JsExport
+//@JsExport
 abstract class MmlCompiler {
     companion object {
         fun create(): MmlCompiler = createDefaultCompiler()

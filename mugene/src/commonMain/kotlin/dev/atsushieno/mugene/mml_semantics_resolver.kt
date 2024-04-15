@@ -2,7 +2,7 @@ package dev.atsushieno.mugene
 
 import dev.atsushieno.ktmidi.*
 import dev.atsushieno.ktmidi.ByteOrder
-import io.ktor.utils.io.core.*
+//import io.ktor.utils.io.core.*
 import kotlin.math.pow
 
 // variable resolver structures

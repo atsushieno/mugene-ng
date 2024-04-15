@@ -1,5 +1,3 @@
-package dev.atsushieno.mugene
-
 import dev.atsushieno.mugene.MmlCompilerJvm
 import dev.atsushieno.mugene.MmlException
 

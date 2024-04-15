@@ -19,4 +19,3 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 include("mugene")
 include("mugene-console")
-include("mugene-console-jvm")

@@ -4,7 +4,7 @@
 
 ## What is this?
 
-This is the successor of my [mugene](https://github.com/atsushieno/mugene/) [Music Macro Language](https://en.wikipedia.org/wiki/Music_Macro_Language) compiler to Kotlin Multiplatform (from C#), so that I can go forward and improve the entire ecosystem and toolchains. Now it can be used as a JVM library, native library, or a JavaScript library, as well as standalone native compiler or a JVM standalone jar.
+This is the successor of my [mugene](https://github.com/atsushieno/mugene/) [Music Macro Language](https://en.wikipedia.org/wiki/Music_Macro_Language) compiler to Kotlin Multiplatform (from C#), so that I can go forward and improve the entire ecosystem and toolchains. Now it can be used as a JVM library, native library, a JavaScript library, or even a WebAssembly library, as well as standalone native compiler or a JVM standalone jar.
 
 The new version in Kotlin has preliminary support for MIDI 2.0 UMP stream format beyond the past C# version did. Any new features will be developed only in this project.
 
@@ -24,19 +24,19 @@ dependencies {
 
 ## Building and using command-line compiler
 
-To use mugene-ng as command line compiler, at this state, you have to run a couple of Gradle tasks to build whatever you'll likely need:
+To use mugene-ng as command line compiler, run:
 
 ```
-./gradlew mugene:generateKotlinCommonGrammarSource build packJsNpmPublication publishToMavenLocal mugene-console-jvm:jar
+./gradlew mugene-console:jvmRun [args]
 ```
 
-This generates some syntax file support code, builds libs and tools, package a single jar for JVM desktop, and generate NPM artifacts that are also used by VSCodium extension (under development).
-
-Once you are done with `build` Gradle build task, there will be `mugene-console/build/bin/native/debugExecutable/mugene-console.kexe` (or `.exe` on Windows). You can then run it to compile mugene MML files like: `(the/path/to/)mugene-console.kexe samples/escape.mugene`. For the complete list of command line arguments, just run this executable without arguments.
+Alternatively, if you run `./gradlew build`, then there will be `mugene-console/build/bin/[platform-arch-dir]/debugExecutable/mugene-console.kexe` (or `.exe` on Windows). You can then use it like a standalone executable to compile mugene MML files like: `(the/path/to/)mugene-console.kexe samples/escape.mugene`. For the complete list of command line arguments, just run this executable without arguments.
 
 ## mugene-ng VSCode extension
 
 mugene-ng is a Kotlin Multiplatform project that supports Kotlin/JS. We publish mugene-ng as an NPM package, as well as [vscode-mugene-language extension](https://marketplace.visualstudio.com/items?itemName=atsushieno.vscode-language-mugene) (the extension used to support .NET based mugene that only ran the compiler as a "native" executable, but now we are fully JS based).
+
+Though note that due to some flaws in publishing workflow, the vscode extension may not be always the latest.
 
 ## mugene-ng applications
 

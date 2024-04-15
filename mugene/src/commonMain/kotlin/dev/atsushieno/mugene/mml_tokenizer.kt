@@ -178,10 +178,10 @@ class MmlTrack(val number: Double) {
 
 // file sources to be parsed into MmlSourceLineSet, for each track
 // and macro.
-@JsExport
+//@JsExport
 data class MmlInputSource(val file: String, val text: String)
 
-@JsExport
+//@JsExport
 class MmlLineInfo(var file: String, line: Int, column: Int) {
     companion object {
         val empty = MmlLineInfo("__internal__", 0, 0)

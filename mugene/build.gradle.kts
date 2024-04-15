@@ -1,6 +1,7 @@
 import com.strumenta.antlrkotlin.gradle.AntlrKotlinTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 buildscript {
     repositories {
@@ -43,6 +44,12 @@ kotlin {
             useJUnit()
         }
     }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        binaries.library()
+        browser()
+        nodejs()
+    }
     js {
         binaries.library()
         useCommonJs()
@@ -78,7 +85,7 @@ kotlin {
                 api(libs.antlr.kotlin.runtime)
                 implementation(libs.ktmidi)
                 implementation(libs.kotlinx.coroutines.core)
-                implementation(libs.ktor.io)
+                //implementation(libs.ktor.io)
                 implementation(libs.antlr.kotlin.runtime)
             }
             kotlin.srcDir(layout.buildDirectory.dir("generatedAntlr"))

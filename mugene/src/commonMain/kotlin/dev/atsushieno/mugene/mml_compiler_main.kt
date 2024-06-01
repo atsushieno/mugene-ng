@@ -71,6 +71,12 @@ abstract class MmlCompiler {
             throw MmlException(output, null)
     }
 
+    fun compile(skipDefaultMmlFiles: Boolean, mmlString: String) = compile(skipDefaultMmlFiles, arrayOf(mmlString))
+
+    @JsExport.Ignore
+    fun compile(skipDefaultMmlFiles: Boolean, mmlParts: Array<String>) =
+        compile(skipDefaultMmlFiles, mmlParts.map { mml -> MmlInputSource("<string>", mml) }.toTypedArray())
+
     @JsName("compile")
     @JvmName("doNotUseCompile")
     fun compile(skipDefaultMmlFiles: Boolean, inputs: Array<MmlInputSource>) = generateMusic(buildSemanticTree(tokenizeInputs(false, skipDefaultMmlFiles, inputs.toList())))
@@ -81,8 +87,10 @@ abstract class MmlCompiler {
         music.write(output, metaWriter ?: Midi1WriterExtension.defaultMetaEventWriter, disableRunningStatus)
     }
 
+    fun compile2(skipDefaultMmlFiles: Boolean, mmlString: String) = compile2(skipDefaultMmlFiles, arrayOf(mmlString))
+
     @JsExport.Ignore
-    fun compile2(skipDefaultMmlFiles: Boolean, vararg mmlParts: String): Midi2Music =
+    fun compile2(skipDefaultMmlFiles: Boolean, mmlParts: Array<String>) =
         compile2(skipDefaultMmlFiles, mmlParts.map { mml -> MmlInputSource("<string>", mml) }.toTypedArray())
 
     @JsName("compile2")

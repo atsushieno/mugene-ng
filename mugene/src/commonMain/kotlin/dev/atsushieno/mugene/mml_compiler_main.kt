@@ -71,18 +71,9 @@ abstract class MmlCompiler {
             throw MmlException(output, null)
     }
 
-    @JsExport.Ignore
-    fun compile(skipDefaultMmlFiles: Boolean, vararg mmlParts: String): Midi1Music {
-        val sources = mmlParts.map { mml -> MmlInputSource("<string>", mml) }.toTypedArray()
-        return compile(skipDefaultMmlFiles, inputs = sources)
-    }
-
     @JsName("compile")
     @JvmName("doNotUseCompile")
     fun compile(skipDefaultMmlFiles: Boolean, inputs: Array<MmlInputSource>) = generateMusic(buildSemanticTree(tokenizeInputs(false, skipDefaultMmlFiles, inputs.toList())))
-
-    @JsExport.Ignore
-    fun compile(skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) = generateMusic(buildSemanticTree(tokenizeInputs(false, skipDefaultMmlFiles, inputs.toList())))
 
     @JsExport.Ignore
     fun compile(skipDefaultMmlFiles: Boolean, inputs: List<MmlInputSource>, metaWriter: ((Boolean, Midi1Event, MutableList<Byte>) -> Int)?, output: MutableList<Byte>, disableRunningStatus: Boolean) {
@@ -97,10 +88,6 @@ abstract class MmlCompiler {
     @JsName("compile2")
     @JvmName("doNotUseCompile2a")
     fun compile2(skipDefaultMmlFiles: Boolean, inputs: Array<MmlInputSource>) =
-        generateMusic2(buildSemanticTree(tokenizeInputs(true, skipDefaultMmlFiles, inputs.toList())))
-
-    @JsExport.Ignore
-    fun compile2(skipDefaultMmlFiles: Boolean, vararg inputs: MmlInputSource) =
         generateMusic2(buildSemanticTree(tokenizeInputs(true, skipDefaultMmlFiles, inputs.toList())))
 
     @JsExport.Ignore

@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.androidLibrary) apply false
-    alias(libs.plugins.jetbrainsCompose) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kotlinJvm) apply false
     alias(libs.plugins.dokka) apply false
@@ -9,8 +8,7 @@ plugins {
     alias(libs.plugins.gradleJavacppPlatform) apply false
     alias(libs.plugins.npmPublish) apply false
     alias(libs.plugins.antlrKotlinPlugin) apply false
-    // FIXME: re-enable metalava when we could migrate to Gradle 8.x
-    //id 'me.tylerbwong.gradle.metalava' version '0.3.5' apply false
+    alias(libs.plugins.binaryCompatibilityValidatorPlugin) apply false
 }
 
 allprojects {

@@ -528,9 +528,11 @@ $dokka.location:dev.atsushieno.mugene/MmlCompiler///PointingToDeclaration/mugen
 $dokka.location:dev.atsushieno.mugene/MmlCompiler/MmlCompiler/#/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler/-mml-compiler.html
 $dokka.location:dev.atsushieno.mugene/MmlCompiler/compile/#kotlin.Boolean#kotlin.Array[dev.atsushieno.mugene.MmlInputSource]/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler/compile.html
 $dokka.location:dev.atsushieno.mugene/MmlCompiler/compile/#kotlin.Boolean#kotlin.Array[kotlin.String]/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler/compile.html
+$dokka.location:dev.atsushieno.mugene/MmlCompiler/compile/#kotlin.Boolean#kotlin.String/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler/compile.html
 $dokka.location:dev.atsushieno.mugene/MmlCompiler/compile/#kotlin.Boolean#kotlin.collections.List[dev.atsushieno.mugene.MmlInputSource]#kotlin.Function3[kotlin.Boolean,dev.atsushieno.ktmidi.Midi1Event,kotlin.collections.MutableList[kotlin.Byte],kotlin.Int]?#kotlin.collections.MutableList[kotlin.Byte]#kotlin.Boolean/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler/compile.html
 $dokka.location:dev.atsushieno.mugene/MmlCompiler/compile2/#kotlin.Boolean#kotlin.Array[dev.atsushieno.mugene.MmlInputSource]/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler/compile2.html
 $dokka.location:dev.atsushieno.mugene/MmlCompiler/compile2/#kotlin.Boolean#kotlin.Array[kotlin.String]/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler/compile2.html
+$dokka.location:dev.atsushieno.mugene/MmlCompiler/compile2/#kotlin.Boolean#kotlin.String/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler/compile2.html
 $dokka.location:dev.atsushieno.mugene/MmlCompiler/compile2/#kotlin.Boolean#kotlin.collections.List[dev.atsushieno.mugene.MmlInputSource]#kotlin.collections.MutableList[kotlin.Byte]/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler/compile2.html
 $dokka.location:dev.atsushieno.mugene/MmlCompiler/continueOnError/#/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler/continue-on-error.html
 $dokka.location:dev.atsushieno.mugene/MmlCompiler/decodeStringUsingEncoding/#kotlin.String#kotlin.String/PointingToDeclaration/mugene/dev.atsushieno.mugene/-mml-compiler/decode-string-using-encoding.html

@@ -1,3 +1,4 @@
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
@@ -11,7 +12,7 @@ kotlin {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         mainRun { mainClass = "MainKt" }
     }
-    @OptIn(ExperimentalWasmDsl::class)
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs {
         browser { binaries.executable() }
         nodejs { binaries.executable() }
@@ -23,13 +24,17 @@ kotlin {
     listOf(
         linuxArm64(),
         linuxX64(),
-        macosArm64(),
-        macosX64(),
-        iosArm64(),
-        iosSimulatorArm64(),
-        iosX64(),
         mingwX64(),
     ).forEach { it.binaries.executable() }
+    if (Os.isFamily(Os.FAMILY_MAC)) {
+        listOf(
+            macosArm64(),
+            macosX64(),
+            iosArm64(),
+            iosSimulatorArm64(),
+            iosX64(),
+        ).forEach { it.binaries.executable() }
+    }
 
     sourceSets {
         val commonMain by getting {

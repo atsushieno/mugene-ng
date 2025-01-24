@@ -1,4 +1,5 @@
 import com.strumenta.antlrkotlin.gradle.AntlrKotlinTask
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
@@ -63,16 +64,18 @@ kotlin {
         }
         browser()
     }
-    macosArm64()
-    macosX64()
+    if (Os.isFamily(Os.FAMILY_MAC)) {
+        macosArm64()
+        macosX64()
 
-    val iosTargets = listOf(
-        iosArm64(),
-        iosX64(),
-        iosSimulatorArm64()
-    ).onEach {
-        it.binaries {
-            framework { baseName = "mugene" }
+        val iosTargets = listOf(
+            iosArm64(),
+            iosX64(),
+            iosSimulatorArm64()
+        ).onEach {
+            it.binaries {
+                framework { baseName = "mugene" }
+            }
         }
     }
     linuxArm64()
@@ -139,18 +142,20 @@ kotlin {
         val mingwX64Main by getting {
             dependsOn(nativeMain)
         }
-        val appleMain by creating {
-            dependsOn(nativeMain)
+        if (Os.isFamily(Os.FAMILY_MAC)) {
+            val appleMain by creating {
+                dependsOn(nativeMain)
+            }
+            val macosMain by creating {
+                dependsOn(appleMain)
+            }
+            val macosArm64Main by getting { dependsOn(macosMain) }
+            val macosX64Main by getting { dependsOn(macosMain) }
+            val iosMain by creating { dependsOn(appleMain) }
+            val iosArm64Main by getting { dependsOn(iosMain) }
+            val iosSimulatorArm64Main by getting { dependsOn(iosMain) }
+            val iosX64Main by getting { dependsOn(iosMain) }
         }
-        val macosMain by creating {
-            dependsOn(appleMain)
-        }
-        val macosArm64Main by getting { dependsOn(macosMain) }
-        val macosX64Main by getting { dependsOn(macosMain) }
-        val iosMain by creating { dependsOn(appleMain) }
-        val iosArm64Main by getting { dependsOn(iosMain) }
-        val iosSimulatorArm64Main by getting { dependsOn(iosMain) }
-        val iosX64Main by getting { dependsOn(iosMain) }
     }
 }
 

@@ -28,7 +28,6 @@ version = libs.versions.mugene.get()
 kotlin {
     jvmToolchain(17)
 
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         optIn.add("kotlin.ExperimentalStdlibApi")
     }
@@ -45,7 +44,7 @@ kotlin {
             useJUnit()
         }
     }
-    @OptIn(ExperimentalWasmDsl::class)
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs {
         binaries.library()
         browser()
@@ -68,7 +67,7 @@ kotlin {
         macosArm64()
         macosX64()
 
-        val iosTargets = listOf(
+        listOf(
             iosArm64(),
             iosX64(),
             iosSimulatorArm64()
@@ -204,35 +203,14 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
     buildTypes {
-        val debug by getting {
-            //minifyEnabled(false)
-        }
-        val release by getting {
-            //minifyEnabled(false)
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        val debug by getting
+        val release by getting
     }
 }
 
 afterEvaluate {
     publishing {
-
-        repositories {
-            maven {
-                name = "OSSRH"
-                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-                credentials {
-                    username = System.getenv("OSSRH_USERNAME")
-                    password = System.getenv("OSSRH_PASSWORD")
-                }
-            }
-        }
-
         publications.withType<MavenPublication> {
-
             // https://github.com/gradle/gradle/issues/26091#issuecomment-1681343496
             val dokkaJar = project.tasks.register("${name}DokkaJar", Jar::class) {
                 group = JavaBasePlugin.DOCUMENTATION_GROUP
@@ -248,7 +226,7 @@ afterEvaluate {
             artifact(dokkaJar)
 
             pom {
-                name.set("mugene-ng")
+                name.set("$name")
                 description.set("mugene-ng MML (Music Macro Language) compiler for MIDI 1.0 and MIDI 2.0")
                 url.set("https://github.com/atsushieno/mugene-ng")
                 scm {
@@ -270,18 +248,14 @@ afterEvaluate {
             }
         }
 
-        val ver = version.toString()
-        for (p in publications) {
-            (p as MavenPublication).apply {
-                groupId = group.toString()
-                if (name.contains("kotlinMultiplatform")) {
-                    artifactId = "mugene"
-                } else if (name.contains("android")) {
-                    artifactId = "mugene-android"
-                } else {
-                    artifactId = "mugene-${name}"
+        repositories {
+            maven {
+                name = "OSSRH"
+                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                credentials {
+                    username = System.getenv("OSSRH_USERNAME")
+                    password = System.getenv("OSSRH_PASSWORD")
                 }
-                version = ver
             }
         }
     }

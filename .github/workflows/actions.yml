@@ -101,7 +101,7 @@ jobs:
       if: success()
       uses: actions/upload-artifact@v4
       with:
-        name: mugene-ng-artifacts
+        name: mugene-ng-artifacts-${{ matrix.os }}
         path: |
           mugene/build/libs/*.jar
           mugene/build/outputs/aar/*.aar

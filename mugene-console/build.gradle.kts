@@ -1,10 +1,9 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     kotlin("multiplatform")
-    id("application")
 }
 
 kotlin {
@@ -14,7 +13,6 @@ kotlin {
     }
     @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs {
-        browser { binaries.executable() }
         nodejs { binaries.executable() }
     }
     js {

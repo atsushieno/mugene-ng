@@ -1,8 +1,6 @@
 import com.strumenta.antlrkotlin.gradle.AntlrKotlinTask
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 buildscript {
     repositories {
@@ -28,6 +26,7 @@ version = libs.versions.mugene.get()
 kotlin {
     jvmToolchain(17)
 
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         optIn.add("kotlin.ExperimentalStdlibApi")
     }
@@ -126,6 +125,7 @@ kotlin {
                 implementation(kotlin("test-js"))
             }
         }
+        /*
         val nativeMain by creating {
             dependsOn(commonMain)
         }
@@ -154,7 +154,7 @@ kotlin {
             val iosArm64Main by getting { dependsOn(iosMain) }
             val iosSimulatorArm64Main by getting { dependsOn(iosMain) }
             val iosX64Main by getting { dependsOn(iosMain) }
-        }
+        }*/
     }
 }
 
@@ -185,7 +185,7 @@ val generateKotlinGrammarSource = tasks.register<AntlrKotlinTask>("generateKotli
     outputDirectory = layout.buildDirectory.dir(outDir).get().asFile
 }
 
-tasks.withType<KotlinCompile<*>> { dependsOn(generateKotlinGrammarSource) }
+//tasks.withType<KotlinCompile<*>> { dependsOn(generateKotlinGrammarSource) }
 afterEvaluate {
     tasks.findByPath(":mugene:androidDebugSourcesJar") !!.dependsOn(generateKotlinGrammarSource)
     tasks.findByPath(":mugene:androidReleaseSourcesJar")!!.dependsOn(generateKotlinGrammarSource)

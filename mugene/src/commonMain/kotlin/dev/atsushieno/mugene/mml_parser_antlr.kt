@@ -294,4 +294,8 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
     override fun visitCommas(ctx: MugeneParser.CommasContext): Any {
         return if (ctx.getCommas() == null) 1 else getSingleContent(ctx) as Int + 1
     }
+
+    override fun defaultResult(): Any {
+        error ("Unexpected parser error")
+    }
 }

@@ -1,6 +1,7 @@
 import com.strumenta.antlrkotlin.gradle.AntlrKotlinTask
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 buildscript {
     repositories {
@@ -185,7 +186,7 @@ val generateKotlinGrammarSource = tasks.register<AntlrKotlinTask>("generateKotli
     outputDirectory = layout.buildDirectory.dir(outDir).get().asFile
 }
 
-//tasks.withType<KotlinCompile<*>> { dependsOn(generateKotlinGrammarSource) }
+tasks.withType<KotlinCompilationTask<*>> { dependsOn(generateKotlinGrammarSource) }
 afterEvaluate {
     tasks.findByPath(":mugene:androidDebugSourcesJar") !!.dependsOn(generateKotlinGrammarSource)
     tasks.findByPath(":mugene:androidReleaseSourcesJar")!!.dependsOn(generateKotlinGrammarSource)

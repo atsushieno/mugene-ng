@@ -17,8 +17,7 @@ plugins {
     alias(libs.plugins.npmPublish)
     alias(libs.plugins.dokka)
     alias(libs.plugins.antlrKotlinPlugin)
-    id("maven-publish")
-    id("signing")
+    alias(libs.plugins.vanniktech.maven.publish)
 }
 
 group = "dev.atsushieno"
@@ -208,60 +207,31 @@ android {
     }
 }
 
-afterEvaluate {
-    publishing {
-        publications.withType<MavenPublication> {
-            // https://github.com/gradle/gradle/issues/26091#issuecomment-1681343496
-            val dokkaJar = project.tasks.register("${name}DokkaJar", Jar::class) {
-                group = JavaBasePlugin.DOCUMENTATION_GROUP
-                description = "Assembles Kotlin docs with Dokka into a Javadoc jar"
-                archiveClassifier.set("javadoc")
-                from(tasks.named("dokkaHtml"))
-
-                // Each archive name should be distinct, to avoid implicit dependency issues.
-                // We use the same format as the sources Jar tasks.
-                // https://youtrack.jetbrains.com/issue/KT-46466
-                archiveBaseName.set("${archiveBaseName.get()}-${name}")
-            }
-            artifact(dokkaJar)
-
-            pom {
-                name.set("$name")
-                description.set("mugene-ng MML (Music Macro Language) compiler for MIDI 1.0 and MIDI 2.0")
-                url.set("https://github.com/atsushieno/mugene-ng")
-                scm {
-                    url.set("https://github.com/atsushieno/mugene-ng")
-                }
-                licenses {
-                    license {
-                        name.set("the MIT License")
-                        url.set("https://github.com/atsushieno/mugene-ng/blob/main/LICENSE")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("atsushieno")
-                        name.set("Atsushi Eno")
-                        email.set("atsushieno@gmail.com")
-                    }
-                }
-            }
-        }
-
-        repositories {
-            maven {
-                name = "OSSRH"
-                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-                credentials {
-                    username = System.getenv("OSSRH_USERNAME")
-                    password = System.getenv("OSSRH_PASSWORD")
-                }
-            }
-        }
-    }
-
-    // keep it as is. It is replaced by CI release builds
-    signing {}
-}
-
 apply(from = "${rootDir}/publish-npm.gradle")
+
+val gitProjectName = "mugene-ng"
+val packageName = project.name
+val packageDescription = "mugene-ng MML (Music Macro Language) compiler for MIDI 1.0 and MIDI 2.0"
+// my common settings
+val packageUrl = "https://github.com/atsushieno/$gitProjectName"
+val licenseName = "MIT"
+val licenseUrl = "https://github.com/atsushieno/$gitProjectName/blob/main/LICENSE"
+val devId = "atsushieno"
+val devName = "Atsushi Eno"
+val devEmail = "atsushieno@gmail.com"
+
+// Common copy-pasted
+mavenPublishing {
+    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
+    if (project.hasProperty("mavenCentralUsername") || System.getenv("ORG_GRADLE_PROJECT_mavenCentralUsername") != null)
+        signAllPublications()
+    coordinates(group.toString(), project.name, version.toString())
+    pom {
+        name.set(packageName)
+        description.set(packageDescription)
+        url.set(packageUrl)
+        scm { url.set(packageUrl) }
+        licenses { license { name.set(licenseName); url.set(licenseUrl) } }
+        developers { developer { id.set(devId); name.set(devName); email.set(devEmail) } }
+    }
+}

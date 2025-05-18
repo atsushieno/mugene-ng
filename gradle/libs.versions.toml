@@ -27,6 +27,8 @@ startup-runtime = "1.2.0"
 ktmidi = "0.11.0"
 mugene = "0.7.0"
 
+vanniktech-maven-publish = "0.31.0"
+
 [libraries]
 ktmidi = { module = "dev.atsushieno:ktmidi", version.ref = "ktmidi" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -45,6 +47,7 @@ gradleJavacppPlatform = { id = "org.bytedeco.gradle-javacpp-platform", version.r
 npmPublish = { id = "org.danilopianini.npm.publish", version.ref = "npm-publish" }
 antlrKotlinPlugin = { id = "com.strumenta.antlr-kotlin", version.ref = "antlr-kotlin" }
 binaryCompatibilityValidatorPlugin = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binary-compatibility-validator" }
+vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech-maven-publish" }
 
 [bundles]
 

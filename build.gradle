@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.npmPublish) apply false
     alias(libs.plugins.antlrKotlinPlugin) apply false
     alias(libs.plugins.binaryCompatibilityValidatorPlugin) apply false
+    alias(libs.plugins.vanniktech.maven.publish) apply false
 }
 
 allprojects {

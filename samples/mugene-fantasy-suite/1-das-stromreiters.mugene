@@ -6,7 +6,7 @@
 // Part II: infancy (the next generation)
 // Part III: departure
 
-_ 0 GM_SYSTEM_ON t120
+_ 0 GM_SYSTEM_ON
 
 _ 0-100,2.1,13.1,13.2,13.3 r1
 

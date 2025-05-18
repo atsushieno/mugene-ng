@@ -2,6 +2,8 @@
 var npmAuthToken = System.getenv('NPM_AUTH_TOKEN') ?: ''
 
 npmPublish {
+  //nodeBin = "node"
+  //npmBin = "npm"
   readme = file("../README.md")
   organization = "dev.atsushieno"
   registries {

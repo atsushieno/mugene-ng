@@ -12,13 +12,13 @@ buildscript {
 }
 
 plugins {
-    id("com.android.library")
-    kotlin("multiplatform")
-    id("dev.petuska.npm.publish")
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.npmPublish)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.antlrKotlinPlugin)
     id("maven-publish")
     id("signing")
-    id("org.jetbrains.dokka")
-    id("com.strumenta.antlr-kotlin")
 }
 
 group = "dev.atsushieno"
@@ -69,7 +69,6 @@ kotlin {
 
         listOf(
             iosArm64(),
-            iosX64(),
             iosSimulatorArm64()
         ).onEach {
             it.binaries {

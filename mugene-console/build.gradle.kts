@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
-    kotlin("multiplatform")
+    alias(libs.plugins.kotlinMultiplatform)
 }
 
 kotlin {
@@ -30,7 +30,6 @@ kotlin {
             macosX64(),
             iosArm64(),
             iosSimulatorArm64(),
-            iosX64(),
         ).forEach { it.binaries.executable() }
     }
 

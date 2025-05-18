@@ -15,7 +15,7 @@ kotlin = "2.0.21"
 dokka = "2.0.0"
 binary-compatibility-validator = "0.17.0"
 antlr-kotlin = "0.1.3"
-npm-publish = "3.5.3"
+npm-publish = "4.0.3"
 
 junit-jupiter-api = "5.10.0"
 kotlin-test-junit = "1.9.0"
@@ -42,7 +42,7 @@ kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 gradleJavacppBuild = { id = "org.bytedeco.gradle-javacpp-build", version.ref = "gradle-javacpp" }
 gradleJavacppPlatform = { id = "org.bytedeco.gradle-javacpp-platform", version.ref = "gradle-javacpp" }
-npmPublish = { id = "dev.petuska.npm.publish", version.ref = "npm-publish" }
+npmPublish = { id = "org.danilopianini.npm.publish", version.ref = "npm-publish" }
 antlrKotlinPlugin = { id = "com.strumenta.antlr-kotlin", version.ref = "antlr-kotlin" }
 binaryCompatibilityValidatorPlugin = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binary-compatibility-validator" }
 

@@ -28,8 +28,6 @@ kotlin {
         listOf(
             macosArm64(),
             macosX64(),
-            iosArm64(),
-            iosSimulatorArm64(),
         ).forEach { it.binaries.executable() }
     }
 

@@ -24,8 +24,8 @@ ktor-io = "3.0.0"
 gradle-javacpp = "1.5.10"
 startup-runtime = "1.2.0"
 
-ktmidi = "0.11.0"
-mugene = "0.7.0"
+ktmidi = "0.11.1"
+mugene = "0.7.1"
 
 vanniktech-maven-publish = "0.31.0"
 

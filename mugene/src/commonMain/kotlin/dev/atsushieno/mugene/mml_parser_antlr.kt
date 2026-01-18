@@ -103,9 +103,9 @@ class WrappedTokenSource(private val ts: TokenStream) : TokenSource {
 
 @Suppress("UNCHECKED_CAST")
 class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserBaseVisitor<Any>() {
-    private fun getSingleContent(ctx: ParserRuleContext) = visit(ctx.getChild(0)!!)!!
+    private fun getSingleContent(ctx: ParserRuleContext) = visit(ctx.getChild(0)!!)
 
-    override fun visitTerminal(node: TerminalNode): Any? {
+    override fun visitTerminal(node: TerminalNode): Any {
         val wt = node.symbol as WrappedToken?
         return wt?.mmlToken ?: super.visitTerminal(node)
     }
@@ -120,7 +120,7 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
 
     override fun visitOperationUses(ctx: MugeneParser.OperationUsesContext): Any {
         val ret = mutableListOf<MmlOperationUse>()
-        ctx.getOperationUse().forEach {
+        ctx.operationUse().forEach {
             val content = visitOperationUse(it)
             if (content is MmlOperationUse)
                 ret.add(content)
@@ -129,10 +129,10 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
     }
 
     override fun visitOperationUse(ctx: MugeneParser.OperationUseContext): Any {
-        val i = visit(ctx.getCanBeIdentifier()!!)!! as MmlToken
+        val i = visit(ctx.canBeIdentifier()) as MmlToken
         val o = MmlOperationUse (i.value as String, i.location)
-        if (ctx.getArgumentsOptCurly() != null) {
-            val l = visit(ctx.getArgumentsOptCurly()!!)!! as List<MmlValueExpr>
+        if (ctx.argumentsOptCurly() != null) {
+            val l = visit(ctx.argumentsOptCurly()!!) as List<MmlValueExpr>
             for (a in l)
                 o.arguments.add(if (a == MmlValueExpr.skippedArgument) null else a)
         }
@@ -144,23 +144,23 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
     }
 
     override fun visitArgumentsOptCurly(ctx: MugeneParser.ArgumentsOptCurlyContext): Any {
-        return if (ctx.getArguments() == null) mutableListOf<MmlValueExpr>() else visit(ctx.getArguments()!!)!!
+        return if (ctx.arguments() == null) mutableListOf<MmlValueExpr>() else visit(ctx.arguments()!!)
     }
 
     override fun visitArguments(ctx: MugeneParser.ArgumentsContext): Any {
-        val head = ctx.getArguments()
+        val head = ctx.arguments()
         val ret =
             if (head != null) visitArguments(head) as MutableList<MmlValueExpr>
             else mutableListOf()
 
-        val commasNode = ctx.getCommas()
+        val commasNode = ctx.commas()
         if (commasNode != null) {
             val numCommas = visit(commasNode) as Int
             // only extra commas contribute to default arguments (i.e. skip "only one" comma)
             ret.addAll((0 until numCommas - 1).map { MmlValueExpr.skippedArgument })
         }
 
-        ret.add(visitArgument(ctx.getArgument()) as MmlValueExpr)
+        ret.add(visitArgument(ctx.argument()) as MmlValueExpr)
 
         return ret
     }
@@ -231,10 +231,10 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
 
     override fun visitPrimaryExpr(ctx: MugeneParser.PrimaryExprContext): Any {
         return when {
-            ctx.getVariableReference() != null || ctx.getStringConstant() != null ||
-                ctx.getStepConstant() != null || ctx.getUnaryExpr() != null
+            ctx.variableReference() != null || ctx.stringConstant() != null ||
+                ctx.stepConstant() != null || ctx.unaryExpr() != null
                 -> getSingleContent(ctx)
-            else -> MmlParenthesizedExpr (visit(ctx.getExpression()!!) as MmlValueExpr)
+            else -> MmlParenthesizedExpr (visit(ctx.expression()!!) as MmlValueExpr)
         }
     }
 
@@ -244,7 +244,7 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
             MmlAddExpr(MmlVariableReferenceExpr(expr.location!!, "__length"), expr)
         } else {
             val mul = if (ctx.Minus() != null) -1 else 1
-            val expr = visit(ctx.getNumberOrLengthConstant()!!) as MmlValueExpr
+            val expr = visit(ctx.numberOrLengthConstant()!!) as MmlValueExpr
             MmlMultiplyExpr(MmlConstantExpr(expr.location, MmlDataType.Number, mul), expr)
         }
     }
@@ -261,7 +261,7 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
 
     override fun visitStepConstant(ctx: MugeneParser.StepConstantContext): Any {
         val mul = if (ctx.Minus() != null) -1 else 1
-        val n = visit(ctx.NumberLiteral() !!) as MmlToken
+        val n = visit(ctx.NumberLiteral()) as MmlToken
         val l = MmlLength (mul * (MmlValueExprResolver.getTypedValue (compiler, n.value, MmlDataType.Number, n.location) as Double).toInt()).apply {
             isValueByStep = true
         }
@@ -269,7 +269,7 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
     }
 
     override fun visitNumberOrLengthConstant(ctx: MugeneParser.NumberOrLengthConstantContext): Any {
-        val dots = ctx.getDots()
+        val dots = ctx.dots()
         return if (ctx.NumberLiteral() != null) {
             val t = visit(ctx.NumberLiteral()!!) as MmlToken
             if (dots == null) {
@@ -288,11 +288,11 @@ class MugeneParserVisitorImpl(private val compiler: MmlCompiler) : MugeneParserB
     }
 
     override fun visitDots(ctx: MugeneParser.DotsContext): Any {
-        return if (ctx.getDots() == null) 1 else getSingleContent(ctx) as Int + 1
+        return if (ctx.dots() == null) 1 else getSingleContent(ctx) as Int + 1
     }
 
     override fun visitCommas(ctx: MugeneParser.CommasContext): Any {
-        return if (ctx.getCommas() == null) 1 else getSingleContent(ctx) as Int + 1
+        return if (ctx.commas() == null) 1 else getSingleContent(ctx) as Int + 1
     }
 
     override fun defaultResult(): Any {

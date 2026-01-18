@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-13, macos-14]
+        os: [ubuntu-24.04, macos-15]
     steps:
     - name: checkout
       uses: actions/checkout@v4
@@ -28,26 +28,13 @@ jobs:
         java-version: 22
         distribution: temurin
 
-    # only for NON-releases on macos-13
-    - name: macos-13 lightweight build with Gradle for libs
-      if: ${{ !startsWith(github.ref, 'refs/tags/') && contains(matrix.os, 'macos-13') }}
-      run: ./gradlew --warning-mode all publishToMavenLocal
-    # only for releases on macos-13
-    - name: macos-13 lightweight publish with Gradle for libs
-      if: ${{ startsWith(github.ref, 'refs/tags/') && contains(matrix.os, 'macos-13') }}
-      run: ./gradlew --no-daemon --warning-mode all publishMacosX64PublicationToMavenCentralRepository publishIosX64PublicationToMavenCentralRepository
-      env:
-        ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
-        ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-        ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
-        ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
-    # only for NON-releases on macos-14
+    # only for NON-releases on macos-15
     - name: macos-14 lightweight build with Gradle for libs and apps
-      if: ${{ !startsWith(github.ref, 'refs/tags/') && contains(matrix.os, 'macos-14') }}
+      if: ${{ !startsWith(github.ref, 'refs/tags/') && contains(matrix.os, 'macos-15') }}
       run: ./gradlew --warning-mode all publishToMavenLocal
-    # only for releases on macos-14
+    # only for releases on macos-15
     - name: macos-14 lightweight publish with Gradle for libs and apps
-      if: ${{ startsWith(github.ref, 'refs/tags/') && contains(matrix.os, 'macos-14') }}
+      if: ${{ startsWith(github.ref, 'refs/tags/') && contains(matrix.os, 'macos-15') }}
       run: ./gradlew --no-daemon --warning-mode all publishMacosArm64PublicationToMavenCentralRepository PublishIosArm64PublicationToMavenCentralRepository PublishIosSimulatorArm64PublicationToMavenCentralRepository
       env:
         ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}

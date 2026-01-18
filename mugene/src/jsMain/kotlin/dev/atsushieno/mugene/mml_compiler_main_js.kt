@@ -2,7 +2,6 @@
 
 package dev.atsushieno.mugene
 
-import com.strumenta.antlrkotlin.runtime.assert
 import dev.atsushieno.ktmidi.Midi2Music
 import dev.atsushieno.ktmidi.Midi1Music
 
@@ -26,7 +25,6 @@ internal actual fun createDefaultCompiler() : MmlCompiler {
         //  There should be some way to leave those functions in the generated .js code.
         midiMusicToByteArray(Midi1Music())
         midi2MusicToByteArray(Midi2Music())
-        assert(NodeModuleResourceStreamResolver.instance.basePath.isNotEmpty())
     }
 }
 

@@ -2,6 +2,7 @@
 package dev.atsushieno.mugene
 
 import dev.atsushieno.ktmidi.*
+import dev.atsushieno.ktmidi.read
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.test.Test
@@ -156,7 +157,9 @@ class MmlCompilerTest {
         val music = Midi1Music().apply { read(midi1Bytes.toList()) }
         assertEquals(72, music.getTotalTicks(), "midi1 total ticks")
         val midi2Bytes = MmlTestUtility.testCompile2("midi2", mml)
-        val music2 = Midi2Music().apply { read (midi2Bytes.toList()) }
+        val music2 = Midi2Music().apply {
+            read(midi2Bytes.toList(), true)
+        }
         assertEquals(72,
             music2.getTotalTicks(),
             "midi2 total ticks")
@@ -242,14 +245,14 @@ class MmlCompilerTest {
 """
         val music = Midi1Music().apply { read(MmlTestUtility.testCompile("midi1", mml).toList()) }
         assertEquals(1, music.tracks.size, "tracks.size")
-        val messages = music.tracks[0].messages
-        assertEquals(0xB0, messages[0].event.statusByte.toUnsigned(), "msg0")
-        assertEquals(0xB0, messages[1].event.statusByte.toUnsigned(), "msg1")
-        assertEquals(0xC0, messages[2].event.statusByte.toUnsigned(), "msg2")
-        assertEquals(0x90, messages[3].event.statusByte.toUnsigned(), "msg3")
-        assertEquals(0x80, messages[4].event.statusByte.toUnsigned(), "msg4")
-        assertEquals(0x90, messages[5].event.statusByte.toUnsigned(), "msg5")
-        assertEquals(0x80, messages[6].event.statusByte.toUnsigned(), "msg6")
+        val messages = music.tracks[0].events
+        assertEquals(0xB0, messages[0].message.statusByte.toUnsigned(), "msg0")
+        assertEquals(0xB0, messages[1].message.statusByte.toUnsigned(), "msg1")
+        assertEquals(0xC0, messages[2].message.statusByte.toUnsigned(), "msg2")
+        assertEquals(0x90, messages[3].message.statusByte.toUnsigned(), "msg3")
+        assertEquals(0x80, messages[4].message.statusByte.toUnsigned(), "msg4")
+        assertEquals(0x90, messages[5].message.statusByte.toUnsigned(), "msg5")
+        assertEquals(0x80, messages[6].message.statusByte.toUnsigned(), "msg6")
     }
 
     @Test
@@ -286,7 +289,9 @@ class MmlCompilerTest {
 1   BEND_CENT_MODE24 o5 c0,1 Bc_0,1200,8,2 f0,1 Bc_0,-1200,8,2 r1
 """
         val umpx = MmlTestUtility.testCompile2("midi2", mml).toList()
-        val music = Midi2Music().apply { read(umpx) }
+        val music = Midi2Music().apply {
+            read(umpx, true)
+        }
         val ml = music.tracks[0].messages.drop(4).dropLast(2) // skip DCS, DCTPQ, DCS, and Start of Clip | drop DCS and End of Clip
         assertTrue(ml.filter { it.int1 == 0x40603C00 }.size > 10, "PN.o5c")
         assertTrue(ml.filter { it.int1 == 0x40604100 }.size > 10, "PN.o5f")
@@ -381,18 +386,18 @@ class MmlCompilerTest {
 """
         val smf = MmlTestUtility.testCompile("mml1", mml).toList()
         val music = Midi1Music().apply { read(smf) }
-        val ml = music.tracks[0].messages
-        assertEquals(MidiChannelStatus.NOTE_OFF, ml[1].event.eventType.toUnsigned(), "eventType1")
+        val ml = music.tracks[0].events
+        assertEquals(MidiChannelStatus.NOTE_OFF, ml[1].message.statusCode.toUnsigned(), "eventType1")
         assertEquals(48, ml[1].deltaTime, "deltaTime1")
-        assertEquals(MidiChannelStatus.NOTE_OFF, ml[3].event.eventType.toUnsigned(), "eventType2")
+        assertEquals(MidiChannelStatus.NOTE_OFF, ml[3].message.statusCode.toUnsigned(), "eventType2")
         assertEquals(44, ml[3].deltaTime, "deltaTime2")
-        assertEquals(MidiChannelStatus.NOTE_OFF, ml[5].event.eventType.toUnsigned(), "eventType3")
+        assertEquals(MidiChannelStatus.NOTE_OFF, ml[5].message.statusCode.toUnsigned(), "eventType3")
         assertEquals(20, ml[5].deltaTime, "deltaTime3")
-        assertEquals(MidiChannelStatus.NOTE_OFF, ml[7].event.eventType.toUnsigned(), "eventType4")
+        assertEquals(MidiChannelStatus.NOTE_OFF, ml[7].message.statusCode.toUnsigned(), "eventType4")
         assertEquals(24, ml[7].deltaTime, "deltaTime4")
-        assertEquals(MidiChannelStatus.NOTE_OFF, ml[9].event.eventType.toUnsigned(), "eventType5")
+        assertEquals(MidiChannelStatus.NOTE_OFF, ml[9].message.statusCode.toUnsigned(), "eventType5")
         assertEquals(8, ml[9].deltaTime, "deltaTime5")
-        assertEquals(MidiChannelStatus.NOTE_OFF, ml[11].event.eventType.toUnsigned(), "eventType6")
+        assertEquals(MidiChannelStatus.NOTE_OFF, ml[11].message.statusCode.toUnsigned(), "eventType6")
         assertEquals(16, ml[11].deltaTime, "deltaTime6")
     }
 
@@ -404,8 +409,8 @@ class MmlCompilerTest {
 """
         val smf = MmlTestUtility.testCompile("mml1", mml).toList()
         val music = Midi1Music().apply { read(smf) }
-        val ml = music.tracks[0].messages
-        assertEquals(MidiChannelStatus.NOTE_ON, ml[0].event.eventType.toUnsigned(), "smf: note-on should appear")
+        val ml = music.tracks[0].events
+        assertEquals(MidiChannelStatus.NOTE_ON, ml[0].message.statusCode.toUnsigned(), "smf: note-on should appear")
 
         val umpx = MmlTestUtility.testCompile2("mml1", mml).toList()
         val music2 = Midi2Music().apply { read(umpx, removeEmptyDeltaClockstamps = false) }
@@ -426,19 +431,19 @@ class MmlCompilerTest {
         var current = 0
         val notes = mutableMapOf<Byte,Int>()
         var count = 0
-        music.tracks[0].messages.forEach {
+        music.tracks[0].events.forEach {
             count++
             current += it.deltaTime
-            when (it.event.eventType.toUnsigned()) {
+            when (it.message.statusCode.toUnsigned()) {
                 MidiChannelStatus.NOTE_OFF -> {
-                    val existing = notes[it.event.msb]
+                    val existing = notes[it.message.msb]
                     assertNotNull(existing)
-                    assertTrue(current != existing, "note on and off at the same time == zero length: " + it.event.msb)
-                    notes.remove(it.event.msb)
+                    assertTrue(current != existing, "note on and off at the same time == zero length: " + it.message.msb)
+                    notes.remove(it.message.msb)
                 }
                 MidiChannelStatus.NOTE_ON -> {
-                    assertTrue(!notes.containsKey(it.event.msb), "There is already an existing note on: " + it.event.msb)
-                    notes[it.event.msb] = current
+                    assertTrue(!notes.containsKey(it.message.msb), "There is already an existing note on: " + it.message.msb)
+                    notes[it.message.msb] = current
                 }
             }
         }

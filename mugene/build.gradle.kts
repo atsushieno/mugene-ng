@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.androidLibrary
 import com.strumenta.antlrkotlin.gradle.AntlrKotlinTask
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
@@ -13,8 +14,8 @@ buildscript {
 }
 
 plugins {
-    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.npmPublish)
     alias(libs.plugins.dokka)
     alias(libs.plugins.antlrKotlinPlugin)
@@ -32,9 +33,11 @@ kotlin {
         optIn.add("kotlin.ExperimentalStdlibApi")
     }
 
-    androidTarget {
-        publishLibraryVariantsGroupedByFlavor = true
-        publishLibraryVariants("debug", "release")
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
+    androidLibrary {
+        namespace = "dev.atsushieno.mugene"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
     }
     jvm {
         compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
@@ -67,8 +70,7 @@ kotlin {
 
         listOf(
             iosArm64(),
-            iosSimulatorArm64(),
-            iosX64()
+            iosSimulatorArm64()
         ).onEach {
             it.binaries {
                 framework { baseName = "mugene" }
@@ -105,12 +107,6 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation(libs.startup.runtime)
-            }
-        }
-        val androidUnitTest by getting {
-            dependencies {
-                implementation(kotlin("test-junit"))
-                implementation(libs.junit)
             }
         }
         val jsMain by getting {
@@ -185,14 +181,15 @@ val generateKotlinGrammarSource = tasks.register<AntlrKotlinTask>("generateKotli
 }
 
 tasks.withType<KotlinCompilationTask<*>> { dependsOn(generateKotlinGrammarSource) }
-afterEvaluate {
+/*afterEvaluate {
     tasks.findByPath(":mugene:androidDebugSourcesJar") !!.dependsOn(generateKotlinGrammarSource)
     tasks.findByPath(":mugene:androidReleaseSourcesJar")!!.dependsOn(generateKotlinGrammarSource)
-}
+}*/
 tasks.filter { it.name.endsWith("ourcesJar")}.forEach {
     it.dependsOn(generateKotlinGrammarSource)
 }
 
+/*
 android {
     namespace = "dev.atsushieno.mugene"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -205,7 +202,7 @@ android {
         val debug by getting
         val release by getting
     }
-}
+}*/
 
 apply(from = "${rootDir}/publish-npm.gradle")
 

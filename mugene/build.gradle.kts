@@ -1,6 +1,7 @@
 import com.strumenta.antlrkotlin.gradle.AntlrKotlinTask
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 buildscript {
@@ -36,9 +37,7 @@ kotlin {
         publishLibraryVariants("debug", "release")
     }
     jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = "17"
-        }
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
         testRuns["test"].executionTask.configure {
             useJUnit()
         }
@@ -223,7 +222,7 @@ val devEmail = "atsushieno@gmail.com"
 
 // Common copy-pasted
 mavenPublishing {
-    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral()
     if (project.hasProperty("mavenCentralUsername") || System.getenv("ORG_GRADLE_PROJECT_mavenCentralUsername") != null)
         signAllPublications()
     coordinates(group.toString(), project.name, version.toString())

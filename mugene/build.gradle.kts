@@ -90,7 +90,6 @@ kotlin {
                 //implementation(libs.ktor.io)
                 implementation(libs.antlr.kotlin.runtime)
             }
-            kotlin.srcDir(layout.buildDirectory.dir("generatedAntlr"))
         }
         val commonTest by getting {
             dependencies {
@@ -153,8 +152,6 @@ kotlin {
     }
 }
 
-// copying antlr-kotlin README
-
 val generateKotlinGrammarSource = tasks.register<AntlrKotlinTask>("generateKotlinGrammarSource") {
     dependsOn("cleanGenerateKotlinGrammarSource")
 
@@ -180,14 +177,7 @@ val generateKotlinGrammarSource = tasks.register<AntlrKotlinTask>("generateKotli
     outputDirectory = layout.buildDirectory.dir(outDir).get().asFile
 }
 
-tasks.withType<KotlinCompilationTask<*>> { dependsOn(generateKotlinGrammarSource) }
-/*afterEvaluate {
-    tasks.findByPath(":mugene:androidDebugSourcesJar") !!.dependsOn(generateKotlinGrammarSource)
-    tasks.findByPath(":mugene:androidReleaseSourcesJar")!!.dependsOn(generateKotlinGrammarSource)
-}*/
-tasks.filter { it.name.endsWith("ourcesJar")}.forEach {
-    it.dependsOn(generateKotlinGrammarSource)
-}
+kotlin.sourceSets.commonMain.configure { kotlin.srcDir(tasks.named("generateKotlinGrammarSource")) }
 
 /*
 android {

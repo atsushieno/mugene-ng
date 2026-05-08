@@ -1,44 +1,41 @@
 <!DOCTYPE html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>Rules</title>
     <link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">
-    <script>var pathToRoot = "../../../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+        <script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
-<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
 <script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async="async"></script>
 <link href="../../../../styles/style.css" rel="Stylesheet">
 <link href="../../../../styles/main.css" rel="Stylesheet">
 <link href="../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../../../scripts/navigation-loader.js" async="async"></script>
 <script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async="async"></script>
 <script type="text/javascript" src="../../../../scripts/main.js" defer="defer"></script>
 <script type="text/javascript" src="../../../../scripts/prism.js" async="async"></script>
 <script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer="defer"></script>
-<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
 </head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-            <a class="library-name--link" href="../../../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+            <a class="library-name--link" href="../../../../index.html" tabindex="1">
                     mugene
             </a>
         <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
@@ -46,11 +43,11 @@
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
         <div class="library-version" id="library-version">
-0.7.1        </div>
+0.7.2        </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector common-like" data-active=""
-                        data-filter=":mugene:dokkaHtml/commonMain">common</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true"
+                        data-filter=":mugene/commonMain">common</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
                         data-role="dropdown-toggle"
@@ -59,16 +56,16 @@
                         aria-expanded="false"
                         aria-label="Toggle source sets"
                 ></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
                         <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
                             <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":mugene:dokkaHtml/commonMain"
-                                       data-filter=":mugene:dokkaHtml/commonMain"/>
+                                <input type="checkbox" class="checkbox--input" id=":mugene/commonMain"
+                                       data-filter=":mugene/commonMain"/>
                                 <span class="checkbox--icon"></span>
                                 common
                             </label>
@@ -76,7 +73,7 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
                     type="button">Switch theme
             </button>
@@ -84,348 +81,350 @@
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
-                        data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config='{"defaultSize": 280, "minSize": 200, "maxSize": 400}'>
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                    data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     mugene
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
-<div class="main-content" data-page-type="classlike" id="content" pageIds="mugene::dev.atsushieno.mugene.parser/MugeneParser.Rules///PointingToDeclaration//188414511">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="mugene::dev.atsushieno.mugene.parser/MugeneParser.Rules///PointingToDeclaration//-256477240">
   <div class="breadcrumbs"><a href="../../../../index.html">mugene</a><span class="delimiter">/</span><a href="../../index.html">dev.atsushieno.mugene.parser</a><span class="delimiter">/</span><a href="../index.html">MugeneParser</a><span class="delimiter">/</span><span class="current">Rules</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Rules</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">Rules</a></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">Rules</a></div></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="PROPERTY">
-        <h2 class="">Properties</h2>
-        <div class="table"><a data-name="905742028%2FProperties%2F188414511" anchor-label="AddSubExpr" id="905742028%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="905742028%2FProperties%2F-256477240" anchor-label="AddSubExpr" id="905742028%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-add-sub-expr.html"><span>Add</span><wbr></wbr><span>Sub</span><wbr></wbr><span><span>Expr</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="905742028%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="905742028%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-add-sub-expr.html">AddSubExpr</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">10</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-add-sub-expr.html">AddSubExpr</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">10</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="296461667%2FProperties%2F188414511" anchor-label="Argument" id="296461667%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="296461667%2FProperties%2F-256477240" anchor-label="Argument" id="296461667%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-argument.html"><span><span>Argument</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="296461667%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="296461667%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-argument.html">Argument</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">5</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-argument.html">Argument</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">5</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-2128335420%2FProperties%2F188414511" anchor-label="Arguments" id="-2128335420%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="-2128335420%2FProperties%2F-256477240" anchor-label="Arguments" id="-2128335420%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-arguments.html"><span><span>Arguments</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2128335420%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2128335420%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-arguments.html">Arguments</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">4</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-arguments.html">Arguments</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">4</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1531451638%2FProperties%2F188414511" anchor-label="ArgumentsOptCurly" id="-1531451638%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="-1531451638%2FProperties%2F-256477240" anchor-label="ArgumentsOptCurly" id="-1531451638%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-arguments-opt-curly.html"><span>Arguments</span><wbr></wbr><span>Opt</span><wbr></wbr><span><span>Curly</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1531451638%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1531451638%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-arguments-opt-curly.html">ArgumentsOptCurly</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">3</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-arguments-opt-curly.html">ArgumentsOptCurly</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">3</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1736568098%2FProperties%2F188414511" anchor-label="CanBeIdentifier" id="-1736568098%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="-1736568098%2FProperties%2F-256477240" anchor-label="CanBeIdentifier" id="-1736568098%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-can-be-identifier.html"><span>Can</span><wbr></wbr><span>Be</span><wbr></wbr><span><span>Identifier</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1736568098%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1736568098%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-can-be-identifier.html">CanBeIdentifier</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">19</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-can-be-identifier.html">CanBeIdentifier</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">19</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-877759550%2FProperties%2F188414511" anchor-label="Commas" id="-877759550%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="-877759550%2FProperties%2F-256477240" anchor-label="Commas" id="-877759550%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-commas.html"><span><span>Commas</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-877759550%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-877759550%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-commas.html">Commas</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">20</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-commas.html">Commas</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">20</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1172195170%2FProperties%2F188414511" anchor-label="ComparisonExpr" id="1172195170%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="1172195170%2FProperties%2F-256477240" anchor-label="ComparisonExpr" id="1172195170%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-comparison-expr.html"><span>Comparison</span><wbr></wbr><span><span>Expr</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1172195170%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1172195170%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-comparison-expr.html">ComparisonExpr</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">8</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-comparison-expr.html">ComparisonExpr</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">8</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="180280979%2FProperties%2F188414511" anchor-label="ComparisonOperator" id="180280979%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="180280979%2FProperties%2F-256477240" anchor-label="ComparisonOperator" id="180280979%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-comparison-operator.html"><span>Comparison</span><wbr></wbr><span><span>Operator</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="180280979%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="180280979%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-comparison-operator.html">ComparisonOperator</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">9</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-comparison-operator.html">ComparisonOperator</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">9</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="443861855%2FProperties%2F188414511" anchor-label="ConditionalExpr" id="443861855%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="443861855%2FProperties%2F-256477240" anchor-label="ConditionalExpr" id="443861855%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-conditional-expr.html"><span>Conditional</span><wbr></wbr><span><span>Expr</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="443861855%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="443861855%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-conditional-expr.html">ConditionalExpr</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">7</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-conditional-expr.html">ConditionalExpr</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">7</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1801167350%2FProperties%2F188414511" anchor-label="Dots" id="1801167350%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="1801167350%2FProperties%2F-256477240" anchor-label="Dots" id="1801167350%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-dots.html"><span><span>Dots</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1801167350%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1801167350%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-dots.html">Dots</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">18</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-dots.html">Dots</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">18</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-937457368%2FProperties%2F188414511" anchor-label="Expression" id="-937457368%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="-937457368%2FProperties%2F-256477240" anchor-label="Expression" id="-937457368%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-expression.html"><span><span>Expression</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-937457368%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-937457368%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-expression.html">Expression</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">6</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-expression.html">Expression</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">6</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-185847710%2FProperties%2F188414511" anchor-label="ExpressionOrOperationUses" id="-185847710%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="-185847710%2FProperties%2F-256477240" anchor-label="ExpressionOrOperationUses" id="-185847710%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-expression-or-operation-uses.html"><span>Expression</span><wbr></wbr><span>Or</span><wbr></wbr><span>Operation</span><wbr></wbr><span><span>Uses</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-185847710%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-185847710%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-expression-or-operation-uses.html">ExpressionOrOperationUses</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">0</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-expression-or-operation-uses.html">ExpressionOrOperationUses</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">0</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1165796848%2FProperties%2F188414511" anchor-label="MulDivModExpr" id="1165796848%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="1165796848%2FProperties%2F-256477240" anchor-label="MulDivModExpr" id="1165796848%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-mul-div-mod-expr.html"><span>Mul</span><wbr></wbr><span>Div</span><wbr></wbr><span>Mod</span><wbr></wbr><span><span>Expr</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1165796848%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1165796848%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-mul-div-mod-expr.html">MulDivModExpr</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">11</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-mul-div-mod-expr.html">MulDivModExpr</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">11</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="669177386%2FProperties%2F188414511" anchor-label="NumberOrLengthConstant" id="669177386%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="669177386%2FProperties%2F-256477240" anchor-label="NumberOrLengthConstant" id="669177386%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-number-or-length-constant.html"><span>Number</span><wbr></wbr><span>Or</span><wbr></wbr><span>Length</span><wbr></wbr><span><span>Constant</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="669177386%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="669177386%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-number-or-length-constant.html">NumberOrLengthConstant</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">17</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-number-or-length-constant.html">NumberOrLengthConstant</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">17</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1657514656%2FProperties%2F188414511" anchor-label="OperationUse" id="-1657514656%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="-1657514656%2FProperties%2F-256477240" anchor-label="OperationUse" id="-1657514656%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-operation-use.html"><span>Operation</span><wbr></wbr><span><span>Use</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1657514656%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1657514656%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-operation-use.html">OperationUse</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">2</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-operation-use.html">OperationUse</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">2</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1722908007%2FProperties%2F188414511" anchor-label="OperationUses" id="1722908007%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="1722908007%2FProperties%2F-256477240" anchor-label="OperationUses" id="1722908007%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-operation-uses.html"><span>Operation</span><wbr></wbr><span><span>Uses</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1722908007%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1722908007%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-operation-uses.html">OperationUses</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">1</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-operation-uses.html">OperationUses</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">1</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-184364061%2FProperties%2F188414511" anchor-label="PrimaryExpr" id="-184364061%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="-184364061%2FProperties%2F-256477240" anchor-label="PrimaryExpr" id="-184364061%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-primary-expr.html"><span>Primary</span><wbr></wbr><span><span>Expr</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-184364061%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-184364061%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-primary-expr.html">PrimaryExpr</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">12</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-primary-expr.html">PrimaryExpr</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">12</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-2073523344%2FProperties%2F188414511" anchor-label="StepConstant" id="-2073523344%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="-2073523344%2FProperties%2F-256477240" anchor-label="StepConstant" id="-2073523344%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-step-constant.html"><span>Step</span><wbr></wbr><span><span>Constant</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2073523344%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2073523344%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-step-constant.html">StepConstant</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">16</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-step-constant.html">StepConstant</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">16</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="761211403%2FProperties%2F188414511" anchor-label="StringConstant" id="761211403%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="761211403%2FProperties%2F-256477240" anchor-label="StringConstant" id="761211403%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-string-constant.html"><span>String</span><wbr></wbr><span><span>Constant</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="761211403%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="761211403%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-string-constant.html">StringConstant</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">15</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-string-constant.html">StringConstant</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">15</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1066198806%2FProperties%2F188414511" anchor-label="UnaryExpr" id="1066198806%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="1066198806%2FProperties%2F-256477240" anchor-label="UnaryExpr" id="1066198806%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-unary-expr.html"><span>Unary</span><wbr></wbr><span><span>Expr</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1066198806%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1066198806%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-unary-expr.html">UnaryExpr</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">13</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-unary-expr.html">UnaryExpr</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">13</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-2078255093%2FProperties%2F188414511" anchor-label="VariableReference" id="-2078255093%2FProperties%2F188414511" data-filterable-set=":mugene:dokkaHtml/commonMain"></a>
-          <div class="table-row" data-filterable-current=":mugene:dokkaHtml/commonMain" data-filterable-set=":mugene:dokkaHtml/commonMain">
+<a data-name="-2078255093%2FProperties%2F-256477240" anchor-label="VariableReference" id="-2078255093%2FProperties%2F-256477240" data-filterable-set=":mugene/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":mugene/commonMain" data-filterable-set=":mugene/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-variable-reference.html"><span>Variable</span><wbr></wbr><span><span>Reference</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2078255093%2FProperties%2F188414511"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2078255093%2FProperties%2F-256477240"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene:dokkaHtml/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-variable-reference.html">VariableReference</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">14</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":mugene/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-variable-reference.html">VariableReference</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">14</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -436,17 +435,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

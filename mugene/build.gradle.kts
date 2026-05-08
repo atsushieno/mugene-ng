@@ -66,7 +66,6 @@ kotlin {
     }
     if (Os.isFamily(Os.FAMILY_MAC)) {
         macosArm64()
-        macosX64()
 
         listOf(
             iosArm64(),

@@ -1,8 +1,8 @@
 [versions]
-agp = "8.12.3"
-android-compileSdk = "36"
+agp = "8.13.2"
+android-compileSdk = "37"
 android-minSdk = "23"
-android-targetSdk = "35"
+android-targetSdk = "37"
 androidx-activityCompose = "1.9.3"
 androidx-appcompat = "1.7.0"
 androidx-core-ktx = "1.15.0"
@@ -11,8 +11,8 @@ androidx-test-junit = "1.2.1"
 compose = "1.7.6"
 compose-plugin = "1.6.11"
 junit = "4.13.2"
-kotlin = "2.3.0"
-dokka = "2.1.0"
+kotlin = "2.3.21"
+dokka = "2.2.0"
 binary-compatibility-validator = "0.18.1"
 antlr-kotlin = "1.0.9"
 npm-publish = "4.1.9"
@@ -24,10 +24,10 @@ ktor-io = "3.0.0"
 gradle-javacpp = "1.5.10"
 startup-runtime = "1.2.0"
 
-ktmidi = "0.11.2"
-mugene = "0.7.1"
+ktmidi = "0.12.0"
+mugene = "0.7.2"
 
-vanniktech-maven-publish = "0.35.0"
+vanniktech-maven-publish = "0.36.0"
 
 [libraries]
 ktmidi = { module = "dev.atsushieno:ktmidi", version.ref = "ktmidi" }

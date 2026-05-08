@@ -26,8 +26,7 @@ kotlin {
     ).forEach { it.binaries.executable() }
     if (Os.isFamily(Os.FAMILY_MAC)) {
         listOf(
-            macosArm64(),
-            macosX64(),
+            macosArm64()
         ).forEach { it.binaries.executable() }
     }
 

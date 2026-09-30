@@ -26,7 +26,7 @@ class LocalFileStreamResolver : StreamResolver() {
 class JarResourceStreamResolver : StreamResolver() {
 
     override fun resolveFilePath(file: String): String? {
-        val resName = if (file.startsWith("/")) file else "/$file"
+        val resName = if (file.startsWith(File.separator)) file else "${File.separator}$file"
         val res = javaClass.getResource(resName)
         if (res == null)
             return null
